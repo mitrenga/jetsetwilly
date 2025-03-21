@@ -1,2 +1,2 @@
 # jetsetwilly
-Jet Set Willy retro-style online game
+online game Jet Set Willy in retro style
