@@ -37,10 +37,10 @@
        "length": "04"
     },
     "adjoiningRoom": {
-      "left": false,
+      "left": "24",
       "right": "22",
-      "above": false,
-      "below": false
+      "above": "29",
+      "below": "1D"
     }
   }
 }

@@ -39,8 +39,8 @@
     },
     "adjoiningRoom": {
       "left": "2D",
-      "right": false,
-      "above": false,
+      "right": "2F",
+      "above": "03",
       "below": false
     }
   }

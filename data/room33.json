@@ -39,8 +39,8 @@
     "adjoiningRoom": {
       "left": "22",
       "right": "20",
-      "above": false,
-      "below": false
+      "above": "27",
+      "below": "1B"
     }
   }
 }

@@ -24,7 +24,7 @@
     "floor": "06AA55224422442244",
     "wall": "0F4444FF1111FF55AA",
     "adjoiningRoom": {
-      "left": "05",
+      "left": "15",
       "right": "0B",
       "above": "1A",
       "below": false
