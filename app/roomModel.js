@@ -25,7 +25,7 @@ export class RoomModel extends AbstractModel {
     
     const http = new XMLHttpRequest();
     http.responser = this;
-    http.open('GET', this.roomNumber.toString().padStart(2, '0')+'.data');
+    http.open('GET', 'room'+this.roomNumber.toString().padStart(2, '0')+'.data');
     http.send();
 
     http.onreadystatechange = function () {
