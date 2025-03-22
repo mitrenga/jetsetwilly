@@ -42,7 +42,7 @@ export class RoomModel extends AbstractModel {
     this.borderEntity.bkColor = this.app.platform.colorByName('black');
     this.roomEntity = new RoomEntity(this.desktopEntity, 0, 0, 32*8, 16*8);
     this.desktopEntity.addEntity(this.roomEntity);
-    this.roomNameEntity = new ZXTextEntity(this.desktopEntity, 0, 16*8, 32*8, 8, '', this.app.platform.colorByName('brightYellow'), this.app.platform.colorByName('brightBlack'), 0, false);
+    this.roomNameEntity = new ZXTextEntity(this.desktopEntity, 0, 16*8, 32*8, 8, '', this.app.platform.colorByName('brightYellow'), this.app.platform.colorByName('brightBlack'), 0, true);
     this.roomNameEntity.justify = 2;
     this.desktopEntity.addEntity(this.roomNameEntity);
   } // init

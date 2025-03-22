@@ -1,5 +1,6 @@
 {
-  "name": "",
+  "name": "Swimming Pool",
+  "bkColor": "07",
   "borderColor": "02",
   "layout": [
     "0000000000000000",
@@ -14,15 +15,26 @@
     "0000000000000000",
     "0000000000000000",
     "0000000000000000",
-    "00000A002A000000",
-    "00002A002A800000",
-    "0000AAFFEAA00000",
-    "5555AAFFEAA55555"
+    "AA555555555554AA",
+    "AA555555555552AA",
+    "AA55555555554AAA",
+    "AAAAAAAAAAAAAAAA"
   ],
   "graphicData": {
-    "background": "000000000000000000",
-    "floor": "44FFFFFDBBD6726040",
-    "wall": "462277228822772288",
-    "nasty": "2F0384483003844830"
+    "floor": "290000000000000000",
+    "wall": "3A4444BB444444BB44",
+    "item": "7020205050888888",
+    "ramp": {
+      "data": "2F03030F0F3F3FFFFF",
+      "direction": "right",
+      "location": {"x": 25, "y": 14},
+       "length": "03"
+    },
+    "adjoiningRoom": {
+      "left": "36",
+      "right": "1E",
+      "above": "25",
+      "below": false
+    }
   }
 }

@@ -1,6 +1,7 @@
 {
-  "name": "The Bridge   ",
-  "borderColor": "02",
+  "name": "The Bridge",
+  "bkColor": "00",
+  "borderColor": "04",
   "layout": [
     "0000000000000000",
     "0000000000000000",
@@ -20,9 +21,26 @@
     "5555AAFFEAA55555"
   ],
   "graphicData": {
-    "background": "000000000000000000",
     "floor": "44FFFFFDBBD6726040",
     "wall": "462277228822772288",
-    "nasty": "2F0384483003844830"
+    "nasty": "2F0384483003844830",
+    "ramp": {
+      "data": "0703030C0D3237C2C8",
+      "direction": "right",
+      "location": {"x": 7, "y": 14},
+       "length": "03"
+    },
+    "conveyor": {
+      "data": "2C014004464F79F0F9",
+      "direction": "right",
+      "location": {"x": 12, "y": 15},
+       "length": "05"
+    },
+    "adjoiningRoom": {
+      "left": "02",
+      "right": "00",
+      "above": false,
+      "below": false
+    }
   }
 }

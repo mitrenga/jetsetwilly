@@ -1,6 +1,7 @@
 {
-  "name": "",
-  "borderColor": "02",
+  "name": "Up on the Battlements",
+  "bkColor": "00",
+  "borderColor": "01",
   "layout": [
     "0000000000000000",
     "0000000000000000",
@@ -11,18 +12,30 @@
     "0000000000000000",
     "0000000000000000",
     "0000000000000000",
-    "0000000000000000",
-    "0000000000000000",
-    "0000000000000000",
-    "00000A002A000000",
-    "00002A002A800000",
-    "0000AAFFEAA00000",
-    "5555AAFFEAA55555"
+    "AA42A400042A42AA",
+    "AAC2AC2AAC2AC2AA",
+    "AAC2AC2AAC2AC2AA",
+    "AAC2AC2AAC2AC2AA",
+    "AAC2AC2AAC2AC2AA",
+    "AAC2AC2AAC2AC2AA",
+    "AAAAAAAAAAAAAAAA"
   ],
   "graphicData": {
-    "background": "000000000000000000",
-    "floor": "44FFFFFDBBD6726040",
-    "wall": "462277228822772288",
-    "nasty": "2F0384483003844830"
+    "floor": "0480C0E0B09094D677",
+    "wall": "0E007F7F636B637F7F",
+    "nasty": "204A2A1A486C6A2988",
+    "item": "1824182C5E5EE766",
+    "conveyor": {
+      "data": "4228AA0A00555555FF",
+      "direction": "left",
+      "location": {"x": 13, "y": 9},
+       "length": "05"
+    },
+    "adjoiningRoom": {
+      "left": "12",
+      "right": "10",
+      "above": false,
+      "below": false
+    }
   }
 }

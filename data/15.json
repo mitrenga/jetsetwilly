@@ -1,6 +1,7 @@
 {
-  "name": "",
-  "borderColor": "02",
+  "name": "I'm sure I've seen this before..",
+  "bkColor": "08",
+  "borderColor": "03",
   "layout": [
     "0000000000000000",
     "0000000000000000",
@@ -11,18 +12,24 @@
     "0000000000000000",
     "0000000000000000",
     "0000000000000000",
-    "0000000000000000",
-    "0000000000000000",
-    "0000000000000000",
-    "00000A002A000000",
-    "00002A002A800000",
-    "0000AAFFEAA00000",
-    "5555AAFFEAA55555"
+    "AA42A42AA42A42AA",
+    "AAC2AC2AAC2AC2AA",
+    "AAC2AC2AAC2AC2AA",
+    "AAC2AC2AAC2AC2AA",
+    "AAC2AC2AAC2AC2AA",
+    "AAC2AC2AAC2AC2AA",
+    "AAAAAAAAAAAAAAAA"
   ],
   "graphicData": {
-    "background": "000000000000000000",
-    "floor": "44FFFFFDBBD6726040",
-    "wall": "462277228822772288",
-    "nasty": "2F0384483003844830"
+    "floor": "0C8040205048545255",
+    "wall": "536666660066666666",
+    "nasty": "4C5155545515554555",
+    "item": "1824182C5E5EE766",
+    "adjoiningRoom": {
+      "left": "10",
+      "right": "0E",
+      "above": false,
+      "below": false
+    }
   }
 }

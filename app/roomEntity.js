@@ -30,12 +30,12 @@ export class RoomEntity extends AbstractEntity {
     roomData['layout'].forEach((row, y) => {
       for (var x = 0; x < 32; x++) {
         var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(x/4)*2, Math.floor(x/4)*2+2)).substring(x%4*2, x%4*2+2));
-        var idItem = ['background', 'floor', 'wall', 'nasty'][item];
-        var attr = roomData['graphicData'][idItem].substring(0, 2);
-        if (attr != roomData['bkColor']) {
-          var spriteData = [];
+        var idItem = [false, 'floor', 'wall', 'nasty'][item];
+        if (idItem !== false) {
+          var attr = roomData['graphicData'][idItem].substring(0, 2);
           //if (['floor', 'wall'].includes(idItem)) {
           {
+            var spriteData = [];
             var graphicData = roomData['graphicData'][idItem].substring(2, 18);
             for (var b = 0; b < 8; b++) {
               var line = this.app.hexToBin(graphicData.substring(b*2, b*2+2));
@@ -45,7 +45,7 @@ export class RoomEntity extends AbstractEntity {
                 }
               }
             }
-            var penColor = this.app.platform.penColorByAttribut(this.app.hexToInt(attr)&63);
+            var penColor = this.app.platform.penColorByAttribut(this.app.hexToInt(attr));
             var bkColor = this.app.platform.bkColorByAttribut(this.app.hexToInt(attr)&63);
             if (bkColor == this.app.platform.bkColorByAttribut(this.app.hexToInt(roomData['bkColor']))) {
               bkColor = false;
@@ -55,6 +55,63 @@ export class RoomEntity extends AbstractEntity {
         }
       }
     });
+
+    // ramp
+    if ('ramp' in roomData['graphicData']) {
+      var spriteData = [];
+      var conveyorData = roomData['graphicData']['ramp'];
+      var attr = conveyorData['data'].substring(0, 2);
+      var graphicData = conveyorData['data'].substring(2, 18);
+      for (var b = 0; b < 8; b++) {
+        var line = this.app.hexToBin(graphicData.substring(b*2, b*2+2));
+        for (var col = 0; col < line.length; col++) {
+          if (line[col] == '1') {
+            spriteData.push({'x': col, 'y': b});
+          }
+        }
+      }
+      var penColor = this.app.platform.penColorByAttribut(this.app.hexToInt(attr));
+      var bkColor = this.app.platform.bkColorByAttribut(this.app.hexToInt(attr)&63);
+      if (bkColor == this.app.platform.bkColorByAttribut(this.app.hexToInt(roomData['bkColor']))) {
+        bkColor = false;
+      }
+      var direction = 0;
+      switch (conveyorData['direction']) {
+        case 'left':
+          direction = -1;
+          break;
+        case 'right':
+          direction = 1;
+          break;
+        }
+      for (var pos = 0; pos < this.app.hexToInt(conveyorData['length']); pos++) {
+        this.addEntity(new SpriteEntity(this, (conveyorData['location']['x']+pos*direction)*8, (conveyorData['location']['y']-pos)*8, 8, 8, spriteData, penColor, bkColor));
+      }
+    }
+
+    // conveyor
+    if ('conveyor' in roomData['graphicData']) {
+      var spriteData = [];
+      var conveyorData = roomData['graphicData']['conveyor'];
+      var attr = conveyorData['data'].substring(0, 2);
+      var graphicData = conveyorData['data'].substring(2, 18);
+      for (var b = 0; b < 8; b++) {
+        var line = this.app.hexToBin(graphicData.substring(b*2, b*2+2));
+        for (var col = 0; col < line.length; col++) {
+          if (line[col] == '1') {
+            spriteData.push({'x': col, 'y': b});
+          }
+        }
+      }
+      var penColor = this.app.platform.penColorByAttribut(this.app.hexToInt(attr));
+      var bkColor = this.app.platform.bkColorByAttribut(this.app.hexToInt(attr)&63);
+      if (bkColor == this.app.platform.bkColorByAttribut(this.app.hexToInt(roomData['bkColor']))) {
+        bkColor = false;
+      }
+      for (var pos = 0; pos < this.app.hexToInt(conveyorData['length']); pos++) {
+        this.addEntity(new SpriteEntity(this, (conveyorData['location']['x']+pos)*8, conveyorData['location']['y']*8, 8, 8, spriteData, penColor, bkColor));
+      }
+    }
     
     super.setData(data);
   } // setData

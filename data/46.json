@@ -1,28 +1,47 @@
 {
-  "name": "",
-  "borderColor": "02",
+  "name": "Tree Root",
+  "bkColor": "00",
+  "borderColor": "01",
   "layout": [
-    "0000000000000000",
-    "0000000000000000",
-    "0000000000000000",
-    "0000000000000000",
-    "0000000000000000",
-    "0000000000000000",
-    "0000000000000000",
-    "0000000000000000",
-    "0000000000000000",
-    "0000000000000000",
-    "0000000000000000",
-    "0000000000000000",
-    "00000A002A000000",
-    "00002A002A800000",
-    "0000AAFFEAA00000",
-    "5555AAFFEAA55555"
+    "AA0AAAAAAAAAAAAA",
+    "AA0AAAAAAAAAAAAA",
+    "AA0AAAAAAAAAAAAA",
+    "AA0AA0AAAAAAAAAA",
+    "AA0AA0AA00A0000A",
+    "AA0AA0AA00A0000A",
+    "AA0AA00000A0000A",
+    "AA0AA00000A0000A",
+    "0000050000A0000A",
+    "000000000000000A",
+    "000000000000002A",
+    "00000001555540AA",
+    "00000000000002AA",
+    "0000000000000AAA",
+    "000C030300302AAA",
+    "AAAAAAAAAAAAAAAA"
   ],
   "graphicData": {
-    "background": "000000000000000000",
-    "floor": "44FFFFFDBBD6726040",
-    "wall": "462277228822772288",
-    "nasty": "2F0384483003844830"
+    "floor": "06FFFF000000000000",
+    "wall": "0A6699242477888D72",
+    "nasty": "021C2A5F7DBEFED27C",
+    "item": "021D225EBE7C3810",
+    "ramp": {
+      "data": "4303020D023108D522",
+      "direction": "right",
+      "location": {"x": 24, "y": 14},
+       "length": "06"
+    },
+    "conveyor": {
+      "data": "04EEAA38FFFF101038",
+      "direction": "left",
+      "location": {"x": 0, "y": 10},
+       "length": "0D"
+    },
+    "adjoiningRoom": {
+      "left": "2D",
+      "right": false,
+      "above": false,
+      "below": false
+    }
   }
 }

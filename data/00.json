@@ -1,6 +1,7 @@
 {
   "name": "The Off Licence",
-  "borderColor": "02",
+  "bkColor": "00",
+  "borderColor": "05",
   "layout": [
     "0000000000000000",
     "0000000000000000",
@@ -20,9 +21,27 @@
     "5555555555555555"
   ],
   "graphicData": {
-    "background": "000000000000000000",
     "floor": "44FFDE6C8812400400",
     "wall": "1622FF88FF22FF88FF",
-    "nasty": "05F8889EBDBD9E88F8"
+    "nasty": "05F8889EBDBD9E88F8",
+    "item": "18183C7E6262627E",
+    "ramp": {
+      "data": "0703000C003000C000",
+      "direction": "right",
+      "location": {"x": 23, "y": 14},
+       "length": "04"
+    },
+    "conveyor": {
+      "data": "4333FF3300FF00AA00",
+      "direction": "left",
+      "location": {"x": 19, "y": 9},
+       "length": "0C"
+    },
+    "adjoiningRoom": {
+      "left": "01",
+      "right": false,
+      "above": false,
+      "below": false
+    }
   }
 }

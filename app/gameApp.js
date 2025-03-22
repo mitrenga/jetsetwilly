@@ -42,7 +42,7 @@ export class GameApp extends AbstractApp {
         break;
       case 'RoomModel': 
         this.roomNumber++;
-        if (this.roomNumber < 60) {
+        if (this.roomNumber < 61) {
           this.model = this.newModel('RoomModel');
         } else {
           this.model = this.newModel('GameOverModel');
