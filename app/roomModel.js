@@ -30,8 +30,8 @@ export class RoomModel extends AbstractModel {
 
     http.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 200) {
-        var roomData = JSON.parse(http.responseText);
-        this.responser.sendEvent(1, {'id': 'setRoomData', 'roomData': roomData});
+        var data = JSON.parse(http.responseText);
+        this.responser.sendEvent(1, {'id': 'setRoomData', 'data': data});
       }
     }
   } // constructor
@@ -48,16 +48,15 @@ export class RoomModel extends AbstractModel {
   } // init
 
   setData(data) {
-    var roomData = data['roomData'];
-    this.roomNameEntity.text = roomData['name'];
-    this.borderEntity.bkColor = this.app.platform.zxColorByAttribut(this.app.hexToInt(roomData['borderColor']), 7, 1);
+    this.roomNameEntity.text = data['name'];
+    this.borderEntity.bkColor = this.app.platform.zxColorByAttribut(this.app.hexToInt(data['borderColor']), 7, 1);
     
     super.setData(data);
   } // setData
 
   handleEvent(event) {
     if (event['id'] == 'setRoomData') {
-      this.setData(event);
+      this.setData(event['data']);
       return true;
     }
 

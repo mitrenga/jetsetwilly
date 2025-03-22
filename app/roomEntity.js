@@ -22,21 +22,20 @@ export class RoomEntity extends AbstractEntity {
   } // drawEntity
 
   setData(data) {
-    var roomData = data['roomData'];
-    this.bkColor = this.app.platform.zxColorByAttribut(this.app.hexToInt(roomData['bkColor']), 56, 8);
+    this.bkColor = this.app.platform.zxColorByAttribut(this.app.hexToInt(data['bkColor']), 56, 8);
 
 
     // layout
-    roomData['layout'].forEach((row, y) => {
+    data['layout'].forEach((row, y) => {
       for (var x = 0; x < 32; x++) {
         var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(x/4)*2, Math.floor(x/4)*2+2)).substring(x%4*2, x%4*2+2));
         var idItem = [false, 'floor', 'wall', 'nasty'][item];
         if (idItem !== false) {
-          var attr = roomData['graphicData'][idItem].substring(0, 2);
+          var attr = data['graphicData'][idItem].substring(0, 2);
           //if (['floor', 'wall'].includes(idItem)) {
           {
             var spriteData = [];
-            var graphicData = roomData['graphicData'][idItem].substring(2, 18);
+            var graphicData = data['graphicData'][idItem].substring(2, 18);
             for (var b = 0; b < 8; b++) {
               var line = this.app.hexToBin(graphicData.substring(b*2, b*2+2));
               for (var col = 0; col < line.length; col++) {
@@ -47,7 +46,7 @@ export class RoomEntity extends AbstractEntity {
             }
             var penColor = this.app.platform.penColorByAttribut(this.app.hexToInt(attr));
             var bkColor = this.app.platform.bkColorByAttribut(this.app.hexToInt(attr)&63);
-            if (bkColor == this.app.platform.bkColorByAttribut(this.app.hexToInt(roomData['bkColor']))) {
+            if (bkColor == this.app.platform.bkColorByAttribut(this.app.hexToInt(data['bkColor']))) {
               bkColor = false;
             }
             this.addEntity(new SpriteEntity(this, x*8, y*8, 8, 8, spriteData, penColor, bkColor));
@@ -57,9 +56,9 @@ export class RoomEntity extends AbstractEntity {
     });
 
     // ramp
-    if ('ramp' in roomData['graphicData']) {
+    if ('ramp' in data['graphicData']) {
       var spriteData = [];
-      var conveyorData = roomData['graphicData']['ramp'];
+      var conveyorData = data['graphicData']['ramp'];
       var attr = conveyorData['data'].substring(0, 2);
       var graphicData = conveyorData['data'].substring(2, 18);
       for (var b = 0; b < 8; b++) {
@@ -72,7 +71,7 @@ export class RoomEntity extends AbstractEntity {
       }
       var penColor = this.app.platform.penColorByAttribut(this.app.hexToInt(attr));
       var bkColor = this.app.platform.bkColorByAttribut(this.app.hexToInt(attr)&63);
-      if (bkColor == this.app.platform.bkColorByAttribut(this.app.hexToInt(roomData['bkColor']))) {
+      if (bkColor == this.app.platform.bkColorByAttribut(this.app.hexToInt(data['bkColor']))) {
         bkColor = false;
       }
       var direction = 0;
@@ -90,9 +89,9 @@ export class RoomEntity extends AbstractEntity {
     }
 
     // conveyor
-    if ('conveyor' in roomData['graphicData']) {
+    if ('conveyor' in data['graphicData']) {
       var spriteData = [];
-      var conveyorData = roomData['graphicData']['conveyor'];
+      var conveyorData = data['graphicData']['conveyor'];
       var attr = conveyorData['data'].substring(0, 2);
       var graphicData = conveyorData['data'].substring(2, 18);
       for (var b = 0; b < 8; b++) {
@@ -105,7 +104,7 @@ export class RoomEntity extends AbstractEntity {
       }
       var penColor = this.app.platform.penColorByAttribut(this.app.hexToInt(attr));
       var bkColor = this.app.platform.bkColorByAttribut(this.app.hexToInt(attr)&63);
-      if (bkColor == this.app.platform.bkColorByAttribut(this.app.hexToInt(roomData['bkColor']))) {
+      if (bkColor == this.app.platform.bkColorByAttribut(this.app.hexToInt(data['bkColor']))) {
         bkColor = false;
       }
       for (var pos = 0; pos < this.app.hexToInt(conveyorData['length']); pos++) {
@@ -113,6 +112,24 @@ export class RoomEntity extends AbstractEntity {
       }
     }
     
+    // items
+    if (this.app.roomNumber in this.app.items) {
+      Object.entries(this.app.items[this.app.roomNumber]).forEach( ([idItem, item]) => {
+        var spriteData = [];
+        var graphicData = data['graphicData']['item'];
+        for (var b = 0; b < 8; b++) {
+          var line = this.app.hexToBin(graphicData.substring(b*2, b*2+2));
+          for (var col = 0; col < line.length; col++) {
+            if (line[col] == '1') {
+              spriteData.push({'x': col, 'y': b});
+            }
+          }
+        }
+        var penColor = this.app.platform.colorByName('white');
+        this.addEntity(new SpriteEntity(this, item['x']*8, item['y']*8, 8, 8, spriteData, penColor, false));
+      });
+    }
+
     super.setData(data);
   } // setData
     
