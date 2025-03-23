@@ -17,7 +17,7 @@ export class GameApp extends AbstractApp {
     super(platform, 'bodyApp',  wsURL);
 
     this.roomNumber = 0;
-    this.items = {};
+    this.items = [];
     this.model = this.newModel('IntroModel');
     this.model.init();
   } // constructor
@@ -58,10 +58,13 @@ export class GameApp extends AbstractApp {
   } // onClick
 
   setGlobalData(data) {
-    this.items = {};
+    this.items = [];
+    for (var r = 0; r < 61; r++) {
+      this.items.push([]);
+    }
     var dataItems = data['items'];
-    Object.entries(dataItems['highOrderByte']).forEach( ([idItem, item]) => {
-      var binaryItem = this.hexToBin(item+dataItems['lowOrderByte'][idItem]).padStart(16, '0');
+    dataItems.forEach((item) => {
+      var binaryItem = this.hexToBin(item);
       // The location of an item is defined by a pair of bytes. The meaning of the bits in each byte pair is as follows:
       // 15 Most significant bit of the y-coordinate
       // 14 Collection flag (reset=collected, set=uncollected)
@@ -71,12 +74,9 @@ export class GameApp extends AbstractApp {
       var x = this.binToInt(binaryItem.substring(11, 16));
       var y = this.binToInt(binaryItem.substring(0, 1)+binaryItem.substring(8, 11));
       var room = this.binToInt(binaryItem.substring(2, 8));
-      if (!(room in this.items)) {
-        this.items[room] = {};
-      }
-      this.items[room][idItem] = {'x': x, 'y': y};
+      this.items[room].push({'x': x, 'y': y});
     });
-  }
+  } // setGlobalData
 
 } // class GameApp
 

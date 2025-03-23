@@ -113,22 +113,20 @@ export class RoomEntity extends AbstractEntity {
     }
     
     // items
-    if (this.app.roomNumber in this.app.items) {
-      Object.entries(this.app.items[this.app.roomNumber]).forEach( ([idItem, item]) => {
-        var spriteData = [];
-        var graphicData = data['graphicData']['item'];
-        for (var b = 0; b < 8; b++) {
-          var line = this.app.hexToBin(graphicData.substring(b*2, b*2+2));
-          for (var col = 0; col < line.length; col++) {
-            if (line[col] == '1') {
-              spriteData.push({'x': col, 'y': b});
-            }
+    this.app.items[this.app.roomNumber].forEach((item) => {
+      var spriteData = [];
+      var graphicData = data['graphicData']['item'];
+      for (var b = 0; b < 8; b++) {
+        var line = this.app.hexToBin(graphicData.substring(b*2, b*2+2));
+        for (var col = 0; col < line.length; col++) {
+          if (line[col] == '1') {
+            spriteData.push({'x': col, 'y': b});
           }
         }
-        var penColor = this.app.platform.colorByName('white');
-        this.addEntity(new SpriteEntity(this, item['x']*8, item['y']*8, 8, 8, spriteData, penColor, false));
-      });
-    }
+      }
+      var penColor = this.app.platform.colorByName('white');
+      this.addEntity(new SpriteEntity(this, item['x']*8, item['y']*8, 8, 8, spriteData, penColor, false));
+    });
 
     super.setData(data);
   } // setData

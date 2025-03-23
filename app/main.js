@@ -45,4 +45,4 @@ window.onblur = function(e) { console.log('blur window'); }
 window.onfocus = function(e) { console.log('focus window'); }
 
 resizeGame();  // calc actual model size
-loopGame();    // start game
+loopGame(0);    // start game
