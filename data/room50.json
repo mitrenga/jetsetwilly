@@ -36,12 +36,12 @@
       "direction": "right",
       "location": {"x": 12, "y": 4},
        "length": "08"
-    },
-    "adjoiningRoom": {
-      "left": false,
-      "right": false,
-      "above": false,
-      "below": "10"
     }
+  },
+  "adjoiningRoom": {
+    "left": false,
+    "right": false,
+    "above": false,
+    "below": "10"
   }
 }

@@ -18,6 +18,8 @@ export class GameApp extends AbstractApp {
 
     this.roomNumber = 0;
     this.items = [];
+    this.roomsCount = 0;
+    this.initRoom = 0;
     this.model = this.newModel('IntroModel');
     this.model.init();
   } // constructor
@@ -31,6 +33,36 @@ export class GameApp extends AbstractApp {
     return null;
   } // newModel
   
+  prepnimistnost(key) { // ##################################################################################################################
+    if (this.model.id == 'RoomModel') {
+      var nextRoom = false;
+      var direction = false;
+      switch(key) {
+        case 'ArrowLeft':
+          direction = 'left';
+          break;
+        case 'ArrowRight':
+          direction = 'right';
+          break;
+        case 'ArrowUp':
+          direction = 'above';
+          break;
+        case 'ArrowDown':
+          direction = 'below';
+          break;
+      }
+      if (direction !== false) {
+        nextRoom = this.model.adjoiningRoom[direction];
+      }
+      if (nextRoom !== false) {
+        this.roomNumber = this.hexToInt(nextRoom);
+        this.model = this.newModel('RoomModel');
+        this.model.init();
+        this.resizeApp();
+      }
+    }
+  } // ######################################################################################################################################
+
   onClick(e) {
     super.onClick(e);
   
@@ -38,7 +70,7 @@ export class GameApp extends AbstractApp {
     this.model = null;
     switch (prevModelID) {
       case 'IntroModel': 
-        this.roomNumber = 0;
+        this.roomNumber = this.initRoom;
         this.model = this.newModel('RoomModel');
         break;
       case 'RoomModel': 
@@ -58,6 +90,8 @@ export class GameApp extends AbstractApp {
   } // onClick
 
   setGlobalData(data) {
+    this.roomsCount = data['roomsCount'];
+    this.initRoom = data['initRoom'];
     this.items = [];
     for (var r = 0; r < 61; r++) {
       this.items.push([]);

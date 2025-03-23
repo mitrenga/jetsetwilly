@@ -24,12 +24,12 @@
     "floor": "04011E067A1AE868A0",
     "wall": "4207FFFC3818102000",
     "nasty": "020181065820408882",
-    "item": "60B8BE5D5A352A15",
-    "adjoiningRoom": {
-      "left": "0A",
-      "right": "0C",
-      "above": false,
-      "below": "09"
-    }
+    "item": "60B8BE5D5A352A15"
+  },
+  "adjoiningRoom": {
+    "left": "0A",
+    "right": "0C",
+    "above": false,
+    "below": "09"
   }
 }

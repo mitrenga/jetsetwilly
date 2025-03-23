@@ -25,24 +25,24 @@ function loopGame(timestamp) {
 } // loopGame
 
 // keyboard press key
-window.onkeydown = function(e) { console.log('press '+e.key); }
+window.onkeydown = function(e) { /*console.log('press '+e.key);*/ }
 // keyboard release key
-window.onkeyup = function(e) { console.log('release '+e.key); }
+window.onkeyup = function(e) { gameApp.prepnimistnost(e.key); /*console.log('release '+e.key);*/ }
 // mouse left key
 gameApp.element.onclick = function(e) { gameApp.onClick(e); e.preventDefault(); }
 // mouse right key
 window.oncontextmenu = function(e) { gameApp.onClick(e); e.preventDefault(); }
 // touch screen
 gameApp.element.ontouchstart = function(e) { gameApp.onClick(e); e.preventDefault(); }
-gameApp.element.ontouchmove = function(e) { console.log(e.touches.length+' '+e.touches[0].clientX+' '+e.touches[0].clientY); e.preventDefault(); }
+gameApp.element.ontouchmove = function(e) { /*console.log(e.touches.length+' '+e.touches[0].clientX+' '+e.touches[0].clientY);*/ e.preventDefault(); }
 gameApp.element.ontouchend = function(e) { e.preventDefault(); }
 gameApp.element.ontouchcancel = function(e) { e.preventDefault(); }
 // resize event
 window.onresize = function(e) { resizeGame(); }
 // blur window
-window.onblur = function(e) { console.log('blur window'); }
+window.onblur = function(e) { /*console.log('blur window');*/ }
 //focus window
-window.onfocus = function(e) { console.log('focus window'); }
+window.onfocus = function(e) { /*console.log('focus window');*/ }
 
 resizeGame();  // calc actual model size
 loopGame(0);    // start game

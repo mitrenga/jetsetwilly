@@ -21,11 +21,11 @@
     "0000000000000000"
   ],
   "graphicData": {
-    "adjoiningRoom": {
-      "left": false,
-      "right": false,
-      "above": false,
-      "below": false
-    }
+  },
+  "adjoiningRoom": {
+    "left": false,
+    "right": false,
+    "above": false,
+    "below": false
   }
 }

@@ -22,6 +22,7 @@ export class RoomModel extends AbstractModel {
     this.airEntity = null;
     this.roomNameEntity = null;
     this.scoreEntity = null;
+    this.adjoiningRoom = null;
     
     const http = new XMLHttpRequest();
     http.responser = this;
@@ -56,6 +57,7 @@ export class RoomModel extends AbstractModel {
 
   handleEvent(event) {
     if (event['id'] == 'setRoomData') {
+      this.adjoiningRoom = event['data']['adjoiningRoom'];
       this.setData(event['data']);
       return true;
     }

@@ -23,17 +23,18 @@
   "graphicData": {
     "wall": "3A20100EC13009C620",
     "nasty": "4488A9A9BBBFBFBF5E",
+    "item": "7E9999E7E799997E",
     "ramp": {
       "data": "07C0C030300C0C0303",
       "direction": "left",
       "location": {"x": 5, "y": 13},
        "length": "06"
-    },
-    "adjoiningRoom": {
-      "left": "14",
-      "right": "0A",
-      "above": false,
-      "below": false
     }
+  },
+  "adjoiningRoom": {
+    "left": "14",
+    "right": "0A",
+    "above": false,
+    "below": false
   }
 }

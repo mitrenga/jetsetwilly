@@ -22,12 +22,12 @@
   ],
   "graphicData": {
     "floor": "055BA4A4550A000000",
-    "wall": "26592526D929D65496",
-    "adjoiningRoom": {
-      "left": "1B",
-      "right": false,
-      "above": "20",
-      "below": "14"
-    }
+    "wall": "26592526D929D65496"
+  },
+  "adjoiningRoom": {
+    "left": "1B",
+    "right": false,
+    "above": "20",
+    "below": "14"
   }
 }

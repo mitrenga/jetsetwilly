@@ -30,12 +30,12 @@
       "direction": "right",
       "location": {"x": 13, "y": 12},
        "length": "02"
-    },
-    "adjoiningRoom": {
-      "left": "08",
-      "right": false,
-      "above": false,
-      "below": "02"
     }
+  },
+  "adjoiningRoom": {
+    "left": "08",
+    "right": false,
+    "above": false,
+    "below": "02"
   }
 }
