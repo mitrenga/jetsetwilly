@@ -45,7 +45,6 @@ export class IntroModel extends AbstractModel {
       this.app.setGlobalData(event['data']);
       return true;
     }
-
     return super.handlEvent(event);
   } // handleEvent
 

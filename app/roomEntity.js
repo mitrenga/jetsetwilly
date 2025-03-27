@@ -22,7 +22,7 @@ export class RoomEntity extends AbstractEntity {
   } // drawEntity
 
   setData(data) {
-    this.bkColor = this.app.platform.zxColorByAttribut(this.app.hexToInt(data['bkColor']), 56, 8);
+    this.bkColor = this.app.platform.zxColorByAttribute(this.app.hexToInt(data['bkColor']), 56, 8);
 
 
     // layout
@@ -44,9 +44,9 @@ export class RoomEntity extends AbstractEntity {
                 }
               }
             }
-            var penColor = this.app.platform.penColorByAttribut(this.app.hexToInt(attr));
-            var bkColor = this.app.platform.bkColorByAttribut(this.app.hexToInt(attr)&63);
-            if (bkColor == this.app.platform.bkColorByAttribut(this.app.hexToInt(data['bkColor']))) {
+            var penColor = this.app.platform.penColorByAttribute(this.app.hexToInt(attr));
+            var bkColor = this.app.platform.bkColorByAttribute(this.app.hexToInt(attr)&63);
+            if (bkColor == this.app.platform.bkColorByAttribute(this.app.hexToInt(data['bkColor']))) {
               bkColor = false;
             }
             this.addEntity(new SpriteEntity(this, x*8, y*8, 8, 8, spriteData, penColor, bkColor));
@@ -69,9 +69,9 @@ export class RoomEntity extends AbstractEntity {
           }
         }
       }
-      var penColor = this.app.platform.penColorByAttribut(this.app.hexToInt(attr));
-      var bkColor = this.app.platform.bkColorByAttribut(this.app.hexToInt(attr)&63);
-      if (bkColor == this.app.platform.bkColorByAttribut(this.app.hexToInt(data['bkColor']))) {
+      var penColor = this.app.platform.penColorByAttribute(this.app.hexToInt(attr));
+      var bkColor = this.app.platform.bkColorByAttribute(this.app.hexToInt(attr)&63);
+      if (bkColor == this.app.platform.bkColorByAttribute(this.app.hexToInt(data['bkColor']))) {
         bkColor = false;
       }
       var direction = 0;
@@ -102,9 +102,9 @@ export class RoomEntity extends AbstractEntity {
           }
         }
       }
-      var penColor = this.app.platform.penColorByAttribut(this.app.hexToInt(attr));
-      var bkColor = this.app.platform.bkColorByAttribut(this.app.hexToInt(attr)&63);
-      if (bkColor == this.app.platform.bkColorByAttribut(this.app.hexToInt(data['bkColor']))) {
+      var penColor = this.app.platform.penColorByAttribute(this.app.hexToInt(attr));
+      var bkColor = this.app.platform.bkColorByAttribute(this.app.hexToInt(attr)&63);
+      if (bkColor == this.app.platform.bkColorByAttribute(this.app.hexToInt(data['bkColor']))) {
         bkColor = false;
       }
       for (var pos = 0; pos < this.app.hexToInt(conveyorData['length']); pos++) {

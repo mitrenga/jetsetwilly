@@ -25,7 +25,10 @@ function loopGame(timestamp) {
 } // loopGame
 
 // keyboard press key
-window.onkeydown = function(e) { /*console.log('press '+e.key);*/ }
+window.onkeydown = function(e) {
+  gameApp.model.roomNameEntity.text = e.key;
+  gameApp.model.roomNameEntity.drawEntity();
+   /*console.log('press '+e.key);*/ }
 // keyboard release key
 window.onkeyup = function(e) { gameApp.prepnimistnost(e.key); /*console.log('release '+e.key);*/ }
 // mouse left key
