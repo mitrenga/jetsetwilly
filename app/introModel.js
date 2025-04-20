@@ -1,12 +1,10 @@
 /**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
-const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
-const { IntroImageEntity } = await import('./introImageEntity.js?ver='+window.srcVersion);
+const { ResetEntity } = await import('./resetEntity.js?ver='+window.srcVersion);
 const { ZXTextEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
-import AbstractEntity from './svision/js/abstractEntity.js';
-import IntroImageEntity from './introImageEntity.js';
+import ResetEntity from './resetEntity.js';
 import ZXTextEntity from './svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js';
 /**/
 // begin code
@@ -14,39 +12,90 @@ import ZXTextEntity from './svision/js/platform/canvas2D/zxSpectrum/zxTextEntity
 export class IntroModel extends AbstractModel {
   
   constructor(app) {
-    super(app);
+    super(app);   
     this.id = 'IntroModel';
-
-    const http = new XMLHttpRequest();
-    http.responser = this;
-    http.open('GET', 'global.data');
-    http.send();
-
-    http.onreadystatechange = function () {
-      if (this.readyState == 4 && this.status == 200) {
-        var data = JSON.parse(http.responseText);
-        this.responser.sendEvent(1, {'id': 'setGlobalData', 'data': data});
-      }
-    }
+    this.resetEntity = null;
+    this.inputLineEntity = null;
+    this.resetTimer = false;
+    this.flashState = false;
   } // constructor
 
   init() {
     super.init();
 
-    this.borderEntity.bkColor = this.app.platform.colorByName('magenta');
-    this.desktopEntity.addEntity(new IntroImageEntity(this.desktopEntity, 0, 0, 32*8, 16*8));
-    this.desktopEntity.addEntity(new AbstractEntity(this.desktopEntity, 0, 16*8, 32*8, 2*8, false, this.app.platform.colorByName('black')));
-    this.desktopEntity.addEntity(new ZXTextEntity(this.desktopEntity, 0, 18*8, 32*8, 1*8, "+++++ Press ENTER to Start +++++", this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), 0, false));
-    this.desktopEntity.addEntity(new AbstractEntity(this.desktopEntity, 0, 19*8, 32*8, 5*8, false, this.app.platform.colorByName('black')));
+    this.resetEntity = new ResetEntity(this.desktopEntity, 0, 0, 32*8, 24*8);
+    this.resetEntity.hide = true;
+    this.desktopEntity.addEntity(this.resetEntity);
+    this.inputLineEntity = new ZXTextEntity(this.desktopEntity, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, 0, true);
+    this.inputLineEntity.hide = true;
+    this.desktopEntity.addEntity(this.inputLineEntity);
+    this.sendEvent(500, {'id': 'showReset'});
   } // init
 
   handleEvent(event) {
-    if (event['id'] == 'setGlobalData') {
-      this.app.setGlobalData(event['data']);
-      return true;
+    switch (event['id']) {
+      case 'changeFlashState':
+        this.flashState = !this.flashState;
+        this.inputLineEntity.flashState = this.flashState;
+        this.drawModel();
+        this.sendEvent(330, {'id': 'changeFlashState'});
+        return true;
+      case 'showReset':
+        this.resetTimer = this.app.now;
+        this.resetEntity.hide = false;
+        this.sendEvent(this.resetEntity.resetTime+1000, {'id': 'showCopyright'});
+        return true;
+      case 'showCopyright':
+        this.resetTimer = false;
+        this.resetEntity.hide = true;
+        this.inputLineEntity.hide = false;
+        this.drawModel();
+        this.sendEvent(2000, {'id': 'showK'});
+        return true;
+      case 'showK':
+          this.inputLineEntity.text = 'K';
+          this.inputLineEntity.flashMask = 'i';
+          this.inputLineEntity.proportional = false;
+          this.drawModel();
+          this.flashState = 0;
+          this.sendEvent(330, {'id': 'changeFlashState'});
+          this.sendEvent(1000, {'id': 'showLOAD'});
+          return true;
+      case 'showLOAD':
+        this.inputLineEntity.text = 'LOAD L';
+        this.inputLineEntity.flashMask = '     i';
+        this.drawModel();
+        this.sendEvent(1000, {'id': 'showLOAD "'});
+        return true;
+      case 'showLOAD "':
+        this.inputLineEntity.text = 'LOAD "L';
+        this.inputLineEntity.flashMask = '      i';
+        this.drawModel();
+        this.sendEvent(500, {'id': 'showLOAD ""'});
+        return true;
+      case 'showLOAD ""':
+        this.inputLineEntity.text = 'LOAD ""L';
+        this.inputLineEntity.flashMask = '       i';
+        this.drawModel();
+        this.sendEvent(500, {'id': 'startLoading'});
+        return true;
+      case 'startLoading':
+        this.cancelEvent('changeFlashState');
+        this.inputLineEntity.hide = true;
+        this.drawModel();
+        return true;
     }
-    return super.handlEvent(event);
+    return super.handleEvent(event);
   } // handleEvent
+
+  loopModel(timestamp) {
+    super.loopModel(timestamp);
+
+    if (this.resetTimer !== false) {
+      this.resetEntity.timeTrace = Math.round(this.app.now-this.resetTimer);
+      this.drawModel();
+    }
+  } // loopModel
 
 } // class IntroModel
 

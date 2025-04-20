@@ -1,11 +1,13 @@
 /**/
 const { AbstractApp } = await import('./svision/js/abstractApp.js?ver='+window.srcVersion);
 const { IntroModel } = await import('./introModel.js?ver='+window.srcVersion);
+const { MainModel } = await import('./mainModel.js?ver='+window.srcVersion);
 const { RoomModel } = await import('./roomModel.js?ver='+window.srcVersion);
 const { GameOverModel } = await import('./gameOverModel.js?ver='+window.srcVersion);
 /*/
 import AbstractApp from './svision/js/abstractApp.js';
 import IntroModel from './introModel.js';
+import MainModel from './mainModel.js';
 import RoomModel from './roomModel.js';
 import GameOverModel from './gameOverModel.js';
 /**/
@@ -26,6 +28,7 @@ export class GameApp extends AbstractApp {
   newModel(model) {
     switch (model) {
       case 'IntroModel': return new IntroModel(this);
+      case 'MainModel': return new MainModel(this);
       case 'RoomModel': return new RoomModel(this, this.roomNumber);
       case 'GameOverModel': return new GameOverModel(this);
     } // switch
@@ -69,6 +72,9 @@ export class GameApp extends AbstractApp {
     this.model = null;
     switch (prevModelID) {
       case 'IntroModel': 
+        this.model = this.newModel('MainModel');
+        break;
+      case 'MainModel': 
         this.roomNumber = this.globalData['initRoom'];
         this.model = this.newModel('RoomModel');
         break;

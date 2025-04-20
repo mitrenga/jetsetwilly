@@ -9,10 +9,11 @@ import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
 
 export class RoomEntity extends AbstractEntity {
 
-  constructor(parentEntity, x, y, width, height) {
+  constructor(parentEntity, x, y, width, height, roomNumber) {
     super(parentEntity, x, y, width, height);
     this.id = 'RoomEntity';
 
+    this.roomNumber = roomNumber;
     this.bkColor = this.app.platform.colorByName('black');
     this.imageData = null;
   } // constructor
@@ -127,6 +128,40 @@ export class RoomEntity extends AbstractEntity {
       var penColor = this.app.platform.colorByName('white');
       this.addEntity(new SpriteEntity(this, item['x']*8, item['y']*8, 8, 8, spriteData, penColor, false));
     });
+ 
+    // Willy
+    var willy =  data['willy'];
+    var willySprite = willy['sprite'][willy['init']['animationFrame']];
+    var penColor = this.app.platform.colorByName('white');
+    var spriteData = [];
+    var spriteWidth = 0;
+    var spriteHeight = 0;
+    willySprite.forEach((row, r) => {
+      for (var col = 0; col < row.length; col++) {
+        if (row[col] == '#') {
+          spriteData.push({'x': col, 'y': r});
+          if (col+1 > spriteWidth) {
+            spriteWidth = col+1;
+          }
+        }
+      }
+      spriteHeight++;
+    });
+    console.log(data);
+    if (data['initRoom'] == this.roomNumber) {
+      this.addEntity(
+        new SpriteEntity(
+          this,
+          willy['init']['x']+willy['paintCorrections']['x'],
+          willy['init']['y']+willy['paintCorrections']['y'],
+          spriteWidth,
+          spriteHeight,
+          spriteData,
+          penColor,
+          false
+        )
+      );
+    }
 
     super.setData(data);
   } // setData

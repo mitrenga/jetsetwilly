@@ -41,7 +41,7 @@ export class RoomModel extends AbstractModel {
     super.init();
 
     this.borderEntity.bkColor = this.app.platform.colorByName('black');
-    this.roomEntity = new RoomEntity(this.desktopEntity, 0, 0, 32*8, 16*8);
+    this.roomEntity = new RoomEntity(this.desktopEntity, 0, 0, 32*8, 16*8, this.roomNumber);
     this.desktopEntity.addEntity(this.roomEntity);
     this.roomNameEntity = new ZXTextEntity(this.desktopEntity, 0, 16*8, 32*8, 8, '', this.app.platform.colorByName('brightYellow'), this.app.platform.colorByName('brightBlack'), 0, true);
     this.roomNameEntity.justify = 2;
@@ -58,6 +58,8 @@ export class RoomModel extends AbstractModel {
   handleEvent(event) {
     if (event['id'] == 'setRoomData') {
       this.adjoiningRoom = event['data']['adjoiningRoom'];
+      event['data']['willy'] = this.app.globalData['willy'];
+      event['data']['initRoom'] = this.app.globalData['initRoom'];
       this.setData(event['data']);
       return true;
     }
