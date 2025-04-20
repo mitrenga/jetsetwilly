@@ -16,10 +16,9 @@ export class GameApp extends AbstractApp {
   constructor(platform, wsURL) {
     super(platform, 'bodyApp',  wsURL);
 
-    this.roomNumber = 0;
+    this.roomNumber = false;
+    this.globalData = false;
     this.items = [];
-    this.roomsCount = 0;
-    this.initRoom = 0;
     this.model = this.newModel('IntroModel');
     this.model.init();
   } // constructor
@@ -70,12 +69,12 @@ export class GameApp extends AbstractApp {
     this.model = null;
     switch (prevModelID) {
       case 'IntroModel': 
-        this.roomNumber = this.initRoom;
+        this.roomNumber = this.globalData['initRoom'];
         this.model = this.newModel('RoomModel');
         break;
       case 'RoomModel': 
         this.roomNumber++;
-        if (this.roomNumber < 61) {
+        if (this.roomNumber < this.globalData['roomsCount']) {
           this.model = this.newModel('RoomModel');
         } else {
           this.model = this.newModel('GameOverModel');
@@ -90,10 +89,10 @@ export class GameApp extends AbstractApp {
   } // onClick
 
   setGlobalData(data) {
-    this.roomsCount = data['roomsCount'];
-    this.initRoom = data['initRoom'];
+    this.globalData = data;
+
     this.items = [];
-    for (var r = 0; r < 61; r++) {
+    for (var r = 0; r < this.globalData['roomsCount']; r++) {
       this.items.push([]);
     }
     var dataItems = data['items'];
