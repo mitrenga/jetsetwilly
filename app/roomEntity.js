@@ -25,7 +25,6 @@ export class RoomEntity extends AbstractEntity {
   setData(data) {
     this.bkColor = this.app.platform.zxColorByAttribute(this.app.hexToInt(data['bkColor']), 56, 8);
 
-
     // layout
     data['layout'].forEach((row, y) => {
       for (var x = 0; x < 32; x++) {
@@ -114,6 +113,7 @@ export class RoomEntity extends AbstractEntity {
     }
     
     // items
+    var itemColor = 3;
     this.app.items[this.app.roomNumber].forEach((item) => {
       var spriteData = [];
       var graphicData = data['graphicData']['item'];
@@ -125,8 +125,12 @@ export class RoomEntity extends AbstractEntity {
           }
         }
       }
-      var penColor = this.app.platform.colorByName('white');
+      var penColor = this.app.platform.color(itemColor);
       this.addEntity(new SpriteEntity(this, item['x']*8, item['y']*8, 8, 8, spriteData, penColor, false));
+      itemColor++;
+      if (itemColor > 6) {
+        itemColor = 3;
+      }
     });
  
     // Willy
@@ -147,7 +151,6 @@ export class RoomEntity extends AbstractEntity {
       }
       spriteHeight++;
     });
-    console.log(data);
     if (data['initRoom'] == this.roomNumber) {
       this.addEntity(
         new SpriteEntity(
@@ -161,6 +164,45 @@ export class RoomEntity extends AbstractEntity {
           false
         )
       );
+    }
+
+    // guardians
+    if ('guardians' in data) {
+      ['horizontal', 'vertical', 'forDropping', 'falling'].forEach((guardianType) => {
+        if (guardianType in data['guardians']) {
+          var guardianTypeData = data['guardians'][guardianType];
+          data['guardians'][guardianType]['figures'].forEach((guardian) => {
+            var guardianSprite = data['guardians'][guardianType]['sprite'][guardian['init']['animationFrame']];
+            var penColor = this.app.platform.penColorByAttribute(this.app.hexToInt(guardian['attribute']));
+            var spriteData = [];
+            var spriteWidth = 0;
+            var spriteHeight = 0;
+            guardianSprite.forEach((row, r) => {
+              for (var col = 0; col < row.length; col++) {
+                if (row[col] == '#') {
+                  spriteData.push({'x': col, 'y': r});
+                  if (col+1 > spriteWidth) {
+                    spriteWidth = col+1;
+                  }
+                }
+              }
+              spriteHeight++;
+            });
+            this.addEntity(
+              new SpriteEntity(
+                this,
+                guardian['init']['x']+guardianTypeData['paintCorrections']['x'],
+                guardian['init']['y']+guardianTypeData['paintCorrections']['y'],
+                spriteWidth,
+                spriteHeight,
+                spriteData,
+                penColor,
+                false
+              )
+            );
+          });
+        }
+      });
     }
 
     super.setData(data);

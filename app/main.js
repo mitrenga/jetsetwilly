@@ -25,19 +25,16 @@ function loopGame(timestamp) {
 } // loopGame
 
 // keyboard press key
-window.onkeydown = function(e) {
-  gameApp.model.roomNameEntity.text = e.key;
-  gameApp.model.roomNameEntity.drawEntity();
-   /*console.log('press '+e.key);*/ }
+window.onkeydown = function(e) { gameApp.model.sendEvent(0, {'id': 'keyPress', 'key': e.key}); }
 // keyboard release key
-window.onkeyup = function(e) { gameApp.prepnimistnost(e.key); /*console.log('release '+e.key);*/ }
+window.onkeyup = function(e) { gameApp.model.sendEvent(0, {'id': 'keyRelease', 'key': e.key}); }
 // mouse left key
-gameApp.element.onclick = function(e) { gameApp.onClick(e); e.preventDefault(); }
+gameApp.element.onclick = function(e) { gameApp.model.sendEvent(0, {'id': 'mouseClick', 'key': 'left', 'x': e.clientX, 'y': e.clientY}); }
 // mouse right key
 window.oncontextmenu = function(e) { gameApp.onClick(e); e.preventDefault(); }
 // touch screen
 gameApp.element.ontouchstart = function(e) { gameApp.onClick(e); e.preventDefault(); }
-gameApp.element.ontouchmove = function(e) { /*console.log(e.touches.length+' '+e.touches[0].clientX+' '+e.touches[0].clientY);*/ e.preventDefault(); }
+gameApp.element.ontouchmove = function(e) { console.log(e.touches.length+' '+e.touches[0].clientX+' '+e.touches[0].clientY); e.preventDefault(); }
 gameApp.element.ontouchend = function(e) { e.preventDefault(); }
 gameApp.element.ontouchcancel = function(e) { e.preventDefault(); }
 // resize event

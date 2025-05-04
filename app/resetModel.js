@@ -9,15 +9,27 @@ import ZXTextEntity from './svision/js/platform/canvas2D/zxSpectrum/zxTextEntity
 /**/
 // begin code
 
-export class IntroModel extends AbstractModel {
+export class ResetModel extends AbstractModel {
   
   constructor(app) {
     super(app);   
-    this.id = 'IntroModel';
+    this.id = 'ResetModel';
     this.resetEntity = null;
     this.inputLineEntity = null;
     this.resetTimer = false;
     this.flashState = false;
+
+    const http = new XMLHttpRequest();
+    http.responser = this;
+    http.open('GET', 'global.data');
+    http.send();
+
+    http.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        var data = JSON.parse(http.responseText);
+        this.responser.sendEvent(1, {'id': 'setGlobalData', 'data': data});
+      }
+    }
   } // constructor
 
   init() {
@@ -27,6 +39,7 @@ export class IntroModel extends AbstractModel {
     this.resetEntity.hide = true;
     this.desktopEntity.addEntity(this.resetEntity);
     this.inputLineEntity = new ZXTextEntity(this.desktopEntity, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, 0, true);
+    this.inputLineEntity.justify = 2;
     this.inputLineEntity.hide = true;
     this.desktopEntity.addEntity(this.inputLineEntity);
     this.sendEvent(500, {'id': 'showReset'});
@@ -50,39 +63,15 @@ export class IntroModel extends AbstractModel {
         this.resetEntity.hide = true;
         this.inputLineEntity.hide = false;
         this.drawModel();
-        this.sendEvent(2000, {'id': 'showK'});
+        this.sendEvent(1200, {'id': 'setMenuModel'});
         return true;
-      case 'showK':
-          this.inputLineEntity.text = 'K';
-          this.inputLineEntity.flashMask = 'i';
-          this.inputLineEntity.proportional = false;
-          this.drawModel();
-          this.flashState = 0;
-          this.sendEvent(330, {'id': 'changeFlashState'});
-          this.sendEvent(1000, {'id': 'showLOAD'});
-          return true;
-      case 'showLOAD':
-        this.inputLineEntity.text = 'LOAD L';
-        this.inputLineEntity.flashMask = '     i';
-        this.drawModel();
-        this.sendEvent(1000, {'id': 'showLOAD "'});
+      case 'setMenuModel':
+        this.app.model = this.app.newModel('MenuModel');
+        this.app.model.init();
+        this.app.resizeApp();
         return true;
-      case 'showLOAD "':
-        this.inputLineEntity.text = 'LOAD "L';
-        this.inputLineEntity.flashMask = '      i';
-        this.drawModel();
-        this.sendEvent(500, {'id': 'showLOAD ""'});
-        return true;
-      case 'showLOAD ""':
-        this.inputLineEntity.text = 'LOAD ""L';
-        this.inputLineEntity.flashMask = '       i';
-        this.drawModel();
-        this.sendEvent(500, {'id': 'startLoading'});
-        return true;
-      case 'startLoading':
-        this.cancelEvent('changeFlashState');
-        this.inputLineEntity.hide = true;
-        this.drawModel();
+      case 'setGlobalData':
+        this.app.setGlobalData(event['data']);
         return true;
     }
     return super.handleEvent(event);
@@ -97,6 +86,6 @@ export class IntroModel extends AbstractModel {
     }
   } // loopModel
 
-} // class IntroModel
+} // class ResetModel
 
-export default IntroModel;
+export default ResetModel;
