@@ -1,0 +1,133 @@
+{
+   "triangle":{
+      "sprite":[
+         "                     -  ",
+         "                   -----",
+         "                 ------x",
+         "               ------xxx",
+         "             ------xxxxx",
+         "           ------xxxxxxx",
+         "         ------xxxxxxxxx",
+         "       ------xxxxxx++xxx",
+         "     ------xxxxxx +++xxx",
+         "   ------xxxxxx   +++xxx",
+         " ------xxxxxx     +++xxx",
+         "+-------xxx       +++xxx",
+         "+++-------        +++xxx",
+         "++++++------      +++xxx",
+         "  ++++++------    +++xxx",
+         "    ++++++------  +++xxx",
+         "      ++++++------+++xxx",
+         "        ++++++----+++xxx",
+         "          ++++++--+++xxx",
+         "            +++++++++xxx",
+         "              +++++++xxx",
+         "                +++++xxx",
+         "                  +++xxx",
+         "                    +x  "
+      ],
+      "conversion":[
+         {
+            "xBegin":0,
+            "xEnd":24,
+            "xStep":1,
+            "yBegin":0,
+            "yEnd":24,
+            "yStep":1,
+            "switchCoordinates":false,
+            "xColor":"dark",
+            "+Color":"medium",
+            "-Color":"light"
+         },
+         {
+            "xBegin":0,
+            "xEnd":24,
+            "xStep":1,
+            "yBegin":23,
+            "yEnd":-1,
+            "yStep":-1,
+            "switchCoordinates":true,
+            "xColor":"medium",
+            "+Color":"light",
+            "-Color":"dark"
+         },
+         {
+            "xBegin":23,
+            "xEnd":-1,
+            "xStep":-1,
+            "yBegin":0,
+            "yEnd":24,
+            "yStep":1,
+            "switchCoordinates":true,
+            "xColor":"dark",
+            "+Color":"medium",
+            "-Color":"light"
+         },
+         {
+            "xBegin":0,
+            "xEnd":24,
+            "xStep":1,
+            "yBegin":0,
+            "yEnd":24,
+            "yStep":1,
+            "switchCoordinates":false,
+            "xColor":"medium",
+            "+Color":"light",
+            "-Color":"dark"
+         },
+         {
+            "xBegin":23,
+            "xEnd":-1,
+            "xStep":-1,
+            "yBegin":23,
+            "yEnd":-1,
+            "yStep":-1,
+            "switchCoordinates":false,
+            "xColor":"dark",
+            "+Color":"medium",
+            "-Color":"light"
+         },
+         {
+            "xBegin":23,
+            "xEnd":-1,
+            "xStep":-1,
+            "yBegin":0,
+            "yEnd":24,
+            "yStep":1,
+            "switchCoordinates":true,
+            "xColor":"medium",
+            "+Color":"light",
+            "-Color":"dark"
+         },
+         {
+            "xBegin":0,
+            "xEnd":24,
+            "xStep":1,
+            "yBegin":23,
+            "yEnd":-1,
+            "yStep":-1,
+            "switchCoordinates":true,
+            "xColor":"dark",
+            "+Color":"medium",
+            "-Color":"light"
+         },
+         {
+            "xBegin":23,
+            "xEnd":-1,
+            "xStep":-1,
+            "yBegin":23,
+            "yEnd":-1,
+            "yStep":-1,
+            "switchCoordinates":false,
+            "xColor":"medium",
+            "+Color":"light",
+            "-Color":"dark"
+         }
+      ],
+      "colors":{
+         "dark":"rgb(100, 100, 100)",
+         "medium":"rgb(125, 125, 125)",
+         "light":"rgb(150, 150, 150)"
+      }
+   }
+}

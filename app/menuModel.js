@@ -9,7 +9,7 @@ import AbstractModel from './svision/js/abstractModel.js';
 import AbstractEntity from './svision/js/abstractEntity.js';
 import ZXTextEntity from './svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js';
 import LogoEntity from './logoEntity.js';
-import TriangleEntity from './tirangleEntity.js';
+import TriangleEntity from './triangleEntity.js';
 /**/
 // begin code
 
@@ -20,8 +20,8 @@ export class MenuModel extends AbstractModel {
     this.id = 'MenuModel';
 
     this.triangleEntity = null;
-    this.triangleMoveX = Math.round(Math.random()*6);
-    this.triangleMoveY = Math.round(Math.random()*6);
+    this.triangleMoveX = 2+Math.round(Math.random()*4);
+    this.triangleMoveY = 2+Math.round(Math.random()*4);
     this.bwColor = '#7c7c7c';
     this.redraw = false;
     this.selectedItem = 0;
@@ -45,6 +45,18 @@ export class MenuModel extends AbstractModel {
       {'id': 'guardian', 'x': 8, 'y': 160}
     ];
     this.copyrightEntity = null;
+
+    const http = new XMLHttpRequest();
+    http.responser = this;
+    http.open('GET', 'menu.data');
+    http.send();
+
+    http.onreadystatechange = function () {
+      if (this.readyState == 4 && this.status == 200) {
+        var data = JSON.parse(http.responseText);
+        this.responser.sendEvent(1, {'id': 'setMenuData', 'data': data});
+      }
+    }
   } // constructor
 
   init() {
@@ -53,10 +65,10 @@ export class MenuModel extends AbstractModel {
     this.borderEntity.bkColor = this.app.platform.colorByName('white');
     this.desktopEntity.bkColor = this.app.platform.colorByName('white');
 
-    this.triangleEntity = new TriangleEntity(this.desktopEntity, 0, 0, 24, 24, 0);
+    this.triangleEntity = new TriangleEntity(this.desktopEntity, 0, 0, 24, 24, 0, null);
     this.desktopEntity.addEntity(this.triangleEntity);
 
-    this.bkEntity = new AbstractEntity(this.desktopEntity, 13, 22, 230, 140, false, 'rgba(223, 218, 208, 0.5)');
+    this.bkEntity = new AbstractEntity(this.desktopEntity, 13, 22, 230, 140, false, 'rgba(223, 218, 208, 0.8)');
     this.desktopEntity.addEntity(this.bkEntity);
 
     for (var y = 0; y < this.menuItems.length; y++) {
@@ -89,6 +101,13 @@ export class MenuModel extends AbstractModel {
     this.sendEvent(330, {'id': 'changeFlashState'});
     this.sendEvent(150, {'id': 'changeTriangle'});
   } // init
+
+  setData(data) {
+    this.triangleEntity.data = data['triangle'];
+    
+    this.drawModel();
+    super.setData(data);
+  } // setData
 
   changeMenuItem(newItem) {
     if (newItem < 0 || newItem >= this.menuItems.length) {
@@ -150,25 +169,25 @@ export class MenuModel extends AbstractModel {
         this.triangleEntity.y += this.triangleMoveY;
         if (this.triangleEntity.x < 0) {
           this.triangleEntity.x -= this.triangleMoveX;
-          this.triangleMoveX = Math.round(Math.random()*6);
+          this.triangleMoveX = 2+Math.round(Math.random()*4);
           this.triangleEntity.x += this.triangleMoveX;
 
         }
         if (this.triangleEntity.x > 231) {
           this.triangleEntity.x -= this.triangleMoveX;
-          this.triangleMoveX = -Math.round(Math.random()*6);
+          this.triangleMoveX = -2-Math.round(Math.random()*4);
           this.triangleEntity.x += this.triangleMoveX;
 
         }
         if (this.triangleEntity.y < 0) {
           this.triangleEntity.y -= this.triangleMoveY;
-          this.triangleMoveY = Math.round(Math.random()*6);
+          this.triangleMoveY = 2+Math.round(Math.random()*4);
           this.triangleEntity.y += this.triangleMoveY;
 
         }
         if (this.triangleEntity.y > 159) {
           this.triangleEntity.y -= this.triangleMoveY;
-          this.triangleMoveY = -Math.round(Math.random()*6);
+          this.triangleMoveY = -2-Math.round(Math.random()*4);
           this.triangleEntity.y += this.triangleMoveY;
 
         }
@@ -176,16 +195,7 @@ export class MenuModel extends AbstractModel {
         this.sendEvent(150, {'id': 'changeTriangle'});
         return true;
       case 'setMenuData':
-        var willy = Object.assign(
-          event['data']['willy'],
-          {
-            'sprite': this.app.globalData['willy']['sprite'],
-            'paintCorrections': this.app.globalData['willy']['paintCorrections'],
-            'width': this.app.globalData['willy']['width'],
-            'height': this.app.globalData['willy']['height']
-          }
-        );
-        this.setData(Object.assign(event['data'], {'willy': willy}));
+        this.setData(event['data']);
         return true;
     }
   } // handleEvent
