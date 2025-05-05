@@ -8,10 +8,9 @@ import AbstractEntity from './svision/js/abstractEntity.js';
 export class TriangleEntity extends AbstractEntity {
 
   constructor(parentEntity, x, y, width, height, snap, data) {
-    super(parentEntity, x, y, width, height);
+    super(parentEntity, x, y, width, height, false, false);
     this.id = 'TriangleEntity';
 
-    this.bkColor = false;
     this.snap = snap;
     this.data = data;
   } // constructor
