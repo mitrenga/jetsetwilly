@@ -24,6 +24,14 @@ function loopGame(timestamp) {
   requestAnimationFrame(loopGame);
 } // loopGame
 
+// master game timer
+function updateScene() {
+  gameApp.model.sendEvent(0, {'id': 'updateScene'});
+}
+
+// master game timer
+setInterval(updateScene, 67);
+
 // keyboard press key
 window.onkeydown = function(e) { gameApp.model.sendEvent(0, {'id': 'keyPress', 'key': e.key}); }
 // keyboard release key

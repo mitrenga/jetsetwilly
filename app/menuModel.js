@@ -3,13 +3,13 @@ const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+wind
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { ZXTextEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js?ver='+window.srcVersion);
 const { LogoEntity } = await import('./logoEntity.js?ver='+window.srcVersion);
-const { TriangleEntity } = await import('./triangleEntity.js?ver='+window.srcVersion);
+const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import AbstractEntity from './svision/js/abstractEntity.js';
 import ZXTextEntity from './svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js';
 import LogoEntity from './logoEntity.js';
-import TriangleEntity from './triangleEntity.js';
+import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
 /**/
 // begin code
 
@@ -19,11 +19,29 @@ export class MenuModel extends AbstractModel {
     super(app);
     this.id = 'MenuModel';
 
-    this.triangleEntity = null;
-    this.triangleMoveX = 2+Math.round(Math.random()*4);
-    this.triangleMoveY = 2+Math.round(Math.random()*4);
     this.bwColor = '#7c7c7c';
     this.redraw = false;
+    this.gameFrame = 0;
+    this.bodyObjects = [
+      {'id': 'body', 'trackX': 0,  'trackY': 26, 'color': 'rgb(217, 41, 188)'},
+      {'id': 'body', 'trackX': 8, 'trackY': 29, 'color': 'rgb(230, 241, 13)'},
+      {'id': 'body', 'trackX': 16, 'trackY': 32, 'color': 'rgb(90, 72, 209)'},
+      {'id': 'body', 'trackX': 24, 'trackY': 35, 'color': 'rgb(42, 165, 63)'},
+      {'id': 'body', 'trackX': 32, 'trackY': 38, 'color': 'rgb(192, 81, 81)'}
+    ];
+    this.track = [];
+    for (var t = 0; t < 40; t++) {
+      this.track[t] = {'x': -16, 'y': 0, 'direction': 0};
+    }
+    this.bodyEntities = [];
+    this.headEntity = null;
+    this.headX = -16;
+    this.headDirectionX = 2;
+    this.headY = 150;
+    this.headDirectionY = 0;
+    this.wave = [0, 2, 4, 5, 6, 7, 7, 7, 6, 5, 4, 2, 0, -2, -4, -5, -6, -7, -7, -7, -6, -5, -4, -2];
+    this.waveCounter = 0;
+    this.willyEntity = null;
     this.selectedItem = 0;
     this.bkEntity = null;
     this.menuEntities = [];
@@ -40,10 +58,6 @@ export class MenuModel extends AbstractModel {
       ['ABOUT GAME', '']
     ];
     this.logoEntity = null;
-    this.objects = [
-      {'id': 'willy', 'x': 48, 'y': 160},
-      {'id': 'guardian', 'x': 8, 'y': 160}
-    ];
     this.copyrightEntity = null;
 
     const http = new XMLHttpRequest();
@@ -65,9 +79,15 @@ export class MenuModel extends AbstractModel {
     this.borderEntity.bkColor = this.app.platform.colorByName('white');
     this.desktopEntity.bkColor = this.app.platform.colorByName('white');
 
-    this.triangleEntity = new TriangleEntity(this.desktopEntity, 0, 0, 24, 24, 0, null);
-    this.desktopEntity.addEntity(this.triangleEntity);
+      this.bodyObjects.forEach((object, o) => {
+      this.bodyEntities[o] = new SpriteEntity(this.desktopEntity, this.track[o]['x'], this.track[o]['y'], object['color'], false, 0, this.track[o]['direction']);
+      this.desktopEntity.addEntity(this.bodyEntities[o]);
+    });
 
+    this.headEntity = new SpriteEntity(this.desktopEntity, this.headX, this.headY, 'rgb(21, 147, 181)', false, 0, 0);
+    this.desktopEntity.addEntity(this.headEntity);
+    this.willyEntity = new SpriteEntity(this.desktopEntity, this.headX-4, this.headY-11, this.bwColor, false, 0, 0);
+    this.desktopEntity.addEntity(this.willyEntity);
     this.bkEntity = new AbstractEntity(this.desktopEntity, 13, 22, 230, 140, false, 'rgba(223, 218, 208, 0.8)');
     this.desktopEntity.addEntity(this.bkEntity);
 
@@ -99,13 +119,16 @@ export class MenuModel extends AbstractModel {
     this.desktopEntity.addEntity(this.floorEntity);
 
     this.sendEvent(330, {'id': 'changeFlashState'});
-    this.sendEvent(150, {'id': 'changeTriangle'});
   } // init
 
   setData(data) {
-    this.triangleEntity.data = data['triangle'];
-    
-    this.drawModel();
+    this.bodyEntities.forEach((entity, e) => {
+      entity.setGraphicsData(data['body']);
+    });
+
+    this.headEntity.setGraphicsData(data['head']);
+    this.willyEntity.setGraphicsData(data['willy']);
+    this.redraw = true;
     super.setData(data);
   } // setData
 
@@ -132,12 +155,14 @@ export class MenuModel extends AbstractModel {
     }
 
     switch (event['id']) {
+
       case 'changeFlashState':
         this.flashState = !this.flashState;
         this.logoEntity.flashState = this.flashState;
         this.redraw = true;
         this.sendEvent(330, {'id': 'changeFlashState'});
         return true;
+
       case 'keyPress':
         switch (event['key']) {
           case 'ArrowDown':
@@ -148,6 +173,7 @@ export class MenuModel extends AbstractModel {
             return true;
           }
         break;
+
       case 'mouseClick':
         for (var i = 0; i < this.menuItems.length; i++) {
           if ((this.menuEntities[i][0].parentX+this.menuEntities[i][0].x)*this.app.layout.ratio <= event['x'] &&
@@ -160,40 +186,75 @@ export class MenuModel extends AbstractModel {
           }
         }        
         break;
-      case 'changeTriangle':
-        this.triangleEntity.snap++;
-        if (this.triangleEntity.snap > 7) {
-          this.triangleEntity.snap = 0;
-        }
-        this.triangleEntity.x += this.triangleMoveX;
-        this.triangleEntity.y += this.triangleMoveY;
-        if (this.triangleEntity.x < 0) {
-          this.triangleEntity.x -= this.triangleMoveX;
-          this.triangleMoveX = 2+Math.round(Math.random()*4);
-          this.triangleEntity.x += this.triangleMoveX;
 
+      case 'updateScene':
+        this.gameFrame++;
+        if (this.gameFrame > 15) {
+          this.gameFrame = 0;
         }
-        if (this.triangleEntity.x > 231) {
-          this.triangleEntity.x -= this.triangleMoveX;
-          this.triangleMoveX = -2-Math.round(Math.random()*4);
-          this.triangleEntity.x += this.triangleMoveX;
+        if (this.gameFrame%2 == 0) {
+          this.headEntity.incFrame();
+          this.redraw = true;
+        }
+        this.headX += this.headDirectionX;
+        if (this.headDirectionX > 0 && this.headX > 235) {
+          this.headDirectionX *= -1;
+          this.headEntity.switchDirection();
+          this.headDirectionY = Math.round(Math.random()*2)-1;
+          if (this.headDirectionY != 0) {
+            this.headY += this.wave[this.waveCounter];
+            this.waveCounter = 0;
+          }
+        }
+        if ((this.headDirectionX > 0 && this.headX > 235) ||
+            (this.headDirectionX < 0 && this.headX < 4)) {
+          this.headDirectionX *= -1;
+          this.headEntity.switchDirection();
+          this.headDirectionY = Math.round((Math.random()*4)-2)/2;
+          if (this.headDirectionY != 0) {
+            this.headY += this.wave[this.waveCounter];
+            this.waveCounter = 0;
+          }
+        }
+        this.headY += this.headDirectionY;
+        if (this.headDirectionY > 0 && this.headY > 160) {
+          this.headDirectionY *= -1;
+        }
+        if (this.headDirectionY < 0 && this.headY < 12) {
+          this.headDirectionY *= -1;
+        }
+        this.headEntity.x = this.headX;
+        this.headEntity.y = this.headY+this.wave[this.waveCounter];
+        if ((this.waveCounter > 0) || (this.headDirectionY == 0)) {
+          this.waveCounter++;
+        }
+        if (this.waveCounter == this.wave.length) {
+          this.waveCounter = 0;
+        }
+        if (this.headDirectionX > 0) {
+          this.willyEntity.x = this.headEntity.x-4;
+        } else {
+          this.willyEntity.x = this.headEntity.x+10;
+        }
+        this.willyEntity.y = this.headEntity.y-11;
+        this.willyEntity.direction = this.headEntity.direction;
+        if (this.gameFrame == 1 || this.gameFrame == 4) {
+          this.willyEntity.incFrame();
+        }
 
-        }
-        if (this.triangleEntity.y < 0) {
-          this.triangleEntity.y -= this.triangleMoveY;
-          this.triangleMoveY = 2+Math.round(Math.random()*4);
-          this.triangleEntity.y += this.triangleMoveY;
-
-        }
-        if (this.triangleEntity.y > 159) {
-          this.triangleEntity.y -= this.triangleMoveY;
-          this.triangleMoveY = -2-Math.round(Math.random()*4);
-          this.triangleEntity.y += this.triangleMoveY;
-
-        }
+        this.bodyEntities.forEach((entity, e) => {
+          entity.x = this.track[this.bodyObjects[e]['trackX']]['x'];
+          entity.y = this.track[this.bodyObjects[e]['trackY']]['y'];
+          entity.direction = this.track[this.bodyObjects[e]['trackX']]['direction'];
+          if (this.gameFrame%4 == 0) {
+            entity.incFrame();
+          }
+        });
+        this.track.shift();
+        this.track.push({'x': this.headEntity.x, 'y': this.headEntity.y, 'direction': this.headEntity.direction});
         this.redraw = true;
-        this.sendEvent(150, {'id': 'changeTriangle'});
         return true;
+
       case 'setMenuData':
         this.setData(event['data']);
         return true;
