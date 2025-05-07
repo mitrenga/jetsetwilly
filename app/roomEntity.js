@@ -34,22 +34,14 @@ export class RoomEntity extends AbstractEntity {
           var attr = data['graphicData'][idItem].substring(0, 2);
           //if (['floor', 'wall'].includes(idItem)) {
           {
-            var spriteData = [];
-            var graphicData = data['graphicData'][idItem].substring(2, 18);
-            for (var b = 0; b < 8; b++) {
-              var line = this.app.hexToBin(graphicData.substring(b*2, b*2+2));
-              for (var col = 0; col < line.length; col++) {
-                if (line[col] == '1') {
-                  spriteData.push({'x': col, 'y': b});
-                }
-              }
-            }
             var penColor = this.app.platform.penColorByAttribute(this.app.hexToInt(attr));
             var bkColor = this.app.platform.bkColorByAttribute(this.app.hexToInt(attr)&63);
             if (bkColor == this.app.platform.bkColorByAttribute(this.app.hexToInt(data['bkColor']))) {
               bkColor = false;
             }
-            this.addEntity(new SpriteEntity(this, x*8, y*8, 8, 8, spriteData, penColor, bkColor));
+            var layoutEntity = new SpriteEntity(this, x*8, y*8, penColor, bkColor, 0, 0);
+            this.addEntity(layoutEntity);
+            layoutEntity.setGraphicsDataFromHexStr(idItem, data['graphicData'][idItem].substring(2, 18));
           }
         }
       }
@@ -57,25 +49,15 @@ export class RoomEntity extends AbstractEntity {
 
     // ramp
     if ('ramp' in data['graphicData']) {
-      var spriteData = [];
-      var conveyorData = data['graphicData']['ramp'];
-      var attr = conveyorData['data'].substring(0, 2);
-      var graphicData = conveyorData['data'].substring(2, 18);
-      for (var b = 0; b < 8; b++) {
-        var line = this.app.hexToBin(graphicData.substring(b*2, b*2+2));
-        for (var col = 0; col < line.length; col++) {
-          if (line[col] == '1') {
-            spriteData.push({'x': col, 'y': b});
-          }
-        }
-      }
+      var rampData = data['graphicData']['ramp'];
+      var attr = rampData['data'].substring(0, 2);
       var penColor = this.app.platform.penColorByAttribute(this.app.hexToInt(attr));
       var bkColor = this.app.platform.bkColorByAttribute(this.app.hexToInt(attr)&63);
       if (bkColor == this.app.platform.bkColorByAttribute(this.app.hexToInt(data['bkColor']))) {
         bkColor = false;
       }
       var direction = 0;
-      switch (conveyorData['direction']) {
+      switch (rampData['direction']) {
         case 'left':
           direction = -1;
           break;
@@ -83,123 +65,58 @@ export class RoomEntity extends AbstractEntity {
           direction = 1;
           break;
         }
-      for (var pos = 0; pos < this.app.hexToInt(conveyorData['length']); pos++) {
-        this.addEntity(new SpriteEntity(this, (conveyorData['location']['x']+pos*direction)*8, (conveyorData['location']['y']-pos)*8, 8, 8, spriteData, penColor, bkColor));
+      for (var pos = 0; pos < this.app.hexToInt(rampData['length']); pos++) {
+        var rampEntity = new SpriteEntity(this, (rampData['location']['x']+pos*direction)*8, (rampData['location']['y']-pos)*8, penColor, bkColor, 0, 0);
+        this.addEntity(rampEntity);
+        rampEntity.setGraphicsDataFromHexStr('ramp', rampData['data'].substring(2, 18));
       }
     }
 
     // conveyor
     if ('conveyor' in data['graphicData']) {
-      var spriteData = [];
       var conveyorData = data['graphicData']['conveyor'];
       var attr = conveyorData['data'].substring(0, 2);
-      var graphicData = conveyorData['data'].substring(2, 18);
-      for (var b = 0; b < 8; b++) {
-        var line = this.app.hexToBin(graphicData.substring(b*2, b*2+2));
-        for (var col = 0; col < line.length; col++) {
-          if (line[col] == '1') {
-            spriteData.push({'x': col, 'y': b});
-          }
-        }
-      }
       var penColor = this.app.platform.penColorByAttribute(this.app.hexToInt(attr));
       var bkColor = this.app.platform.bkColorByAttribute(this.app.hexToInt(attr)&63);
       if (bkColor == this.app.platform.bkColorByAttribute(this.app.hexToInt(data['bkColor']))) {
         bkColor = false;
       }
       for (var pos = 0; pos < this.app.hexToInt(conveyorData['length']); pos++) {
-        this.addEntity(new SpriteEntity(this, (conveyorData['location']['x']+pos)*8, conveyorData['location']['y']*8, 8, 8, spriteData, penColor, bkColor));
+        var conveyorEntity = new SpriteEntity(this, (conveyorData['location']['x']+pos)*8, (conveyorData['location']['y'])*8, penColor, bkColor, 0, 0);
+        this.addEntity(conveyorEntity);
+        conveyorEntity.setGraphicsDataFromHexStr('conveyor', conveyorData['data'].substring(2, 18));
       }
     }
     
     // items
     var itemColor = 3;
     this.app.items[this.app.roomNumber].forEach((item) => {
-      var spriteData = [];
-      var graphicData = data['graphicData']['item'];
-      for (var b = 0; b < 8; b++) {
-        var line = this.app.hexToBin(graphicData.substring(b*2, b*2+2));
-        for (var col = 0; col < line.length; col++) {
-          if (line[col] == '1') {
-            spriteData.push({'x': col, 'y': b});
-          }
-        }
-      }
       var penColor = this.app.platform.color(itemColor);
-      this.addEntity(new SpriteEntity(this, item['x']*8, item['y']*8, 8, 8, spriteData, penColor, false));
-      itemColor++;
-      if (itemColor > 6) {
-        itemColor = 3;
-      }
+      var itemEntity = new SpriteEntity(this, item['x']*8, item['y']*8, penColor, false, 0, 0);
+      this.addEntity(itemEntity);
+      itemEntity.setGraphicsDataFromHexStr('item', data['graphicData']['item']);
+      itemColor = this.app.rotateInc(itemColor, 3, 5);
     });
  
     // Willy
-    var willy =  data['willy'];
-    var willySprite = willy['sprite'][willy['init']['frame']];
+    var willy = data['willy'];
     var penColor = this.app.platform.colorByName('white');
-    var spriteData = [];
-    var spriteWidth = 0;
-    var spriteHeight = 0;
-    willySprite.forEach((row, r) => {
-      for (var col = 0; col < row.length; col++) {
-        if (row[col] == '#') {
-          spriteData.push({'x': col, 'y': r});
-          if (col+1 > spriteWidth) {
-            spriteWidth = col+1;
-          }
-        }
-      }
-      spriteHeight++;
-    });
     if (data['initRoom'] == this.roomNumber) {
-      this.addEntity(
-        new SpriteEntity(
-          this,
-          willy['init']['x']+willy['paintCorrections']['x'],
-          willy['init']['y']+willy['paintCorrections']['y'],
-          spriteWidth,
-          spriteHeight,
-          spriteData,
-          penColor,
-          false
-        )
-      );
+      var willyEntity = new SpriteEntity(this, willy['init']['x']+willy['paintCorrections']['x'], willy['init']['y']+willy['paintCorrections']['y'], penColor, false, willy['init']['frame'], willy['init']['direction']);
+      this.addEntity(willyEntity);
+      willyEntity.setGraphicsData(willy);
     }
 
     // guardians
     if ('guardians' in data) {
-      ['horizontal', 'vertical', 'forDropping', 'falling'].forEach((guardianType) => {
+      ['horizontal', 'vertical'].forEach((guardianType) => {
         if (guardianType in data['guardians']) {
           var guardianTypeData = data['guardians'][guardianType];
-          data['guardians'][guardianType]['figures'].forEach((guardian) => {
-            var guardianSprite = data['guardians'][guardianType]['sprite'][guardian['init']['frame']];
+          guardianTypeData['figures'].forEach((guardian) => {
             var penColor = this.app.platform.penColorByAttribute(this.app.hexToInt(guardian['attribute']));
-            var spriteData = [];
-            var spriteWidth = 0;
-            var spriteHeight = 0;
-            guardianSprite.forEach((row, r) => {
-              for (var col = 0; col < row.length; col++) {
-                if (row[col] == '#') {
-                  spriteData.push({'x': col, 'y': r});
-                  if (col+1 > spriteWidth) {
-                    spriteWidth = col+1;
-                  }
-                }
-              }
-              spriteHeight++;
-            });
-            this.addEntity(
-              new SpriteEntity(
-                this,
-                guardian['init']['x']+guardianTypeData['paintCorrections']['x'],
-                guardian['init']['y']+guardianTypeData['paintCorrections']['y'],
-                spriteWidth,
-                spriteHeight,
-                spriteData,
-                penColor,
-                false
-              )
-            );
+            var guardianEntity = new SpriteEntity(this, guardian['init']['x']+guardianTypeData['paintCorrections']['x'], guardian['init']['y']+guardianTypeData['paintCorrections']['y'], penColor, false, guardian['init']['frame'], guardian['init']['direction']);
+            this.addEntity(guardianEntity);
+            guardianEntity.setGraphicsData(guardianTypeData);
           });
         }
       });
