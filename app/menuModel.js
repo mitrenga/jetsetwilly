@@ -188,10 +188,10 @@ export class MenuModel extends AbstractModel {
         break;
 
       case 'updateScene':
-        this.gameFrame++;
-        if (this.gameFrame > 15) {
-          this.gameFrame = 0;
-        }
+
+        this.gameFrame = this.app.rotateInc(this.gameFrame, 0, 14);
+
+        // head
         if (this.gameFrame%2 == 0) {
           this.headEntity.incFrame();
           this.redraw = true;
@@ -226,11 +226,10 @@ export class MenuModel extends AbstractModel {
         this.headEntity.x = this.headX;
         this.headEntity.y = this.headY+this.wave[this.waveCounter];
         if ((this.waveCounter > 0) || (this.headDirectionY == 0)) {
-          this.waveCounter++;
+          this.waveCounter = this.app.rotateInc(this.waveCounter, 0, this.wave.length-1);
         }
-        if (this.waveCounter == this.wave.length) {
-          this.waveCounter = 0;
-        }
+
+        // Willy
         if (this.headDirectionX > 0) {
           this.willyEntity.x = this.headEntity.x-4;
         } else {
@@ -242,6 +241,7 @@ export class MenuModel extends AbstractModel {
           this.willyEntity.incFrame();
         }
 
+        // body
         this.bodyEntities.forEach((entity, e) => {
           entity.x = this.track[this.bodyObjects[e]['trackX']]['x'];
           entity.y = this.track[this.bodyObjects[e]['trackY']]['y'];
@@ -253,6 +253,7 @@ export class MenuModel extends AbstractModel {
         this.track.shift();
         this.track.push({'x': this.headEntity.x, 'y': this.headEntity.y, 'direction': this.headEntity.direction});
         this.redraw = true;
+
         return true;
 
       case 'setMenuData':

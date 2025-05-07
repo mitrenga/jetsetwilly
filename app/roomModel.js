@@ -64,7 +64,7 @@ export class RoomModel extends AbstractModel {
       return true;
     }
 
-    return super.handlEvent(event);
+    return super.handleEvent(event);
   } // handleEvent
 
 } // class RoomModel

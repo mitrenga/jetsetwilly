@@ -2,7 +2,6 @@
    "willy":{
       "frames": 2,
       "directions": 2,
-      "pen": "#",
       "background": false,
       "sprite":[
          [
@@ -82,7 +81,6 @@
    "head":{
       "frames": 2,
       "directions": 2,
-      "pen": "#",
       "background": false,
       "sprite":[
          [
@@ -162,7 +160,6 @@
    "body":{
       "frames": 2,
       "directions": 2,
-      "pen": "#",
       "background": false,
       "sprite":[
          [

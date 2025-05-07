@@ -45,7 +45,7 @@ export class MainModel extends AbstractModel {
       this.app.setGlobalData(event['data']);
       return true;
     }
-    return super.handlEvent(event);
+    return super.handleEvent(event);
   } // handleEvent
 
 } // class MainModel

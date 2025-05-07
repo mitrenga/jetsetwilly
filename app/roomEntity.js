@@ -135,7 +135,7 @@ export class RoomEntity extends AbstractEntity {
  
     // Willy
     var willy =  data['willy'];
-    var willySprite = willy['sprite'][willy['init']['animationFrame']];
+    var willySprite = willy['sprite'][willy['init']['frame']];
     var penColor = this.app.platform.colorByName('white');
     var spriteData = [];
     var spriteWidth = 0;
@@ -172,7 +172,7 @@ export class RoomEntity extends AbstractEntity {
         if (guardianType in data['guardians']) {
           var guardianTypeData = data['guardians'][guardianType];
           data['guardians'][guardianType]['figures'].forEach((guardian) => {
-            var guardianSprite = data['guardians'][guardianType]['sprite'][guardian['init']['animationFrame']];
+            var guardianSprite = data['guardians'][guardianType]['sprite'][guardian['init']['frame']];
             var penColor = this.app.platform.penColorByAttribute(this.app.hexToInt(guardian['attribute']));
             var spriteData = [];
             var spriteWidth = 0;
