@@ -24,7 +24,7 @@ setInterval(updateScene, 67);
 window.onkeydown = function(event) { gameApp.eventKeyDown(event); }
 window.onkeyup = function(event) { gameApp.eventKeyUp(event); }
 window.onclick = function(event) { gameApp.eventMouseClick(event, 'left'); }
-window.oncontextmenu = function(event) { gameApp.eventMouseClick(event, 'right'); event.preventDefault(); }
+window.oncontextmenu = function(event) { gameApp.eventMouseClick(event, 'right'); }
 window.ontouchstart = function(event) {gameApp.eventTouchStart(event); }
 window.ontouchend =  function(event) {gameApp.eventTouchEnd(event); }
 window.ontouchcancel =  function(event) {gameApp.eventTouchCancel(event); }
