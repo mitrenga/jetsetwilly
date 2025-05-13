@@ -20,6 +20,9 @@ export class GameApp extends AbstractApp {
   constructor(platform, wsURL) {
     super(platform, 'bodyApp',  wsURL);
 
+    this.sound = 0.3;
+    this.music = 0.3;
+    
     this.roomNumber = false;
     this.globalData = false;
     this.items = [];
@@ -38,68 +41,6 @@ export class GameApp extends AbstractApp {
     return null;
   } // newModel
   
-  prepnimistnost(key) { // ##################################################################################################################
-    if (this.model.id == 'RoomModel') {
-      var nextRoom = false;
-      var direction = false;
-      switch(key) {
-        case 'ArrowLeft':
-          direction = 'left';
-          break;
-        case 'ArrowRight':
-          direction = 'right';
-          break;
-        case 'ArrowUp':
-          direction = 'above';
-          break;
-        case 'ArrowDown':
-          direction = 'below';
-          break;
-      }
-      if (direction !== false) {
-        nextRoom = this.model.adjoiningRoom[direction];
-      }
-      if (nextRoom !== false) {
-        this.roomNumber = this.hexToInt(nextRoom);
-        this.model = this.newModel('RoomModel');
-        this.model.init();
-        this.resizeApp();
-      }
-    }
-  } // ######################################################################################################################################
-
-  onClick(e) {
-    super.onClick(e);
-  
-    var prevModelID = this.model.id; 
-    this.model = null;
-    switch (prevModelID) {
-      case 'ResetModel': 
-        this.model = this.newModel('MenuModel');
-        break;
-      case 'MenuModel': 
-        this.model = this.newModel('MainModel');
-        break;
-      case 'MainModel': 
-        this.roomNumber = this.globalData['initRoom'];
-        this.model = this.newModel('RoomModel');
-        break;
-      case 'RoomModel': 
-        this.roomNumber++;
-        if (this.roomNumber < this.globalData['roomsCount']) {
-          this.model = this.newModel('RoomModel');
-        } else {
-          this.model = this.newModel('GameOverModel');
-        }
-        break;
-      case 'GameOverModel': 
-        this.model = this.newModel('MainModel');
-        break;
-    }
-    this.model.init();
-    this.resizeApp();
-  } // onClick
-
   setGlobalData(data) {
     this.globalData = data;
 

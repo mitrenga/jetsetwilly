@@ -10,47 +10,28 @@ import appPlatform from './appPlatform.js';
 var gameApp = new GameApp(appPlatform, window.wsURL);
 var audio = null;
 
-function resizeGame() {
-  var elementRoot = document.documentElement;
-  if (window.innerHeight != gameApp.element.height) {
-    elementRoot.style.setProperty('--app-height', window.innerHeight+'px');
-  }
-  gameApp.resizeApp();
-} // resizeGame
-
-// main loop
+// animation loop
 function loopGame(timestamp) {
   gameApp.loopApp(timestamp);
   requestAnimationFrame(loopGame);
 } // loopGame
 
-// master game timer
-function updateScene() {
-  gameApp.model.sendEvent(0, {'id': 'updateScene'});
-}
-
-// master game timer
+// master game timer & loop
+function updateScene() { gameApp.model.sendEvent(0, {'id': 'updateScene'}); }
 setInterval(updateScene, 67);
 
-// keyboard press key
-window.onkeydown = function(e) { gameApp.model.sendEvent(0, {'id': 'keyPress', 'key': e.key}); }
-// keyboard release key
-window.onkeyup = function(e) { gameApp.model.sendEvent(0, {'id': 'keyRelease', 'key': e.key}); }
-// mouse left key
-gameApp.element.onclick = function(e) { gameApp.model.sendEvent(0, {'id': 'mouseClick', 'key': 'left', 'x': e.clientX, 'y': e.clientY}); }
-// mouse right key
-window.oncontextmenu = function(e) { gameApp.onClick(e); e.preventDefault(); }
-// touch screen
-gameApp.element.ontouchstart = function(e) { gameApp.onClick(e); e.preventDefault(); }
-gameApp.element.ontouchmove = function(e) { console.log(e.touches.length+' '+e.touches[0].clientX+' '+e.touches[0].clientY); e.preventDefault(); }
-gameApp.element.ontouchend = function(e) { e.preventDefault(); }
-gameApp.element.ontouchcancel = function(e) { e.preventDefault(); }
-// resize event
-window.onresize = function(e) { resizeGame(); }
-// blur window
-window.onblur = function(e) { /*console.log('blur window');*/ }
-//focus window
-window.onfocus = function(e) { /*console.log('focus window');*/ }
+// events processing
+window.onkeydown = function(event) { gameApp.eventKeyDown(event); }
+window.onkeyup = function(event) { gameApp.eventKeyUp(event); }
+window.onclick = function(event) { gameApp.eventMouseClick(event, 'left'); }
+window.oncontextmenu = function(event) { gameApp.eventMouseClick(event, 'right'); event.preventDefault(); }
+window.ontouchstart = function(event) {gameApp.eventTouchStart(event); }
+window.ontouchend =  function(event) {gameApp.eventTouchEnd(event); }
+window.ontouchcancel =  function(event) {gameApp.eventTouchCancel(event); }
+window.ontouchmove =  function(event) {gameApp.eventTouchMove(event); }
+window.onblur = function(event) { gameApp.eventBlurWindow(event); }
+window.onfocus = function(event) { gameApp.eventFocusWindow(event); }
+window.onresize = function(event) { gameApp.eventResizeWindow(event); }
 
-resizeGame();  // calc actual model size
+gameApp.resizeApp();  // calc actual model size
 loopGame(0);    // start game

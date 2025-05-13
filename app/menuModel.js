@@ -4,12 +4,18 @@ const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+wi
 const { ZXTextEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js?ver='+window.srcVersion);
 const { LogoEntity } = await import('./logoEntity.js?ver='+window.srcVersion);
 const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
+const { PlayerNameEntity } = await import('./playerNameEntity.js?ver='+window.srcVersion);
+const { HallOfFameEntity } = await import('./hallOfFameEntity.js?ver='+window.srcVersion);
+const { AboutEntity } = await import('./aboutEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import AbstractEntity from './svision/js/abstractEntity.js';
 import ZXTextEntity from './svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js';
 import LogoEntity from './logoEntity.js';
 import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
+import PlayerNameEntity from './playerNameEntity.js';
+import HallOfFameEntity from './hallOfFameEntity.js';
+import AboutEntity from './aboutEntity.js';
 /**/
 // begin code
 
@@ -19,7 +25,6 @@ export class MenuModel extends AbstractModel {
     super(app);
     this.id = 'MenuModel';
 
-    this.bwColor = '#7c7c7c';
     this.redraw = false;
     this.gameFrame = 0;
     this.bodyObjects = [
@@ -44,18 +49,19 @@ export class MenuModel extends AbstractModel {
     this.willyEntity = null;
     this.selectedItem = 0;
     this.bkEntity = null;
+    this.menuSelectedRow = null;
+    this.penMenuItemColor = 'rgb(127, 127, 127)';
+    this.penSelectedMenuItemColor = 'rgb(0, 0, 0)';
     this.menuEntities = [];
-    this.menuItemColor = 'rgb(108, 108, 108)';
-    this.menuSelectedItemColor = 'rgb(240,240,240)';
     this.menuItems = [
-      ['START GAME', ''],
-      ['PLAYER NAME', 'libmit'],
-      ['HALL OF FAME', ''],
-      ['SOUND', 'OFF'],
-      ['MUSIC', 'OFF'],
-      ['CONTROLS', ''],
-      ['SHOW TAPE LOADING', ''],
-      ['ABOUT GAME', '']
+      {'label': 'START GAME', 'event': 'startGame'},
+      {'label': 'PLAYER NAME', 'event': 'setPlayerName'},
+      {'label': 'HALL OF FAME', 'event': 'showHallOfFame'},
+      {'label': 'SOUND', 'event': 'setSound'},
+      {'label': 'MUSIC', 'event': 'setMusic'},
+      {'label': 'CONTROLS', 'event': 'showControls'},
+      {'label': 'SHOW TAPE LOADING', 'event': 'startTapeLoading'},
+      {'label': 'ABOUT GAME', 'event': 'showAbout'}
     ];
     this.logoEntity = null;
     this.copyrightEntity = null;
@@ -86,29 +92,30 @@ export class MenuModel extends AbstractModel {
 
     this.headEntity = new SpriteEntity(this.desktopEntity, this.headX, this.headY, 'rgb(21, 147, 181)', false, 0, 0);
     this.desktopEntity.addEntity(this.headEntity);
-    this.willyEntity = new SpriteEntity(this.desktopEntity, this.headX-4, this.headY-11, this.bwColor, false, 0, 0);
+    this.willyEntity = new SpriteEntity(this.desktopEntity, this.headX-4, this.headY-11, '#7c7c7c', false, 0, 0);
     this.desktopEntity.addEntity(this.willyEntity);
-    this.bkEntity = new AbstractEntity(this.desktopEntity, 13, 22, 230, 140, false, 'rgba(223, 218, 208, 0.8)');
+
+    this.bkEntity = new AbstractEntity(this.desktopEntity, 13, 22, 230, 144, false, 'rgba(223, 218, 208, 0.8)');
     this.desktopEntity.addEntity(this.bkEntity);
+    this.menuSelectedRow = new ZXTextEntity(this.bkEntity, 10, 10+this.selectedItem*16, 210, 12, '', false, 'rgba(0, 0, 0, 0.15)', 0, false);
+    this.bkEntity.addEntity(this.menuSelectedRow);
 
     for (var y = 0; y < this.menuItems.length; y++) {
-      var bkColor = false;
-      var penColor = this.menuItemColor;
+      var color = this.penMenuItemColor;
       if (y == this.selectedItem) {
-        bkColor = this.menuItemColor
-        penColor = this.menuSelectedItemColor;
+        color = this.penSelectedMenuItemColor;
       }
       this.menuEntities[y] = [];
-      this.menuEntities[y][1] = new ZXTextEntity(this.desktopEntity, 133, 30+y*16, 100, 12, this.menuItems[y][1], penColor, bkColor, 0, true);
+      this.menuEntities[y][0] = new ZXTextEntity(this.bkEntity, 10, 10+y*16, 138, 12, this.menuItems[y]['label'], color, false, 0, true);
+      this.menuEntities[y][0].margin = 2;
+      this.bkEntity.addEntity(this.menuEntities[y][0]);
+      this.menuEntities[y][1] = new ZXTextEntity(this.bkEntity, 120, 10+y*16, 100, 12, this.menuParamValue(this.menuItems[y]['event']), color, false, 0, true);
       this.menuEntities[y][1].margin = 2;
       this.menuEntities[y][1].justify = 1;
-      this.desktopEntity.addEntity(this.menuEntities[y][1]);
-      this.menuEntities[y][0] = new ZXTextEntity(this.desktopEntity, 23, 30+y*16, 138, 12, this.menuItems[y][0], penColor, bkColor, 0, true);
-      this.menuEntities[y][0].margin = 2;
-      this.desktopEntity.addEntity(this.menuEntities[y][0]);
+      this.bkEntity.addEntity(this.menuEntities[y][1]);
     }
 
-    this.logoEntity = new LogoEntity(this.desktopEntity, 144, 6, 93, 10, 0);
+    this.logoEntity = new LogoEntity(this.desktopEntity, 144, 6, 93, 10, 'rgb(91, 91, 91)', 'rgb(155, 155, 155)', false, 2);
     this.desktopEntity.addEntity(this.logoEntity);
 
     this.copyrightEntity = new ZXTextEntity(this.desktopEntity, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, 0, true);
@@ -120,6 +127,31 @@ export class MenuModel extends AbstractModel {
 
     this.sendEvent(330, {'id': 'changeFlashState'});
   } // init
+
+  menuParamValue(event) {
+    switch (event) {
+      case 'setPlayerName':
+        return 'libmit';
+      case 'setSound':
+        if (this.app.sound == 0) {
+          return 'OFF';
+        }
+        return 'ON';
+      case 'setMusic':
+        if (this.app.music == 0) {
+          return 'OFF';
+        }
+        return 'ON';
+    }
+    return '';
+  } // menuParamValue
+
+  refreshMenu() {
+    for (var y = 0; y < this.menuItems.length; y++) {
+      this.menuEntities[y][0].text = this.menuItems[y]['label'];
+      this.menuEntities[y][1].text = this.menuParamValue(this.menuItems[y]['event']);
+    }
+  } // refreshMenu
 
   setData(data) {
     this.bodyEntities.forEach((entity, e) => {
@@ -136,15 +168,12 @@ export class MenuModel extends AbstractModel {
     if (newItem < 0 || newItem >= this.menuItems.length) {
       return;
     }
-    this.menuEntities[this.selectedItem][0].bkColor = false;
-    this.menuEntities[this.selectedItem][1].bkColor = false;
-    this.menuEntities[this.selectedItem][0].penColor = this.menuItemColor;
-    this.menuEntities[this.selectedItem][1].penColor = this.menuItemColor;
+    this.menuEntities[this.selectedItem][0].penColor = this.penMenuItemColor;
+    this.menuEntities[this.selectedItem][1].penColor = this.penMenuItemColor;
     this.selectedItem = newItem;
-    this.menuEntities[this.selectedItem][0].bkColor = this.menuItemColor;
-    this.menuEntities[this.selectedItem][1].bkColor = this.menuItemColor;
-    this.menuEntities[this.selectedItem][0].penColor = this.menuSelectedItemColor;
-    this.menuEntities[this.selectedItem][1].penColor = this.menuSelectedItemColor;
+    this.menuEntities[this.selectedItem][0].penColor = this.penSelectedMenuItemColor;
+    this.menuEntities[this.selectedItem][1].penColor = this.penSelectedMenuItemColor;
+    this.menuSelectedRow.y = 10+this.selectedItem*16;
     this.redraw = true;
 } // changeMenuItem
 
@@ -156,6 +185,42 @@ export class MenuModel extends AbstractModel {
 
     switch (event['id']) {
 
+      case 'startGame': 
+        this.app.model = this.app.newModel('MainModel');
+        this.app.model.init();
+        this.app.resizeApp();
+        return true;
+
+      case 'setSound':
+        if (this.app.sound == 0) {
+          this.app.sound = 0.3;
+        } else {
+          this.app.sound = 0;
+        }
+        this.refreshMenu();
+        return true;
+
+      case 'setMusic':
+        if (this.app.music == 0) {
+          this.app.music = 0.3;
+        } else {
+          this.app.music = 0;
+        }
+        this.refreshMenu();
+        return true;
+    
+      case 'setPlayerName':
+        this.desktopEntity.addModalEntity(new PlayerNameEntity(this.desktopEntity, 28, 42, 200, 100));
+      return true;
+
+      case 'showHallOfFame':
+        this.desktopEntity.addModalEntity(new HallOfFameEntity(this.desktopEntity, 28, 26, 200, 132));
+      return true;
+
+      case 'showAbout':
+        this.desktopEntity.addModalEntity(new AboutEntity(this.desktopEntity, 28, 26, 200, 132));
+      return true;
+
       case 'changeFlashState':
         this.flashState = !this.flashState;
         this.logoEntity.flashState = this.flashState;
@@ -165,6 +230,10 @@ export class MenuModel extends AbstractModel {
 
       case 'keyPress':
         switch (event['key']) {
+          case 'Enter':
+          case ' ':
+              this.sendEvent(0, {'id': this.menuItems[this.selectedItem]['event']});
+            return true;
           case 'ArrowDown':
             this.changeMenuItem(this.selectedItem+1);
             return true;
@@ -175,22 +244,24 @@ export class MenuModel extends AbstractModel {
         break;
 
       case 'mouseClick':
-        for (var i = 0; i < this.menuItems.length; i++) {
-          if ((this.menuEntities[i][0].parentX+this.menuEntities[i][0].x)*this.app.layout.ratio <= event['x'] &&
-            (this.menuEntities[i][0].parentY+this.menuEntities[i][0].y)*this.app.layout.ratio <= event['y'] &&
-            (this.menuEntities[i][1].parentX+this.menuEntities[i][1].x+this.menuEntities[i][1].width)*this.app.layout.ratio >= event['x'] &&
-            (this.menuEntities[i][1].parentY+this.menuEntities[i][1].y+this.menuEntities[i][1].height)*this.app.layout.ratio >= event['y']
-          ) {
-            this.changeMenuItem(i);
-            return true;
+        if (event['key'] == 'left') {
+          for (var i = 0; i < this.menuItems.length; i++) {
+            if ((this.menuEntities[i][0].parentX+this.menuEntities[i][0].x)*this.app.layout.ratio <= event['x'] &&
+              (this.menuEntities[i][0].parentY+this.menuEntities[i][0].y)*this.app.layout.ratio <= event['y'] &&
+              (this.menuEntities[i][1].parentX+this.menuEntities[i][1].x+this.menuEntities[i][1].width)*this.app.layout.ratio >= event['x'] &&
+              (this.menuEntities[i][1].parentY+this.menuEntities[i][1].y+this.menuEntities[i][1].height)*this.app.layout.ratio >= event['y']
+            ) {
+              this.changeMenuItem(i);
+              this.sendEvent(0, {'id': this.menuItems[this.selectedItem]['event']});
+              return true;
+            }
           }
-        }        
+        }
         break;
 
       case 'updateScene':
-
         this.gameFrame = this.app.rotateInc(this.gameFrame, 0, 14);
-
+    
         // head
         if (this.gameFrame%2 == 0) {
           this.headEntity.incFrame();
@@ -260,6 +331,8 @@ export class MenuModel extends AbstractModel {
         this.setData(event['data']);
         return true;
     }
+
+    return false;
   } // handleEvent
 
   loopModel(timestamp) {
