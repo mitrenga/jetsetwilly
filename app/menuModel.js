@@ -246,11 +246,7 @@ export class MenuModel extends AbstractModel {
       case 'mouseClick':
         if (event['key'] == 'left') {
           for (var i = 0; i < this.menuItems.length; i++) {
-            if ((this.menuEntities[i][0].parentX+this.menuEntities[i][0].x)*this.app.layout.ratio <= event['x'] &&
-              (this.menuEntities[i][0].parentY+this.menuEntities[i][0].y)*this.app.layout.ratio <= event['y'] &&
-              (this.menuEntities[i][1].parentX+this.menuEntities[i][1].x+this.menuEntities[i][1].width)*this.app.layout.ratio >= event['x'] &&
-              (this.menuEntities[i][1].parentY+this.menuEntities[i][1].y+this.menuEntities[i][1].height)*this.app.layout.ratio >= event['y']
-            ) {
+            if ((this.menuEntities[i][0].pointOnEntity(event)) || (this.menuEntities[i][1].pointOnEntity(event))) {
               this.changeMenuItem(i);
               this.sendEvent(0, {'id': this.menuItems[this.selectedItem]['event']});
               return true;
