@@ -190,6 +190,12 @@ export class MenuModel extends AbstractModel {
         this.app.model.init();
         this.app.resizeApp();
         return true;
+      
+      case 'startTapeLoading': 
+        this.app.model = this.app.newModel('TapeLoadingModel');
+        this.app.model.init();
+        this.app.resizeApp();
+        return true;
 
       case 'setSound':
         if (this.app.sound == 0) {
@@ -333,7 +339,7 @@ export class MenuModel extends AbstractModel {
 
   loopModel(timestamp) {
     super.loopModel(timestamp);
-
+  
     if (this.redraw == true) {
       this.redraw = false;
       this.drawModel();

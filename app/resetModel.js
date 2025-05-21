@@ -17,7 +17,6 @@ export class ResetModel extends AbstractModel {
     this.resetEntity = null;
     this.inputLineEntity = null;
     this.resetTimer = false;
-    this.flashState = false;
 
     const http = new XMLHttpRequest();
     http.responser = this;
@@ -47,12 +46,6 @@ export class ResetModel extends AbstractModel {
 
   handleEvent(event) {
     switch (event['id']) {
-      case 'changeFlashState':
-        this.flashState = !this.flashState;
-        this.inputLineEntity.flashState = this.flashState;
-        this.drawModel();
-        this.sendEvent(330, {'id': 'changeFlashState'});
-        return true;
       case 'showReset':
         this.resetTimer = this.app.now;
         this.resetEntity.hide = false;

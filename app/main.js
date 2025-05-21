@@ -21,17 +21,23 @@ function updateScene() { gameApp.model.sendEvent(0, {'id': 'updateScene'}); }
 setInterval(updateScene, 67);
 
 // events processing
-window.onkeydown = function(event) { gameApp.eventKeyDown(event); }
-window.onkeyup = function(event) { gameApp.eventKeyUp(event); }
-window.onclick = function(event) { gameApp.eventMouseClick(event, 'left'); }
-window.oncontextmenu = function(event) { gameApp.eventMouseClick(event, 'right'); }
-window.ontouchstart = function(event) {gameApp.eventTouchStart(event); }
-window.ontouchend =  function(event) {gameApp.eventTouchEnd(event); }
-window.ontouchcancel =  function(event) {gameApp.eventTouchCancel(event); }
-window.ontouchmove =  function(event) {gameApp.eventTouchMove(event); }
+window.onkeydown = function(event) { gameApp.inputEventsManager.eventKeyDown(event); }
+window.onkeyup = function(event) { gameApp.inputEventsManager.eventKeyUp(event); }
+window.onclick = function(event) { gameApp.inputEventsManager.eventClick(event); }
+window.oncontextmenu = function(event) { gameApp.inputEventsManager.eventContextMenu(event); }
+window.onmousedown = function(event) { gameApp.inputEventsManager.eventMouseDown(event); }
+window.onmouseup = function(event) { gameApp.inputEventsManager.eventMouseUp(event); }
+window.onmousemove = function(event) { gameApp.inputEventsManager.eventMouseMove(event); }
+window.ontouchstart = function(event) {gameApp.inputEventsManager.eventTouchStart(event); }
+window.ontouchend = function(event) {gameApp.inputEventsManager.eventTouchEnd(event); }
+window.ontouchcancel = function(event) {gameApp.inputEventsManager.eventTouchCancel(event); }
+window.ontouchmove = function(event) {gameApp.inputEventsManager.eventTouchMove(event); }
+window.ongamepadconnected = function(event) { gameApp.inputEventsManager.eventGamePadConnected(event); }
+window.ongamepaddisconnected = function(event) { gameApp.inputEventsManager.eventGamePadDisconnected(event); }
 window.onblur = function(event) { gameApp.eventBlurWindow(event); }
 window.onfocus = function(event) { gameApp.eventFocusWindow(event); }
 window.onresize = function(event) { gameApp.eventResizeWindow(event); }
 
-gameApp.resizeApp();  // calc actual model size
-loopGame(0);    // start game
+// start game
+gameApp.resizeApp();
+loopGame(0);

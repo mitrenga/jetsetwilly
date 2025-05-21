@@ -5,6 +5,7 @@ const { MenuModel } = await import('./menuModel.js?ver='+window.srcVersion);
 const { MainModel } = await import('./mainModel.js?ver='+window.srcVersion);
 const { RoomModel } = await import('./roomModel.js?ver='+window.srcVersion);
 const { GameOverModel } = await import('./gameOverModel.js?ver='+window.srcVersion);
+const { TapeLoadingModel } = await import('./tapeLoadingModel.js?ver='+window.srcVersion);
 /*/
 import AbstractApp from './svision/js/abstractApp.js';
 import ResetModel from './resetModel.js';
@@ -12,6 +13,7 @@ import MenuModel from './menuModel.js';
 import MainModel from './mainModel.js';
 import RoomModel from './roomModel.js';
 import GameOverModel from './gameOverModel.js';
+import TapeLoadingModel from './tapeLoadingModel.js';
 /**/
 // begin code
 
@@ -28,6 +30,8 @@ export class GameApp extends AbstractApp {
     this.items = [];
     this.model = this.newModel('ResetModel');
     this.model.init();
+
+    this.gamePad = false;
   } // constructor
 
   newModel(model) {
@@ -37,6 +41,7 @@ export class GameApp extends AbstractApp {
       case 'MainModel': return new MainModel(this);
       case 'RoomModel': return new RoomModel(this, this.roomNumber);
       case 'GameOverModel': return new GameOverModel(this);
+      case 'TapeLoadingModel': return new TapeLoadingModel(this);
     } // switch
     return null;
   } // newModel
