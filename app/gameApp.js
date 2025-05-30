@@ -22,7 +22,7 @@ export class GameApp extends AbstractApp {
   constructor(platform, wsURL) {
     super(platform, 'bodyApp',  wsURL);
 
-    this.sound = 0.3;
+    this.sounds = 0.3;
     this.music = 0.3;
     
     this.roomNumber = false;

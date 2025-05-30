@@ -57,7 +57,7 @@ export class MenuModel extends AbstractModel {
       {'label': 'START GAME', 'event': 'startGame'},
       {'label': 'PLAYER NAME', 'event': 'setPlayerName'},
       {'label': 'HALL OF FAME', 'event': 'showHallOfFame'},
-      {'label': 'SOUND', 'event': 'setSound'},
+      {'label': 'SOUNDS', 'event': 'setSounds'},
       {'label': 'MUSIC', 'event': 'setMusic'},
       {'label': 'CONTROLS', 'event': 'showControls'},
       {'label': 'SHOW TAPE LOADING', 'event': 'startTapeLoading'},
@@ -132,8 +132,8 @@ export class MenuModel extends AbstractModel {
     switch (event) {
       case 'setPlayerName':
         return 'libmit';
-      case 'setSound':
-        if (this.app.sound == 0) {
+      case 'setSounds':
+        if (this.app.sounds == 0) {
           return 'OFF';
         }
         return 'ON';
@@ -197,11 +197,11 @@ export class MenuModel extends AbstractModel {
         this.app.resizeApp();
         return true;
 
-      case 'setSound':
-        if (this.app.sound == 0) {
-          this.app.sound = 0.3;
+      case 'setSounds':
+        if (this.app.sounds == 0) {
+          this.app.sounds = 0.3;
         } else {
-          this.app.sound = 0;
+          this.app.sounds = 0;
         }
         this.refreshMenu();
         return true;
