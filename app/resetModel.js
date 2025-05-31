@@ -59,6 +59,7 @@ export class ResetModel extends AbstractModel {
         this.sendEvent(1200, {'id': 'setMenuModel'});
         return true;
       case 'setMenuModel':
+        this.app.model.shutdown();
         this.app.model = this.app.newModel('MenuModel');
         this.app.model.init();
         this.app.resizeApp();

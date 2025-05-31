@@ -71,6 +71,9 @@ export class TapeLoadingModel extends AbstractModel {
     this.copyrightLine5.hide = true;
     this.desktopEntity.addEntity(this.copyrightLine5);
 
+    if (this.app.sounds > 0) {
+      this.sendEvent(500, {'id': 'openAudioChannel', 'channel': 'sounds'});
+    }
     this.sendEvent(1000, {'id': 'updateCommand'});
     this.sendEvent(330, {'id': 'changeFlashState'});
   } // init
@@ -142,6 +145,7 @@ export class TapeLoadingModel extends AbstractModel {
         return true;
 
       case 'setMenuModel':
+        this.app.model.shutdown();
         this.app.model = this.app.newModel('MenuModel');
         this.app.model.init();
         this.app.resizeApp();

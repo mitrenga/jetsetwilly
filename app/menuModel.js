@@ -186,12 +186,14 @@ export class MenuModel extends AbstractModel {
     switch (event['id']) {
 
       case 'startGame': 
+        this.app.model.shutdown();
         this.app.model = this.app.newModel('MainModel');
         this.app.model.init();
         this.app.resizeApp();
         return true;
       
       case 'startTapeLoading': 
+        this.app.model.shutdown();
         this.app.model = this.app.newModel('TapeLoadingModel');
         this.app.model.init();
         this.app.resizeApp();
@@ -200,10 +202,8 @@ export class MenuModel extends AbstractModel {
       case 'setSounds':
         if (this.app.sounds == 0) {
           this.app.sounds = 0.3;
-          this.sendEvent(1, {'id': 'openAudioHandler', 'channel': 'sounds'});
         } else {
           this.app.sounds = 0;
-          this.sendEvent(1, {'id': 'closeAudioHandler', 'channel': 'sounds'});
         }
         this.refreshMenu();
         return true;
@@ -211,10 +211,8 @@ export class MenuModel extends AbstractModel {
       case 'setMusic':
         if (this.app.music == 0) {
           this.app.music = 0.3;
-          this.sendEvent(1, {'id': 'openAudioHandler', 'channel': 'music'});
         } else {
           this.app.music = 0;
-          this.sendEvent(1, {'id': 'closeAudioHandler', 'channel': 'music'});
         }
         this.refreshMenu();
         return true;
