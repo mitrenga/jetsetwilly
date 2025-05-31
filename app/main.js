@@ -7,8 +7,7 @@ import appPlatform from './appPlatform.js';
 /**/
 // begin code
 
-var gameApp = new GameApp(appPlatform, window.wsURL);
-var audio = null;
+var gameApp = new GameApp(appPlatform, window.importPath, window.wsURL);
 
 // animation loop
 function loopGame(timestamp) {
