@@ -7,7 +7,6 @@ const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEnti
 const { PlayerNameEntity } = await import('./playerNameEntity.js?ver='+window.srcVersion);
 const { HallOfFameEntity } = await import('./hallOfFameEntity.js?ver='+window.srcVersion);
 const { AboutEntity } = await import('./aboutEntity.js?ver='+window.srcVersion);
-const { AudioWorkletHandler } = await import('./svision/js/audioWorkletHandler.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import AbstractEntity from './svision/js/abstractEntity.js';
@@ -17,7 +16,6 @@ import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
 import PlayerNameEntity from './playerNameEntity.js';
 import HallOfFameEntity from './hallOfFameEntity.js';
 import AboutEntity from './aboutEntity.js';
-import AudioWorkletHandler from './svision/js/audioWorkletHandler.js';
 /**/
 // begin code
 
@@ -202,10 +200,10 @@ export class MenuModel extends AbstractModel {
       case 'setSounds':
         if (this.app.sounds == 0) {
           this.app.sounds = 0.3;
-          this.app.audioManager.openChannel('sounds', new AudioWorkletHandler(this.app));
+          this.sendEvent(1, {'id': 'openAudioHandler', 'channel': 'sounds'});
         } else {
           this.app.sounds = 0;
-          this.app.audioManager.closeChannel('sounds');
+          this.sendEvent(1, {'id': 'closeAudioHandler', 'channel': 'sounds'});
         }
         this.refreshMenu();
         return true;
@@ -213,10 +211,10 @@ export class MenuModel extends AbstractModel {
       case 'setMusic':
         if (this.app.music == 0) {
           this.app.music = 0.3;
-          this.app.audioManager.openChannel('music', new AudioWorkletHandler(this.app));
+          this.sendEvent(1, {'id': 'openAudioHandler', 'channel': 'music'});
         } else {
           this.app.music = 0;
-          this.app.audioManager.closeChannel('music');
+          this.sendEvent(1, {'id': 'closeAudioHandler', 'channel': 'music'});
         }
         this.refreshMenu();
         return true;
