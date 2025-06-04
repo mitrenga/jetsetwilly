@@ -71,7 +71,7 @@ export class TapeLoadingModel extends AbstractModel {
     this.copyrightLine5.hide = true;
     this.desktopEntity.addEntity(this.copyrightLine5);
 
-    if (this.app.sounds > 0) {
+    if (this.app.audioManager.sounds > 0) {
       this.sendEvent(500, {'id': 'openAudioChannel', 'channel': 'sounds'});
     }
     this.sendEvent(1000, {'id': 'updateCommand'});
@@ -109,6 +109,7 @@ export class TapeLoadingModel extends AbstractModel {
         switch (this.tape[this.phase]['id']) {
           case 'pilot':
             this.sendEvent(0, {'id': 'setBorderAnimation', 'value': 'pilotTone'})
+            this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'pilotTone', 'parameters': false})
             break;
           case 'data':
             this.sendEvent(0, {'id': 'setBorderAnimation', 'value': 'dataTone'})
