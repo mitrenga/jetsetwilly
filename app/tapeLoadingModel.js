@@ -108,14 +108,14 @@ export class TapeLoadingModel extends AbstractModel {
       case 'updateTape':
         switch (this.tape[this.phase]['id']) {
           case 'pilot':
-            this.sendEvent(0, {'id': 'setBorderAnimation', 'value': 'pilotTone'})
-            this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'pilotTone', 'parameters': false})
+            this.sendEvent(0, {'id': 'setBorderAnimation', 'value': 'pilotTone'});
+            this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'tapePilotTone', 'options': {'repeat': true}});
             break;
           case 'data':
-            this.sendEvent(0, {'id': 'setBorderAnimation', 'value': 'dataTone'})
+            this.sendEvent(0, {'id': 'setBorderAnimation', 'value': 'dataTone'});
             break;
           case 'pause':
-            this.sendEvent(0, {'id': 'setBorderAnimation', 'value': false})
+            this.sendEvent(0, {'id': 'setBorderAnimation', 'value': false});
             break;
         }
         if ('event' in this.tape[this.phase]) {

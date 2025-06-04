@@ -14,8 +14,8 @@ export class AudioManager extends AbstractAudioManager {
   constructor(app) {
     super(app);
     this.id = 'AudioManager';
-    this.sounds = this.app.getCookie('audioChannelSounds', 0.3);
-    this.music = this.app.getCookie('audioChannelMusic', 0.3);
+    this.sounds = Number(this.app.getCookie('audioChannelSounds', 0.3));
+    this.music = Number(this.app.getCookie('audioChannelMusic', 0.3));
   } // constructor
 
 createAudioHandler() {
@@ -40,6 +40,24 @@ createAudioHandler() {
 
     return audioHandler;
   } // createAudioHandler
+
+  audioData(channel, sound, options) {
+    var sampleRate = this.channels[channel].ctx.sampleRate;
+    switch (sound) {
+      case 'tapePilotTone': return this.tapePilotToneData(sampleRate);
+    }
+    return false;
+  } // audioData
+
+  tapePilotToneData(sampleRate) {
+    // T-state is 1/3500000 = 0.0000002867 sec. 
+    // leader pulse is 2,168 T-states long and is repeated 8,063 times for header blocks and 3,223 times for data blocks
+    var pulse = Math.round(sampleRate*2168/3500000);
+    var audioData = Array(pulse*2);
+    audioData.fill(this.sounds, 0, pulse);
+    audioData.fill(0, pulse, pulse*2);
+    return audioData;
+  } // tapePilotToneData
 
 } // class AudioManager
 
