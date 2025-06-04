@@ -5,6 +5,8 @@ import ZXSpectrumPlatform from './svision/js/platform/canvas2D/zxSpectrum/zxSpec
 /**/
 // begin code
 
-export var appPlatform = new ZXSpectrumPlatform();
+export function appPlatform() {
+  return new ZXSpectrumPlatform();
+} // appPlatform
 
 export default appPlatform;
