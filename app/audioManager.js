@@ -14,19 +14,27 @@ export class AudioManager extends AbstractAudioManager {
   constructor(app) {
     super(app);
     this.id = 'AudioManager';
-    this.sounds = 0.3;
-    this.music = 0.3;
+    this.sounds = this.app.getCookie('audioChannelSounds', 0.3);
+    this.music = this.app.getCookie('audioChannelMusic', 0.3);
   } // constructor
 
-  createAudioHandler() {
+createAudioHandler() {
     var audioHandler = false;
+
+    if (this.unsupportedAudioChannel == false) {
+      this.unsupportedAudioChannel = this.app.getCookie('unsupportedAudioChannel', false);
+    }
 
     switch (this.unsupportedAudioChannel) {
       case false:
         audioHandler = new AudioWorkletHandler(this.app);
         break;
       case 'AudioWorkletHandler':
+        this.app.setCookie('unsupportedAudioChannel', 'AudioWorkletHandler');
         audioHandler = new AudioScriptProcessorHandler(this.app);
+        break;
+      case 'AudioScriptProcessorHandler':
+        this.app.setCookie('unsupportedAudioChannel', 'AudioScriptProcessorHandler');
         break;
     }
 
