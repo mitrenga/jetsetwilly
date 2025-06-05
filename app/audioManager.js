@@ -45,7 +45,7 @@ createAudioHandler(channel) {
     var sampleRate = this.channels[channel].ctx.sampleRate;
     switch (sound) {
       case 'tapePilotTone': return this.tapePilotToneData(sampleRate);
-      case 'tapeRandomToneData': return this.tapeRandomToneData(sampleRate);
+      case 'tapeRndToneData': return this.tapeRndToneData(sampleRate);
       case 'cycleBasicBeepsData': return this.cycleBasicBeepsData(sampleRate);
       case 'pressKeyboardData': return this.pressKeyboardData(sampleRate);
      }
@@ -61,7 +61,7 @@ createAudioHandler(channel) {
     return {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds};
   } // tapePilotToneData
 
-  tapeRandomToneData(sampleRate) {
+  tapeRndToneData(sampleRate) {
     // two sync pulses of 667 and 735 T-states
     var f667 = Math.ceil(sampleRate*667/3500000);
     var f735 = Math.ceil(sampleRate*735/3500000);
@@ -72,7 +72,7 @@ createAudioHandler(channel) {
     var fragments = [f667, f735, f885, f1710];
     var pulses = [0, 0, 1, 1];
     return {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds, 'infinityRndPulses': {'fragments': [2, 3], 'quantity': 2}};
-  } // tapeRandomToneData
+  } // tapeRndToneData
 
   cycleBasicBeepsData(sampleRate) {
     var beeps = [261.626, 293.665, 329.628, 369.994, 415.305, 466.164, 523.251];
