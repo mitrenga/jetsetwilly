@@ -38,7 +38,7 @@ export class TapeLoadingModel extends AbstractModel {
       {'id': 'data', 'duration': 100},
       {'id': 'pause', 'duration': 800},
       {'id': 'pilot', 'duration': 1500},
-      {'id': 'data', 'duration': 10000}
+      {'id': 'data', 'duration': 5000}
     ];
   } // constructor
 
@@ -95,6 +95,7 @@ export class TapeLoadingModel extends AbstractModel {
           this.inputLineEntity.flashMask = this.inputLineEntity.flashMask.padStart (this.command[this.phase].length-1, ' ')+'#';
         }
         this.phase++;
+        this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'pressKeyboardData', 'options': false});
         if (this.phase < this.command.length) {
           this.sendEvent(800, {'id': 'updateCommand'});
         } else {
@@ -108,13 +109,15 @@ export class TapeLoadingModel extends AbstractModel {
       case 'updateTape':
         switch (this.tape[this.phase]['id']) {
           case 'pilot':
-            this.sendEvent(0, {'id': 'setBorderAnimation', 'value': 'pilotTone'});
             this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'tapePilotTone', 'options': {'repeat': true}});
+            this.sendEvent(0, {'id': 'setBorderAnimation', 'value': 'pilotTone'});
             break;
           case 'data':
+            //this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'tapeScreenAttrToneData', 'options': false});
             this.sendEvent(0, {'id': 'setBorderAnimation', 'value': 'dataTone'});
             break;
           case 'pause':
+            this.sendEvent(0, {'id': 'stopAudioChannel', 'channel': 'sounds'});
             this.sendEvent(0, {'id': 'setBorderAnimation', 'value': false});
             break;
         }
@@ -136,6 +139,7 @@ export class TapeLoadingModel extends AbstractModel {
       case 'printCopyright':
         this.programNameEntity.destroy();
         this.programNameEntity = null;
+        this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'cycleBasicBeepsData', 'options': false});
         this.copyrightLine1.hide = false;
         this.copyrightLine2.hide = false;
         this.copyrightLine3.hide = false;

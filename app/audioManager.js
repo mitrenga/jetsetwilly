@@ -18,7 +18,7 @@ export class AudioManager extends AbstractAudioManager {
     this.music = Number(this.app.getCookie('audioChannelMusic', 0.3));
   } // constructor
 
-createAudioHandler() {
+createAudioHandler(channel) {
     var audioHandler = false;
 
     if (this.unsupportedAudioChannel == false) {
@@ -45,19 +45,62 @@ createAudioHandler() {
     var sampleRate = this.channels[channel].ctx.sampleRate;
     switch (sound) {
       case 'tapePilotTone': return this.tapePilotToneData(sampleRate);
-    }
+      case 'tapeRandomToneData': return this.tapeRandomToneData(sampleRate);
+      case 'cycleBasicBeepsData': return this.cycleBasicBeepsData(sampleRate);
+      case 'pressKeyboardData': return this.pressKeyboardData(sampleRate);
+     }
     return false;
   } // audioData
 
   tapePilotToneData(sampleRate) {
     // T-state is 1/3500000 = 0.0000002867 sec. 
-    // leader pulse is 2,168 T-states long and is repeated 8,063 times for header blocks and 3,223 times for data blocks
+    // leader pulse is 2168 T-states long and is repeated 8063 times for header blocks and 3223 times for data blocks
     var pulse = Math.round(sampleRate*2168/3500000);
-    var audioData = Array(pulse*2);
-    audioData.fill(this.sounds, 0, pulse);
-    audioData.fill(0, pulse, pulse*2);
-    return audioData;
+    var fragments = [pulse];
+    var pulses = [0];
+    return {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds};
   } // tapePilotToneData
+
+  tapeRandomToneData(sampleRate) {
+    // two sync pulses of 667 and 735 T-states
+    var f667 = Math.round(sampleRate*667/3500000);
+    var f735 = Math.round(sampleRate*735/3500000);
+    // data is encoded as two 855 T-state pulses for binary zero, and two 1,710 T-state pulses for binary one
+    var f885 = Math.round(sampleRate*855/3500000);
+    var f1710 = Math.round(sampleRate*1710/3500000);
+
+    var fragments = [f667, f735, f885, f1710];
+    var pulses = [0, 0, 1, 1];
+    return {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds, 'randomPulses': {'fragments': [2, 3], 'count': 2}};
+  } // tapeRandomToneData
+
+  cycleBasicBeepsData(sampleRate) {
+    var beeps = [261.626, 293.665, 329.628, 369.994, 415.305, 466.164, 523.251];
+    
+    var fragments = [];
+    for (var x = 0; x < beeps.length; x++) {
+      fragments.push(Math.round(sampleRate/beeps[x]/2));
+    }
+    fragments.push(Math.round(sampleRate/44));
+
+    var pulses = [];
+    for (var x = 0; x < beeps.length; x++) {
+      var duration = 0;
+      do {
+        pulses.push(x);
+        duration = duration+fragments[x];
+      } while (duration < sampleRate/10);
+      pulses.push(beeps.length);
+    }
+    return {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds};
+  } // cycleBasicBeepsData
+
+  pressKeyboardData(sampleRate) {
+    var pulse = Math.round(15*sampleRate/44100);
+    var fragments = [pulse];
+    var pulses = [0];
+    return {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds};
+  } // pressKeyboardData
 
 } // class AudioManager
 
