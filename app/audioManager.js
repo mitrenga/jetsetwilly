@@ -55,7 +55,7 @@ createAudioHandler(channel) {
   tapePilotToneData(sampleRate) {
     // T-state is 1/3500000 = 0.0000002867 sec. 
     // leader pulse is 2168 T-states long and is repeated 8063 times for header blocks and 3223 times for data blocks
-    var pulse = Math.round(sampleRate*2168/3500000);
+    var pulse = Math.ceil(sampleRate*2168/3500000);
     var fragments = [pulse];
     var pulses = [0];
     return {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds};
@@ -63,15 +63,15 @@ createAudioHandler(channel) {
 
   tapeRandomToneData(sampleRate) {
     // two sync pulses of 667 and 735 T-states
-    var f667 = Math.round(sampleRate*667/3500000);
-    var f735 = Math.round(sampleRate*735/3500000);
-    // data is encoded as two 855 T-state pulses for binary zero, and two 1,710 T-state pulses for binary one
-    var f885 = Math.round(sampleRate*855/3500000);
-    var f1710 = Math.round(sampleRate*1710/3500000);
+    var f667 = Math.ceil(sampleRate*667/3500000);
+    var f735 = Math.ceil(sampleRate*735/3500000);
+    // data is encoded as two 855 T-state pulses for binary zero, and two 1710 T-state pulses for binary one
+    var f885 = Math.ceil(sampleRate*855/3500000);
+    var f1710 = Math.ceil(sampleRate*1710/3500000);
 
     var fragments = [f667, f735, f885, f1710];
     var pulses = [0, 0, 1, 1];
-    return {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds, 'randomPulses': {'fragments': [2, 3], 'count': 2}};
+    return {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds, 'infinityRndPulses': {'fragments': [2, 3], 'quantity': 2}};
   } // tapeRandomToneData
 
   cycleBasicBeepsData(sampleRate) {
@@ -79,9 +79,9 @@ createAudioHandler(channel) {
     
     var fragments = [];
     for (var x = 0; x < beeps.length; x++) {
-      fragments.push(Math.round(sampleRate/beeps[x]/2));
+      fragments.push(Math.ceil(sampleRate/beeps[x]/2));
     }
-    fragments.push(Math.round(sampleRate/44));
+    fragments.push(Math.ceil(sampleRate/44));
 
     var pulses = [];
     for (var x = 0; x < beeps.length; x++) {
@@ -96,7 +96,7 @@ createAudioHandler(channel) {
   } // cycleBasicBeepsData
 
   pressKeyboardData(sampleRate) {
-    var pulse = Math.round(15*sampleRate/44100);
+    var pulse = Math.ceil(15*sampleRate/44100);
     var fragments = [pulse];
     var pulses = [0];
     return {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds};
