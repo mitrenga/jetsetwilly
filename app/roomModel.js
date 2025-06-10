@@ -49,18 +49,18 @@ export class RoomModel extends AbstractModel {
   } // init
 
   setData(data) {
-    this.roomNameEntity.text = data['name'];
-    this.borderEntity.bkColor = this.app.platform.zxColorByAttribute(this.app.hexToInt(data['borderColor']), 7, 1);
+    this.roomNameEntity.text = data.name;
+    this.borderEntity.bkColor = this.app.platform.zxColorByAttribute(this.app.hexToInt(data.borderColor), 7, 1);
     
     super.setData(data);
   } // setData
 
   handleEvent(event) {
-    if (event['id'] == 'setRoomData') {
-      this.adjoiningRoom = event['data']['adjoiningRoom'];
-      event['data']['willy'] = this.app.globalData['willy'];
-      event['data']['initRoom'] = this.app.globalData['initRoom'];
-      this.setData(event['data']);
+    if (event.id == 'setRoomData') {
+      this.adjoiningRoom = event.data.adjoiningRoom;
+      event.data.willy = this.app.globalData.willy;
+      event.data.initRoom = this.app.globalData.initRoom;
+      this.setData(event.data);
       return true;
     }
 

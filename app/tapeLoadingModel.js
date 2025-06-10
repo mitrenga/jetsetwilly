@@ -22,7 +22,7 @@ export class TapeLoadingModel extends AbstractModel {
     this.copyrightLine3 = null;
     this.copyrightLine4 = null;
     this.copyrightLine5 = null;
-    this.app.stack['flashState'] = false;
+    this.app.stack.flashState = false;
     this.tape = [
       {'id': 'pause', 'duration': 1000},
       
@@ -79,10 +79,10 @@ export class TapeLoadingModel extends AbstractModel {
   } // init
 
   handleEvent(event) {
-    switch (event['id']) {
+    switch (event.id) {
 
       case 'changeFlashState':
-        this.app.stack['flashState'] = !this.app.stack['flashState'];
+        this.app.stack.flashState = !this.app.stack.flashState;
         this.sendEvent(330, {'id': 'changeFlashState'});
         return true;
 
@@ -95,7 +95,7 @@ export class TapeLoadingModel extends AbstractModel {
           this.inputLineEntity.flashMask = this.inputLineEntity.flashMask.padStart (this.command[this.phase].length-1, ' ')+'#';
         }
         this.phase++;
-        this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'pressKeyboardData', 'options': false});
+        this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'keyboardSound', 'options': false});
         if (this.phase < this.command.length) {
           this.sendEvent(800, {'id': 'updateCommand'});
         } else {
@@ -107,13 +107,13 @@ export class TapeLoadingModel extends AbstractModel {
         return true;
 
       case 'updateTape':
-        switch (this.tape[this.phase]['id']) {
+        switch (this.tape[this.phase].id) {
           case 'pilot':
-            this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'tapePilotTone', 'options': {'repeat': true}});
+            this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'tapePilotToneSound', 'options': {'repeat': true}});
             this.sendEvent(0, {'id': 'setBorderAnimation', 'value': 'pilotTone'});
             break;
           case 'data':
-            this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'tapeRndToneData', 'options': false});
+            this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'tapeRndDataSound', 'options': false});
             this.sendEvent(0, {'id': 'setBorderAnimation', 'value': 'dataTone'});
             break;
           case 'pause':
@@ -122,13 +122,13 @@ export class TapeLoadingModel extends AbstractModel {
             break;
         }
         if ('event' in this.tape[this.phase]) {
-          this.sendEvent(0, {'id': this.tape[this.phase]['event']})
+          this.sendEvent(0, {'id': this.tape[this.phase].event})
         }
         this.phase++;
         if (this.phase < this.tape.length) {
-          this.sendEvent(this.tape[this.phase-1]['duration'], {'id': 'updateTape'});
+          this.sendEvent(this.tape[this.phase-1].duration, {'id': 'updateTape'});
         } else {
-          this.sendEvent(this.tape[this.phase-1]['duration'], {'id': 'setMenuModel'});
+          this.sendEvent(this.tape[this.phase-1].duration, {'id': 'setMenuModel'});
         }
       return true;
 
@@ -139,7 +139,7 @@ export class TapeLoadingModel extends AbstractModel {
       case 'printCopyright':
         this.programNameEntity.destroy();
         this.programNameEntity = null;
-        this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'cycleBasicBeepsData', 'options': false});
+        this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'basicBeepsSound', 'options': false});
         this.copyrightLine1.hide = false;
         this.copyrightLine2.hide = false;
         this.copyrightLine3.hide = false;

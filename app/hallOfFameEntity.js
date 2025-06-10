@@ -25,7 +25,7 @@ export class HallOfFameEntity extends AbstractEntity {
   } // init
 
   handleEvent(event) {
-    switch (event['id']) {
+    switch (event.id) {
       case 'mouseClick':
         this.destroy();
         return true;

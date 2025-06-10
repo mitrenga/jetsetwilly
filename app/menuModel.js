@@ -86,7 +86,7 @@ export class MenuModel extends AbstractModel {
     this.desktopEntity.bkColor = this.app.platform.colorByName('white');
 
       this.bodyObjects.forEach((object, o) => {
-      this.bodyEntities[o] = new SpriteEntity(this.desktopEntity, this.track[o]['x'], this.track[o]['y'], object['color'], false, 0, this.track[o]['direction']);
+      this.bodyEntities[o] = new SpriteEntity(this.desktopEntity, this.track[o].x, this.track[o].y, object.color, false, 0, this.track[o].direction);
       this.desktopEntity.addEntity(this.bodyEntities[o]);
     });
 
@@ -106,10 +106,10 @@ export class MenuModel extends AbstractModel {
         color = this.penSelectedMenuItemColor;
       }
       this.menuEntities[y] = [];
-      this.menuEntities[y][0] = new ZXTextEntity(this.bkEntity, 10, 10+y*16, 138, 12, this.menuItems[y]['label'], color, false, 0, true);
+      this.menuEntities[y][0] = new ZXTextEntity(this.bkEntity, 10, 10+y*16, 138, 12, this.menuItems[y].label, color, false, 0, true);
       this.menuEntities[y][0].margin = 2;
       this.bkEntity.addEntity(this.menuEntities[y][0]);
-      this.menuEntities[y][1] = new ZXTextEntity(this.bkEntity, 120, 10+y*16, 100, 12, this.menuParamValue(this.menuItems[y]['event']), color, false, 0, true);
+      this.menuEntities[y][1] = new ZXTextEntity(this.bkEntity, 120, 10+y*16, 100, 12, this.menuParamValue(this.menuItems[y].event), color, false, 0, true);
       this.menuEntities[y][1].margin = 2;
       this.menuEntities[y][1].justify = 1;
       this.bkEntity.addEntity(this.menuEntities[y][1]);
@@ -148,18 +148,18 @@ export class MenuModel extends AbstractModel {
 
   refreshMenu() {
     for (var y = 0; y < this.menuItems.length; y++) {
-      this.menuEntities[y][0].text = this.menuItems[y]['label'];
-      this.menuEntities[y][1].text = this.menuParamValue(this.menuItems[y]['event']);
+      this.menuEntities[y][0].text = this.menuItems[y].label;
+      this.menuEntities[y][1].text = this.menuParamValue(this.menuItems[y].event);
     }
   } // refreshMenu
 
   setData(data) {
     this.bodyEntities.forEach((entity, e) => {
-      entity.setGraphicsData(data['body']);
+      entity.setGraphicsData(data.body);
     });
 
-    this.headEntity.setGraphicsData(data['head']);
-    this.willyEntity.setGraphicsData(data['willy']);
+    this.headEntity.setGraphicsData(data.head);
+    this.willyEntity.setGraphicsData(data.willy);
     this.redraw = true;
     super.setData(data);
   } // setData
@@ -183,7 +183,7 @@ export class MenuModel extends AbstractModel {
       return true;
     }
 
-    switch (event['id']) {
+    switch (event.id) {
 
       case 'startGame': 
         this.app.model.shutdown();
@@ -239,10 +239,10 @@ export class MenuModel extends AbstractModel {
         return true;
 
       case 'keyPress':
-        switch (event['key']) {
+        switch (event.key) {
           case 'Enter':
           case ' ':
-              this.sendEvent(0, {'id': this.menuItems[this.selectedItem]['event']});
+              this.sendEvent(0, {'id': this.menuItems[this.selectedItem].event});
             return true;
           case 'ArrowDown':
             this.changeMenuItem(this.selectedItem+1);
@@ -254,11 +254,11 @@ export class MenuModel extends AbstractModel {
         break;
 
       case 'mouseClick':
-        if (event['key'] == 'left') {
+        if (event.key == 'left') {
           for (var i = 0; i < this.menuItems.length; i++) {
             if ((this.menuEntities[i][0].pointOnEntity(event)) || (this.menuEntities[i][1].pointOnEntity(event))) {
               this.changeMenuItem(i);
-              this.sendEvent(0, {'id': this.menuItems[this.selectedItem]['event']});
+              this.sendEvent(0, {'id': this.menuItems[this.selectedItem].event});
               return true;
             }
           }
@@ -320,9 +320,9 @@ export class MenuModel extends AbstractModel {
 
         // body
         this.bodyEntities.forEach((entity, e) => {
-          entity.x = this.track[this.bodyObjects[e]['trackX']]['x'];
-          entity.y = this.track[this.bodyObjects[e]['trackY']]['y'];
-          entity.direction = this.track[this.bodyObjects[e]['trackX']]['direction'];
+          entity.x = this.track[this.bodyObjects[e].trackX].x;
+          entity.y = this.track[this.bodyObjects[e].trackY].y;
+          entity.direction = this.track[this.bodyObjects[e].trackX].direction;
           if (this.gameFrame%4 == 0) {
             entity.incFrame();
           }
@@ -334,7 +334,7 @@ export class MenuModel extends AbstractModel {
         return true;
 
       case 'setMenuData':
-        this.setData(event['data']);
+        this.setData(event.data);
         return true;
     }
 

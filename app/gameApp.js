@@ -51,10 +51,10 @@ export class GameApp extends AbstractApp {
     this.globalData = data;
 
     this.items = [];
-    for (var r = 0; r < this.globalData['roomsCount']; r++) {
+    for (var r = 0; r < this.globalData.roomsCount; r++) {
       this.items.push([]);
     }
-    var dataItems = data['items'];
+    var dataItems = data.items;
     dataItems.forEach((item) => {
       var binaryItem = this.hexToBin(item);
       // The location of an item is defined by a pair of bytes. The meaning of the bits in each byte pair is as follows:

@@ -15,7 +15,7 @@ export class AboutEntity extends AbstractEntity {
     super(parentEntity, x, y, width, height, false, false);
     this.id = 'AboutEntity';    
 
-    this.stack['flashState'] = false;
+    this.stack.flashState = false;
   } // constructor
 
   init() {
@@ -46,7 +46,7 @@ export class AboutEntity extends AbstractEntity {
   } // init
 
   handleEvent(event) {
-    switch (event['id']) {
+    switch (event.id) {
       case 'closeAbout':
         this.destroy();
         return true;

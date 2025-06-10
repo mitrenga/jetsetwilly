@@ -38,11 +38,15 @@ export class MainModel extends AbstractModel {
     this.desktopEntity.addEntity(new AbstractEntity(this.desktopEntity, 0, 16*8, 32*8, 2*8, false, this.app.platform.colorByName('black')));
     this.desktopEntity.addEntity(new ZXTextEntity(this.desktopEntity, 0, 18*8, 32*8, 1*8, "+++++ Press ENTER to Start +++++", this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), 0, false));
     this.desktopEntity.addEntity(new AbstractEntity(this.desktopEntity, 0, 19*8, 32*8, 5*8, false, this.app.platform.colorByName('black')));
+    if (this.app.audioManager.music > 0) {
+      this.sendEvent(500, {'id': 'openAudioChannel', 'channel': 'music'});
+      this.sendEvent(750, {'id': 'playSound', 'channel': 'music', 'sound': 'titleScreenMelody', 'options': false});
+    }
   } // init
 
   handleEvent(event) {
-    if (event['id'] == 'setGlobalData') {
-      this.app.setGlobalData(event['data']);
+    if (event.id == 'setGlobalData') {
+      this.app.setGlobalData(event.data);
       return true;
     }
     return super.handleEvent(event);
