@@ -23,7 +23,7 @@ export class RoomEntity extends AbstractEntity {
   } // drawEntity
 
   setData(data) {
-    this.bkColor = this.app.platform.zxColorByAttribute(this.app.hexToInt(data.bkColor), 56, 8);
+    this.bkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(data.bkColor), 56, 8);
 
     // layout
     data.layout.forEach((row, y) => {
@@ -34,9 +34,9 @@ export class RoomEntity extends AbstractEntity {
           var attr = data.graphicData[idItem].substring(0, 2);
           //if (['floor', 'wall'].includes(idItem)) {
           {
-            var penColor = this.app.platform.penColorByAttribute(this.app.hexToInt(attr));
-            var bkColor = this.app.platform.bkColorByAttribute(this.app.hexToInt(attr)&63);
-            if (bkColor == this.app.platform.bkColorByAttribute(this.app.hexToInt(data.bkColor))) {
+            var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(attr));
+            var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(attr)&63);
+            if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(data.bkColor))) {
               bkColor = false;
             }
             var layoutEntity = new SpriteEntity(this, x*8, y*8, penColor, bkColor, 0, 0);
@@ -51,9 +51,9 @@ export class RoomEntity extends AbstractEntity {
     if ('ramp' in data.graphicData) {
       var rampData = data.graphicData.ramp;
       var attr = rampData.data.substring(0, 2);
-      var penColor = this.app.platform.penColorByAttribute(this.app.hexToInt(attr));
-      var bkColor = this.app.platform.bkColorByAttribute(this.app.hexToInt(attr)&63);
-      if (bkColor == this.app.platform.bkColorByAttribute(this.app.hexToInt(data.bkColor))) {
+      var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(attr));
+      var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(attr)&63);
+      if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(data.bkColor))) {
         bkColor = false;
       }
       var direction = 0;
@@ -76,9 +76,9 @@ export class RoomEntity extends AbstractEntity {
     if ('conveyor' in data.graphicData) {
       var conveyorData = data.graphicData.conveyor;
       var attr = conveyorData.data.substring(0, 2);
-      var penColor = this.app.platform.penColorByAttribute(this.app.hexToInt(attr));
-      var bkColor = this.app.platform.bkColorByAttribute(this.app.hexToInt(attr)&63);
-      if (bkColor == this.app.platform.bkColorByAttribute(this.app.hexToInt(data.bkColor))) {
+      var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(attr));
+      var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(attr)&63);
+      if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(data.bkColor))) {
         bkColor = false;
       }
       for (var pos = 0; pos < this.app.hexToInt(conveyorData.length); pos++) {
@@ -113,7 +113,7 @@ export class RoomEntity extends AbstractEntity {
         if (guardianType in data.guardians) {
           var guardianTypeData = data.guardians[guardianType];
           guardianTypeData.figures.forEach((guardian) => {
-            var penColor = this.app.platform.penColorByAttribute(this.app.hexToInt(guardian.attribute));
+            var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(guardian.attribute));
             var guardianEntity = new SpriteEntity(this, guardian.init.x+guardianTypeData.paintCorrections.x, guardian.init.y+guardianTypeData.paintCorrections.y, penColor, false, guardian.init.frame, guardian.init.direction);
             this.addEntity(guardianEntity);
             guardianEntity.setGraphicsData(guardianTypeData);

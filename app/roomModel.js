@@ -50,7 +50,7 @@ export class RoomModel extends AbstractModel {
 
   setData(data) {
     this.roomNameEntity.text = data.name;
-    this.borderEntity.bkColor = this.app.platform.zxColorByAttribute(this.app.hexToInt(data.borderColor), 7, 1);
+    this.borderEntity.bkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(data.borderColor), 7, 1);
     
     super.setData(data);
   } // setData
