@@ -15,10 +15,6 @@ function loopGame(timestamp) {
   requestAnimationFrame(loopGame);
 } // loopGame
 
-// master game timer & loop
-function updateScene() { gameApp.model.sendEvent(0, {'id': 'updateScene'}); }
-setInterval(updateScene, 67);
-
 // events processing
 window.onkeydown = function(event) { gameApp.inputEventsManager.eventKeyDown(event); }
 window.onkeyup = function(event) { gameApp.inputEventsManager.eventKeyUp(event); }
@@ -39,4 +35,4 @@ window.onresize = function(event) { gameApp.eventResizeWindow(event); }
 
 // start game
 gameApp.resizeApp();
-loopGame(0);
+requestAnimationFrame(loopGame);

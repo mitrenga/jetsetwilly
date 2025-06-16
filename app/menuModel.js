@@ -25,7 +25,7 @@ export class MenuModel extends AbstractModel {
     super(app);
     this.id = 'MenuModel';
 
-    this.redraw = false;
+    this.prevCounter = 0;
     this.gameFrame = 0;
     this.bodyObjects = [
       {'id': 'body', 'trackX': 0,  'trackY': 26, 'color': 'rgb(217, 41, 188)'},
@@ -160,7 +160,6 @@ export class MenuModel extends AbstractModel {
 
     this.headEntity.setGraphicsData(data.head);
     this.willyEntity.setGraphicsData(data.willy);
-    this.redraw = true;
     super.setData(data);
   } // setData
 
@@ -174,7 +173,6 @@ export class MenuModel extends AbstractModel {
     this.menuEntities[this.selectedItem][0].penColor = this.penSelectedMenuItemColor;
     this.menuEntities[this.selectedItem][1].penColor = this.penSelectedMenuItemColor;
     this.menuSelectedRow.y = 10+this.selectedItem*16;
-    this.redraw = true;
 } // changeMenuItem
 
   handleEvent(event) {
@@ -234,7 +232,6 @@ export class MenuModel extends AbstractModel {
       case 'changeFlashState':
         this.flashState = !this.flashState;
         this.logoEntity.flashState = this.flashState;
-        this.redraw = true;
         this.sendEvent(330, {'id': 'changeFlashState'});
         return true;
 
@@ -265,13 +262,28 @@ export class MenuModel extends AbstractModel {
         }
         break;
 
-      case 'updateScene':
+      case 'setMenuData':
+        this.setData(event.data);
+        return true;
+    }
+
+    return false;
+  } // handleEvent
+
+  loopModel(timestamp) {
+    super.loopModel(timestamp);
+
+    if (this.timer === false) {
+      this.timer = timestamp;
+    } else {
+      var counter = Math.round((timestamp-this.timer)/(1000/15));
+      if (this.prevCounter != counter) {
+        this.prevCounter = counter;
         this.gameFrame = this.app.rotateInc(this.gameFrame, 0, 14);
     
         // head
         if (this.gameFrame%2 == 0) {
           this.headEntity.incFrame();
-          this.redraw = true;
         }
         this.headX += this.headDirectionX;
         if (this.headDirectionX > 0 && this.headX > 235) {
@@ -329,26 +341,11 @@ export class MenuModel extends AbstractModel {
         });
         this.track.shift();
         this.track.push({'x': this.headEntity.x, 'y': this.headEntity.y, 'direction': this.headEntity.direction});
-        this.redraw = true;
-
-        return true;
-
-      case 'setMenuData':
-        this.setData(event.data);
-        return true;
+      }
     }
-
-    return false;
-  } // handleEvent
-
-  loopModel(timestamp) {
-    super.loopModel(timestamp);
   
-    if (this.redraw == true) {
-      this.redraw = false;
-      this.drawModel();
-    }
-  }
+    this.drawModel();
+  } // loopModel
 
 } // class MenuModel
 
