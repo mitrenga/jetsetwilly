@@ -14,8 +14,6 @@ export class AboutEntity extends AbstractEntity {
   constructor(parentEntity, x, y, width, height) {
     super(parentEntity, x, y, width, height, false, false);
     this.id = 'AboutEntity';    
-
-    this.stack.flashState = false;
   } // constructor
 
   init() {

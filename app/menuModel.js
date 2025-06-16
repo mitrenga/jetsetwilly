@@ -125,6 +125,7 @@ export class MenuModel extends AbstractModel {
     this.floorEntity = new AbstractEntity(this.desktopEntity, 12, 176, 230, 2, false, false);
     this.desktopEntity.addEntity(this.floorEntity);
 
+    this.app.stack.flashState = false;
     this.sendEvent(330, {'id': 'changeFlashState'});
   } // init
 
@@ -230,8 +231,7 @@ export class MenuModel extends AbstractModel {
       return true;
 
       case 'changeFlashState':
-        this.flashState = !this.flashState;
-        this.logoEntity.flashState = this.flashState;
+        this.app.stack.flashState = !this.app.stack.flashState;
         this.sendEvent(330, {'id': 'changeFlashState'});
         return true;
 

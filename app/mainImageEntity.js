@@ -67,6 +67,11 @@ export class MainImageEntity extends ZXVideoRAMEntity {
       if (attr == '2C') {
         attr = '25';
       }
+      if (this.app.stack.flashState) {
+        if (attr == 'D3') {
+          attr = 'DA';
+        }
+      }
       return attr;
     }
     return false;

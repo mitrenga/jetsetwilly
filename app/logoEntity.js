@@ -43,7 +43,7 @@ export class LogoEntity extends TextEntity {
   } // getTextLength
 
   getPenColorChar(position) {
-    if (this.flashState == true) {
+    if (this.app.stack.flashState == true) {
       return this.flashColor;
     }
     return this.penColor;
