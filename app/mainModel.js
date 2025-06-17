@@ -18,6 +18,8 @@ export class MainModel extends AbstractModel {
     this.id = 'MainModel';
 
     this.mainImageEntity = null;
+    this.bannerTxt = '+++++ Press ENTER to Start +++++  JET-SET WILLY by Matthew Smith  © 1984 SOFTWARE PROJECTS Ltd . . . . .Guide Willy to collect all the items around the house before Midnight so Maria will let you get to your bed. . . . . . .+++++ Press ENTER to Start +++++';
+    this.bannerEntity = null;
 
     const http = new XMLHttpRequest();
     http.responser = this;
@@ -59,6 +61,16 @@ export class MainModel extends AbstractModel {
         this.app.stack.flashState = !this.app.stack.flashState;
         this.sendEvent(330, {'id': 'changeFlashState'});
         return true;
+
+      case 'melodyCompleted':
+        this.sendEvent(0, {'id': 'playSound', 'channel': 'music', 'sound': 'screechSound', 'options': false});
+        return true;
+
+      case 'screechCompleted':
+        this.sendEvent(0, {'id': 'playSound', 'channel': 'music', 'sound': 'titleScreenMelody', 'options': false});
+        return true;
+
+
     }
     return super.handleEvent(event);
   } // handleEvent

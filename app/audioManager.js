@@ -89,6 +89,7 @@ createAudioHandler(channel) {
     var fKeys = {};
     var pulses = new Uint8Array(33000);
     var pulsesCounter = 0;
+    var events = {};
 
     var k = Math.round(sampleRate/860)/100;
     var frame = 0;
@@ -121,7 +122,8 @@ createAudioHandler(channel) {
       } while (c > 0);
     }
     pulses = this.resizeArray(pulses, pulsesCounter);
-    return {'fragments': fragments, 'pulses': pulses, 'volume': this.music};
+    events[pulsesCounter] = {'id': 'melodyCompleted'};
+    return {'fragments': fragments, 'pulses': pulses, 'volume': this.music, 'events': events};
   } // titleScreenMelody
 
   screechSound(sampleRate) {
@@ -129,43 +131,47 @@ createAudioHandler(channel) {
     var fKeys = {};
     var pulses = new Uint8Array(4500);
     var pulsesCounter = 0;
+    var events = {};
 
     var k = Math.round(sampleRate/865)/100;
     var frame = 0;
     var lastPos = -1;
 
-    for (var t = 50; t < 81; t++) {
-      var a = t;
-      var e = a;
-      do {
-        var b = e;
+    for (var o = 0; o < 7; o++) {
+      for (var t = 50; t < 81; t++) {
+        var a = t;
+        var e = a;
         do {
-          if (a == b) {
-            if (pulsesCounter == pulses.length) {
-              pulses = this.extendArray(pulses, 500);
+          var b = e;
+          do {
+            if (a == b) {
+              if (pulsesCounter == pulses.length) {
+                pulses = this.extendArray(pulses, 500);
+              }
+              lastPos = this.addPulse(frame, k, lastPos, fKeys, fragments, pulses, pulsesCounter);
+              pulsesCounter++;
             }
-            lastPos = this.addPulse(frame, k, lastPos, fKeys, fragments, pulses, pulsesCounter);
-            pulsesCounter++;
+            frame++;
+            b--;
+          } while (b > 0);
+          a--;
+          if (pulsesCounter == pulses.length) {
+            pulses = this.extendArray(pulses, 500);
           }
-          frame++;
-          b--;
-        } while (b > 0);
-        a--;
+          lastPos = this.addPulse(frame, k, lastPos, fKeys, fragments, pulses, pulsesCounter);
+          pulsesCounter++;
+        } while (a > 0);
+        frame = frame+1941;
         if (pulsesCounter == pulses.length) {
           pulses = this.extendArray(pulses, 500);
         }
         lastPos = this.addPulse(frame, k, lastPos, fKeys, fragments, pulses, pulsesCounter);
         pulsesCounter++;
-      } while (a > 0);
-      frame = frame+1941;
-      if (pulsesCounter == pulses.length) {
-        pulses = this.extendArray(pulses, 500);
       }
-      lastPos = this.addPulse(frame, k, lastPos, fKeys, fragments, pulses, pulsesCounter);
-      pulsesCounter++;
     }
     pulses = this.resizeArray(pulses, pulsesCounter);
-    return {'fragments': fragments, 'pulses': pulses, 'volume': this.music};
+    events[pulsesCounter] = {'id': 'screechCompleted'};
+    return {'fragments': fragments, 'pulses': pulses, 'volume': this.music, 'events': events};
   } // screechSound
 
   inGameMelody(sampleRate, lives) {
