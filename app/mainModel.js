@@ -20,6 +20,7 @@ export class MainModel extends AbstractModel {
     this.mainImageEntity = null;
     this.bannerTxt = '+++++ Press ENTER to Start +++++  JET-SET WILLY by Matthew Smith  © 1984 SOFTWARE PROJECTS Ltd . . . . .Guide Willy to collect all the items around the house before Midnight so Maria will let you get to your bed. . . . . . .+++++ Press ENTER to Start +++++';
     this.bannerEntity = null;
+    this.screechDuration = 0;
 
     const http = new XMLHttpRequest();
     http.responser = this;
@@ -41,7 +42,8 @@ export class MainModel extends AbstractModel {
     this.mainImageEntity = new MainImageEntity(this.desktopEntity, 0, 0, 32*8, 16*8, this.flashState);
     this.desktopEntity.addEntity(this.mainImageEntity);
     this.desktopEntity.addEntity(new AbstractEntity(this.desktopEntity, 0, 16*8, 32*8, 2*8, false, this.app.platform.colorByName('black')));
-    this.desktopEntity.addEntity(new ZXTextEntity(this.desktopEntity, 0, 18*8, 32*8, 1*8, "+++++ Press ENTER to Start +++++", this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), 0, false));
+    this.bannerEntity = new ZXTextEntity(this.desktopEntity, 0, 18*8, 32*8, 1*8, this.bannerTxt, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), 0, false);
+    this.desktopEntity.addEntity(this.bannerEntity);
     this.desktopEntity.addEntity(new AbstractEntity(this.desktopEntity, 0, 19*8, 32*8, 5*8, false, this.app.platform.colorByName('black')));
     if (this.app.audioManager.music > 0) {
       this.sendEvent(500, {'id': 'openAudioChannel', 'channel': 'music'});
@@ -62,11 +64,23 @@ export class MainModel extends AbstractModel {
         this.sendEvent(330, {'id': 'changeFlashState'});
         return true;
 
-      case 'melodyCompleted':
+      case 'melodyEnd':
         this.sendEvent(0, {'id': 'playSound', 'channel': 'music', 'sound': 'screechSound', 'options': false});
         return true;
 
-      case 'screechCompleted':
+      case 'screechBegin':
+        this.bannerEntity.penColor = this.app.platform.colorByName('brightWhite');
+        this.bannerEntity.bkColor = this.app.platform.colorByName('brightBlue');
+        this.screechDuration = event.data.duration;
+        this.timer = this.app.now;
+        return true;
+
+      case 'screechEnd':
+        this.bannerEntity.penColor = this.app.platform.colorByName('yellow');
+        this.bannerEntity.bkColor = this.app.platform.colorByName('black');
+        this.bannerEntity.x = 0;
+        this.bannerEntity.width = 32*8;
+        this.timer = false;
         this.sendEvent(0, {'id': 'playSound', 'channel': 'music', 'sound': 'titleScreenMelody', 'options': false});
         return true;
 
@@ -77,6 +91,14 @@ export class MainModel extends AbstractModel {
 
   loopModel(timestamp) {
     super.loopModel(timestamp);
+
+    if (this.timer != false) {
+      if (timestamp-this.timer < this.screechDuration) {
+        var pos = Math.round((this.bannerTxt.length-32)*8*(timestamp-this.timer)/this.screechDuration);
+        this.bannerEntity.x = -pos;
+        this.bannerEntity.width = 32*8+pos;
+      }
+    }
 
     this.drawModel();
   } // loopModel
