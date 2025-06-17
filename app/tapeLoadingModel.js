@@ -1,8 +1,10 @@
 /**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
+const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion);
 const { ZXTextEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
+import BorderEntity from './borderEntity.js';
 import ZXTextEntity from './svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js';
 /**/
 // begin code
@@ -41,6 +43,10 @@ export class TapeLoadingModel extends AbstractModel {
       {'id': 'data', 'duration': 5000}
     ];
   } // constructor
+
+  newBorderEntity() {
+    return new BorderEntity(null, 0, 0, 0, 0, false, false);
+  } // newBorderEntity
 
   init() {
     super.init();
