@@ -29,7 +29,12 @@ export class BorderEntity  extends AbstractEntity {
     }
 
     var y = 0;
-    var color = Math.floor(this.diff/10);
+    var color = 0;
+    if (this.animation == 'screech') {
+      color = Math.floor(Math.random()*this.style[this.animation].colors.length);
+    } else {
+      color = Math.floor(this.diff/10);
+    }
     if (this.stripes.length == 0) {
       while (y < this.height) {
         var stripeHeight = this.style[this.animation].stripeHeight;
@@ -50,7 +55,11 @@ export class BorderEntity  extends AbstractEntity {
         }
         this.stripes.push({'y': y, 'height': stripeHeight+extraStripe, 'color': this.app.platform.colorByName(this.style[this.animation].colors[color])});
         y += stripeHeight+extraStripe;
-        color = this.app.rotateInc(color, 0, this.style[this.animation].colors.length-1);
+        if (this.animation == 'screech') {
+          color = Math.floor(Math.random()*this.style[this.animation].colors.length);
+        } else {
+          color = this.app.rotateInc(color, 0, this.style[this.animation].colors.length-1);
+        }
       }
     }
     for (var s = 0; s < this.stripes.length; s++) {
