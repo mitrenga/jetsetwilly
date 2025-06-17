@@ -1,11 +1,13 @@
 /**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
+const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion);
 const { MainImageEntity } = await import('./mainImageEntity.js?ver='+window.srcVersion);
 const { ZXTextEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import AbstractEntity from './svision/js/abstractEntity.js';
+import BorderEntity from './borderEntity.js';
 import MainImageEntity from './mainImageEntity.js';
 import ZXTextEntity from './svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js';
 /**/
@@ -34,6 +36,10 @@ export class MainModel extends AbstractModel {
       }
     }
   } // constructor
+
+  newBorderEntity() {
+    return new BorderEntity(null, 0, 0, 0, 0, false, false);
+  } // newBorderEntity
 
   init() {
     super.init();
@@ -73,6 +79,7 @@ export class MainModel extends AbstractModel {
         this.bannerEntity.bkColor = this.app.platform.colorByName('brightBlue');
         this.screechDuration = event.data.duration;
         this.timer = this.app.now;
+        this.sendEvent(0, {'id': 'setBorderAnimation', 'value': 'screech'});
         return true;
 
       case 'screechEnd':
@@ -81,6 +88,7 @@ export class MainModel extends AbstractModel {
         this.bannerEntity.x = 0;
         this.bannerEntity.width = 32*8;
         this.timer = false;
+        this.sendEvent(0, {'id': 'setBorderAnimation', 'value': false});
         this.sendEvent(0, {'id': 'playSound', 'channel': 'music', 'sound': 'titleScreenMelody', 'options': false});
         return true;
 

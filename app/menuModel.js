@@ -122,9 +122,6 @@ export class MenuModel extends AbstractModel {
     this.copyrightEntity.justify = 2;
     this.desktopEntity.addEntity(this.copyrightEntity);
 
-    this.floorEntity = new AbstractEntity(this.desktopEntity, 12, 176, 230, 2, false, false);
-    this.desktopEntity.addEntity(this.floorEntity);
-
     this.app.stack.flashState = false;
     this.sendEvent(330, {'id': 'changeFlashState'});
   } // init
