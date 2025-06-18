@@ -45,12 +45,10 @@ export class MainModel extends AbstractModel {
     super.init();
 
     this.borderEntity.bkColor = this.app.platform.colorByName('black');
-    this.mainImageEntity = new MainImageEntity(this.desktopEntity, 0, 0, 32*8, 16*8, this.flashState);
+    this.mainImageEntity = new MainImageEntity(this.desktopEntity, 0, 0, 32*8, 24*8, this.flashState);
     this.desktopEntity.addEntity(this.mainImageEntity);
-    this.desktopEntity.addEntity(new AbstractEntity(this.desktopEntity, 0, 16*8, 32*8, 2*8, false, this.app.platform.colorByName('black')));
-    this.bannerEntity = new ZXTextEntity(this.desktopEntity, 0, 18*8, 32*8, 1*8, this.bannerTxt, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), 0, false);
-    this.desktopEntity.addEntity(this.bannerEntity);
-    this.desktopEntity.addEntity(new AbstractEntity(this.desktopEntity, 0, 19*8, 32*8, 5*8, false, this.app.platform.colorByName('black')));
+    this.bannerEntity = new ZXTextEntity(this.mainImageEntity, 0, 18*8, 32*8, 1*8, this.bannerTxt, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), 0, false);
+    this.mainImageEntity.addEntity(this.bannerEntity);
     if (this.app.audioManager.music > 0) {
       this.sendEvent(500, {'id': 'openAudioChannel', 'channel': 'music'});
       this.sendEvent(750, {'id': 'playSound', 'channel': 'music', 'sound': 'titleScreenMelody', 'options': false});
@@ -87,6 +85,7 @@ export class MainModel extends AbstractModel {
         this.bannerEntity.bkColor = this.app.platform.colorByName('black');
         this.bannerEntity.x = 0;
         this.bannerEntity.width = 32*8;
+        this.mainImageEntity.attrStep = 0;
         this.timer = false;
         this.sendEvent(0, {'id': 'setBorderAnimation', 'value': false});
         this.sendEvent(0, {'id': 'playSound', 'channel': 'music', 'sound': 'titleScreenMelody', 'options': false});
@@ -105,6 +104,8 @@ export class MainModel extends AbstractModel {
         var pos = Math.round((this.bannerTxt.length-32)*8*(timestamp-this.timer)/this.screechDuration);
         this.bannerEntity.x = -pos;
         this.bannerEntity.width = 32*8+pos;
+
+        this.mainImageEntity.attrStep = Math.floor(((timestamp-this.timer)/(1000/15))%8)*3;
       }
     }
 

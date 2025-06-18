@@ -10,6 +10,7 @@ export class MainImageEntity extends ZXVideoRAMEntity {
   constructor(parentEntity, x, y, width, height) {
     super(parentEntity, x, y, width, height);
     this.id = 'MainImageEntity';
+    this.attrStep = 0;
 
     this.introImageTriangles = [
       "C0F0FCFFFFFFFFFF",
@@ -35,11 +36,19 @@ export class MainImageEntity extends ZXVideoRAMEntity {
       "000000000000D300D300D300D300D3080909D309242400D30000000000000000",
       "000000000000D3D3D3D3D300D300D3D3D308D3D3D32400D30000000000000000",
       "0000000000000000000000000000000000000808040400000000000000000000",
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "0000000000000000000000000000000000000000000000000000000000000000",
+      "0000000000000000000000000000000000000000000000000000000000000000"
     ]; // introImageAttributes
   } // constructor
 
   getVideoRAMValue(addr) {
-    if (addr < 4096) {
+    if (addr < 6144) {
       var row = Math.floor(addr/32);
       var column = addr%32;
       var triangle = false;
@@ -72,6 +81,10 @@ export class MainImageEntity extends ZXVideoRAMEntity {
           attr = 'DA';
         }
       }
+      if (this.attrStep == 0)
+        return attr;
+      var intAttr = this.app.hexToInt(attr);
+      attr = this.app.intToHex( (((intAttr&56)+(this.attrStep<<3))&56)+(((intAttr&7)+this.attrStep)&7) );
       return attr;
     }
     return false;
