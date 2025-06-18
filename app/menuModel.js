@@ -38,6 +38,7 @@ export class MenuModel extends AbstractModel {
     for (var t = 0; t < 40; t++) {
       this.track[t] = {'x': -16, 'y': 0, 'direction': 0};
     }
+    this.dataLoaded = false;
     this.bodyEntities = [];
     this.headEntity = null;
     this.headX = -16;
@@ -158,6 +159,7 @@ export class MenuModel extends AbstractModel {
 
     this.headEntity.setGraphicsData(data.head);
     this.willyEntity.setGraphicsData(data.willy);
+    this.dataLoaded = true;
     super.setData(data);
   } // setData
 
@@ -273,71 +275,73 @@ export class MenuModel extends AbstractModel {
     if (this.timer === false) {
       this.timer = timestamp;
     } else {
-      var counter = Math.round((timestamp-this.timer)/(1000/15));
-      if (this.prevCounter != counter) {
-        this.prevCounter = counter;
-        this.gameFrame = this.app.rotateInc(this.gameFrame, 0, 14);
-    
-        // head
-        if (this.gameFrame%2 == 0) {
-          this.headEntity.incFrame();
-        }
-        this.headX += this.headDirectionX;
-        if (this.headDirectionX > 0 && this.headX > 235) {
-          this.headDirectionX *= -1;
-          this.headEntity.switchDirection();
-          this.headDirectionY = Math.round(Math.random()*2)-1;
-          if (this.headDirectionY != 0) {
-            this.headY += this.wave[this.waveCounter];
-            this.waveCounter = 0;
+      if (this.dataLoaded) {
+        var counter = Math.round((timestamp-this.timer)/(1000/15));
+        if (this.prevCounter != counter) {
+          this.prevCounter = counter;
+          this.gameFrame = this.app.rotateInc(this.gameFrame, 0, 14);
+      
+          // head
+          if (this.gameFrame%2 == 0) {
+            this.headEntity.incFrame();
           }
-        }
-        if ((this.headDirectionX > 0 && this.headX > 235) ||
-            (this.headDirectionX < 0 && this.headX < 4)) {
-          this.headDirectionX *= -1;
-          this.headEntity.switchDirection();
-          this.headDirectionY = Math.round((Math.random()*4)-2)/2;
-          if (this.headDirectionY != 0) {
-            this.headY += this.wave[this.waveCounter];
-            this.waveCounter = 0;
+          this.headX += this.headDirectionX;
+          if (this.headDirectionX > 0 && this.headX > 235) {
+            this.headDirectionX *= -1;
+            this.headEntity.switchDirection();
+            this.headDirectionY = Math.round(Math.random()*2)-1;
+            if (this.headDirectionY != 0) {
+              this.headY += this.wave[this.waveCounter];
+              this.waveCounter = 0;
+            }
           }
-        }
-        this.headY += this.headDirectionY;
-        if (this.headDirectionY > 0 && this.headY > 160) {
-          this.headDirectionY *= -1;
-        }
-        if (this.headDirectionY < 0 && this.headY < 12) {
-          this.headDirectionY *= -1;
-        }
-        this.headEntity.x = this.headX;
-        this.headEntity.y = this.headY+this.wave[this.waveCounter];
-        if ((this.waveCounter > 0) || (this.headDirectionY == 0)) {
-          this.waveCounter = this.app.rotateInc(this.waveCounter, 0, this.wave.length-1);
-        }
+          if ((this.headDirectionX > 0 && this.headX > 235) ||
+              (this.headDirectionX < 0 && this.headX < 4)) {
+            this.headDirectionX *= -1;
+            this.headEntity.switchDirection();
+            this.headDirectionY = Math.round((Math.random()*4)-2)/2;
+            if (this.headDirectionY != 0) {
+              this.headY += this.wave[this.waveCounter];
+              this.waveCounter = 0;
+            }
+          }
+          this.headY += this.headDirectionY;
+          if (this.headDirectionY > 0 && this.headY > 160) {
+            this.headDirectionY *= -1;
+          }
+          if (this.headDirectionY < 0 && this.headY < 12) {
+            this.headDirectionY *= -1;
+          }
+          this.headEntity.x = this.headX;
+          this.headEntity.y = this.headY+this.wave[this.waveCounter];
+          if ((this.waveCounter > 0) || (this.headDirectionY == 0)) {
+            this.waveCounter = this.app.rotateInc(this.waveCounter, 0, this.wave.length-1);
+          }
 
-        // Willy
-        if (this.headDirectionX > 0) {
-          this.willyEntity.x = this.headEntity.x-4;
-        } else {
-          this.willyEntity.x = this.headEntity.x+10;
-        }
-        this.willyEntity.y = this.headEntity.y-11;
-        this.willyEntity.direction = this.headEntity.direction;
-        if (this.gameFrame == 1 || this.gameFrame == 4) {
-          this.willyEntity.incFrame();
-        }
-
-        // body
-        this.bodyEntities.forEach((entity, e) => {
-          entity.x = this.track[this.bodyObjects[e].trackX].x;
-          entity.y = this.track[this.bodyObjects[e].trackY].y;
-          entity.direction = this.track[this.bodyObjects[e].trackX].direction;
-          if (this.gameFrame%4 == 0) {
-            entity.incFrame();
+          // Willy
+          if (this.headDirectionX > 0) {
+            this.willyEntity.x = this.headEntity.x-4;
+          } else {
+            this.willyEntity.x = this.headEntity.x+10;
           }
-        });
-        this.track.shift();
-        this.track.push({'x': this.headEntity.x, 'y': this.headEntity.y, 'direction': this.headEntity.direction});
+          this.willyEntity.y = this.headEntity.y-11;
+          this.willyEntity.direction = this.headEntity.direction;
+          if (this.gameFrame == 1 || this.gameFrame == 4) {
+            this.willyEntity.incFrame();
+          }
+
+          // body
+          this.bodyEntities.forEach((entity, e) => {
+            entity.x = this.track[this.bodyObjects[e].trackX].x;
+            entity.y = this.track[this.bodyObjects[e].trackY].y;
+            entity.direction = this.track[this.bodyObjects[e].trackX].direction;
+            if (this.gameFrame%4 == 0) {
+              entity.incFrame();
+            }
+          });
+          this.track.shift();
+          this.track.push({'x': this.headEntity.x, 'y': this.headEntity.y, 'direction': this.headEntity.direction});
+        }
       }
     }
   
