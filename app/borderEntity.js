@@ -25,6 +25,7 @@ export class BorderEntity  extends AbstractEntity {
   drawEntity() {
     super.drawEntity();
     if (this.animation === false) {
+      this.drawSubEntities();
       return;
     }
 
@@ -66,6 +67,22 @@ export class BorderEntity  extends AbstractEntity {
       this.app.layout.paintRect(this.app.stack.ctx, 0, this.stripes[s].y, this.width, this.stripes[s].height, this.stripes[s].color);
     }
     this.drawSubEntities();
+    /*
+    this.imageData = this.app.stack['ctx'].getImageData(30, 30, 50, 50);
+    this.pixels = new Uint32Array(this.imageData.data.buffer);
+    for (var x = 0; x < 50*50; x++) {
+      this.pixels[x] = 0xff << 24 | 0x00 << 16 | 0x00 < 8 | 0xff;
+    }
+    this.app.stack['ctx'].putImageData(this.imageData, 30, 30);*/
+    var cacheCanvas = document.createElement('canvas');
+    cacheCanvas.width = 50;
+    cacheCanvas.height = 50;
+    var ctx = cacheCanvas.getContext('2d');
+    ctx.fillStyle = 'red';
+    //for (var x = 0; x < 50; x++) {
+      ctx.fillRect(0, 0, 50, 50);
+    //}
+    this.app.stack['ctx'].drawImage(cacheCanvas, -30, 0);
   } // drawEntity
 
   handleEvent(event) {

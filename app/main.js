@@ -34,5 +34,5 @@ window.onfocus = function(event) { gameApp.eventFocusWindow(event); }
 window.onresize = function(event) { gameApp.eventResizeWindow(event); }
 
 // start game
-gameApp.resizeApp();
+gameApp.eventResizeWindow(null);
 requestAnimationFrame(loopGame);
