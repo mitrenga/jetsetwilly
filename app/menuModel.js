@@ -34,10 +34,6 @@ export class MenuModel extends AbstractModel {
       {'id': 'body', 'trackX': 24, 'trackY': 35, 'color': 'rgb(42, 165, 63)'},
       {'id': 'body', 'trackX': 32, 'trackY': 38, 'color': 'rgb(192, 81, 81)'}
     ];
-    this.track = [];
-    for (var t = 0; t < 40; t++) {
-      this.track[t] = {'x': -16, 'y': 0, 'direction': 0};
-    }
     this.dataLoaded = false;
     this.bodyEntities = [];
     this.headEntity = null;
@@ -45,6 +41,10 @@ export class MenuModel extends AbstractModel {
     this.headDirectionX = 2;
     this.headY = 150;
     this.headDirectionY = 0;
+    this.track = [];
+    for (var t = 0; t < 40; t++) {
+      this.track[t] = {'x': this.headX, 'y': this.headY, 'direction': 0};
+    }
     this.wave = [0, 2, 4, 5, 6, 7, 7, 7, 6, 5, 4, 2, 0, -2, -4, -5, -6, -7, -7, -7, -6, -5, -4, -2];
     this.waveCounter = 0;
     this.willyEntity = null;
@@ -87,7 +87,7 @@ export class MenuModel extends AbstractModel {
     this.desktopEntity.bkColor = this.app.platform.colorByName('white');
 
       this.bodyObjects.forEach((object, o) => {
-      this.bodyEntities[o] = new SpriteEntity(this.desktopEntity, this.track[o].x, this.track[o].y, object.color, false, 0, this.track[o].direction);
+      this.bodyEntities[o] = new SpriteEntity(this.desktopEntity, this.headX, this.headY, object.color, false, 0, this.track[o].direction);
       this.desktopEntity.addEntity(this.bodyEntities[o]);
     });
 
