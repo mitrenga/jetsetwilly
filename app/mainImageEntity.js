@@ -1,23 +1,16 @@
 /**/
-const { ZXVideoRAMEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxVideoRAMEntity.js?ver='+window.srcVersion);
+const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 /*/
-import ZXVideoRAMEntity from './svision/js/platform/canvas2D/zxSpectrum/zxVideoRAMEntity.js';
+import AbstractEntity from './svision/js/abstractEntity.js';
 /**/
 // begin code
 
-export class MainImageEntity extends ZXVideoRAMEntity {
+export class MainImageEntity extends AbstractEntity {
 
   constructor(parentEntity, x, y, width, height) {
     super(parentEntity, x, y, width, height);
     this.id = 'MainImageEntity';
     this.attrStep = 0;
-
-    this.introImageTriangles = [
-      "C0F0FCFFFFFFFFFF",
-      "00000000C0F0FCFF",
-      "FFFFFFFFFCF0C000",
-      "FCF0C00000000000"
-    ]; // introImageTriangles
 
     this.introImageAttributes = [
       "0000000000000000000000000000000000000000000000000000000000000000",
@@ -35,60 +28,80 @@ export class MainImageEntity extends ZXVideoRAMEntity {
       "000000000000D300D300D300D308D3092929D30924D3D3D3D3D3000000000000",
       "000000000000D300D300D300D300D3080909D309242400D30000000000000000",
       "000000000000D3D3D3D3D300D300D3D3D308D3D3D32400D30000000000000000",
-      "0000000000000000000000000000000000000808040400000000000000000000",
-      "0000000000000000000000000000000000000000000000000000000000000000",
-      "0000000000000000000000000000000000000000000000000000000000000000",
-      "0000000000000000000000000000000000000000000000000000000000000000",
-      "0000000000000000000000000000000000000000000000000000000000000000",
-      "0000000000000000000000000000000000000000000000000000000000000000",
-      "0000000000000000000000000000000000000000000000000000000000000000",
-      "0000000000000000000000000000000000000000000000000000000000000000",
-      "0000000000000000000000000000000000000000000000000000000000000000"
+      "0000000000000000000000000000000000000808040400000000000000000000"
     ]; // introImageAttributes
   } // constructor
-
-  getVideoRAMValue(addr) {
-    if (addr < 6144) {
-      var row = Math.floor(addr/32);
-      var column = addr%32;
-      var triangle = false;
-      switch (this.introImageAttributes[row%8+Math.floor(row/64)*8].substring(column*2, column*2+2)) {
-        case '05':
-        case '08':
-        case '29':
-        case '2C':
-          triangle = 0;
-          break;
-        case '04':
-        case '0C':
-        case '25':              
-        case '28':
-          triangle = 2;
-          break;
-      }
-      if (triangle === false) {
-        return '00';
-      }
-      return this.introImageTriangles[triangle+addr%2].substring(Math.floor(addr%2048/256)*2, Math.floor(addr%2048/256)*2+2);
+  
+  drawEntity() {
+    var attr = 0;
+    if (this.attrStep > 0) {
+      attr = (((attr&56)+(this.attrStep<<3))&56)+(((attr&7)+this.attrStep)&7);
     }
-    if (addr > 6143) {
-      var attr = this.introImageAttributes[Math.floor((addr-6144)/32)].substring(((addr-6144)%32)*2, ((addr-6144)%32)*2+2);
-      if (attr == '2C') {
-        attr = '25';
-      }
-      if (this.app.stack.flashState) {
-        if (attr == 'D3') {
-          attr = 'DA';
+    this.app.layout.paint(this, 0, 0, this.width, this.height, this.app.platform.bkColorByAttr(attr));
+    for (var block = 0; block < 2; block++) {
+      for (var row = 0; row < 8; row++) {
+        for (var column = 0; column < 32; column++) {
+          var hexAttr = this.introImageAttributes[block*8+row].substring(column*2, column*2+2);
+          if (hexAttr != '00') {
+            attr = this.app.hexToInt(hexAttr);
+            if (this.attrStep == 0) {
+              if (this.app.stack.flashState) {
+                if (attr == 211) {
+                  attr = 218;
+                }
+              }
+            } else {
+              attr = (((attr&56)+(this.attrStep<<3))&56)+(((attr&7)+this.attrStep)&7);
+            }
+            var bkColor = this.app.platform.bkColorByAttr(attr);
+            var penColor = this.app.platform.penColorByAttr(attr);
+            if (hexAttr == '2C') {
+              var tmpColor = bkColor;
+              bkColor = penColor;
+              penColor = tmpColor;
+            }
+            this.app.layout.paint(this, column*8, (block*8+row)*8, 8, 8, bkColor);
+            switch (hexAttr) {
+              case '05':
+              case '08':
+              case '29':
+              case '2C':
+                if (column%2 == 0) {
+                  this.app.layout.paint(this, column*8, (block*8+row)*8, 2, 1, penColor);
+                  this.app.layout.paint(this, column*8, (block*8+row)*8+1, 4, 1, penColor);
+                  this.app.layout.paint(this, column*8, (block*8+row)*8+2, 6, 1, penColor);
+                  this.app.layout.paint(this, column*8, (block*8+row)*8+3, 8, 5, penColor);
+                } else {
+                  this.app.layout.paint(this, column*8, (block*8+row)*8+4, 2, 1, penColor);
+                  this.app.layout.paint(this, column*8, (block*8+row)*8+5, 4, 1, penColor);
+                  this.app.layout.paint(this, column*8, (block*8+row)*8+6, 6, 1, penColor);
+                  this.app.layout.paint(this, column*8, (block*8+row)*8+7, 8, 1, penColor);
+                }
+                break;
+
+              case '04':
+              case '0C':
+              case '25':
+              case '28':
+                if (column%2 == 0) {
+                  this.app.layout.paint(this, column*8, (block*8+row)*8, 8, 5, penColor);
+                  this.app.layout.paint(this, column*8, (block*8+row)*8+5, 6, 1, penColor);
+                  this.app.layout.paint(this, column*8, (block*8+row)*8+6, 4, 1, penColor);
+                  this.app.layout.paint(this, column*8, (block*8+row)*8+7, 2, 1, penColor);
+                } else {
+                  this.app.layout.paint(this, column*8, (block*8+row)*8, 8, 1, penColor);
+                  this.app.layout.paint(this, column*8, (block*8+row)*8+1, 6, 1, penColor);
+                  this.app.layout.paint(this, column*8, (block*8+row)*8+2, 4, 1, penColor);
+                  this.app.layout.paint(this, column*8, (block*8+row)*8+3, 2, 1, penColor);
+                }
+                break;
+            }
+          }
         }
       }
-      if (this.attrStep == 0)
-        return attr;
-      var intAttr = this.app.hexToInt(attr);
-      attr = this.app.intToHex( (((intAttr&56)+(this.attrStep<<3))&56)+(((intAttr&7)+this.attrStep)&7) );
-      return attr;
     }
-    return false;
-  } // getVideoRAMValue
+    super.drawSubEntities();
+  } // drawEntity
 
 } // class MainImageEntity
 
