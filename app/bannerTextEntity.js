@@ -13,6 +13,7 @@ export class BannerTextEntity extends ZXTextEntity {
     super(parentEntity, x, y, width, height, text, penColor, bkColor, 0, false);
     this.id = 'BannerTextEntity';
     this.bannerPosition = 0;
+    this.app.layout.newDrawingCropCache(this);
   } // constructor
 
   drawEntity() {
@@ -29,13 +30,7 @@ export class BannerTextEntity extends ZXTextEntity {
         this.cursorX += charData.width;
       }
     }
-    if (this.drawingCropCache == null) {
-      this.drawingCropCache = new DrawingCache(this.app);
-      this.drawingCropCache.init(this.width, this.height);
-    }
-    this.drawingCropCache.ctx.clearRect(0, 0, this.drawingCropCache.canvas.width, this.drawingCropCache.canvas.height);
-    this.drawingCropCache.ctx.drawImage(this.drawingCache[0].canvas, -this.bannerPosition*this.app.layout.ratio, 0);
-    this.app.stack.ctx.drawImage(this.drawingCropCache.canvas, (this.parentX+this.x)*this.app.layout.ratio, (this.parentY+this.y)*this.app.layout.ratio);
+    this.app.layout.paintCropCache(this, 0, -this.bannerPosition, 0);
   } // drawEntity
 
 } // class BannerTextEntity
