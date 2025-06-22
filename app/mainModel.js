@@ -1,15 +1,13 @@
 /**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
-const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion);
 const { MainImageEntity } = await import('./mainImageEntity.js?ver='+window.srcVersion);
-const { ZXTextEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js?ver='+window.srcVersion);
+const { BannerTextEntity } = await import('./bannerTextEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
-import AbstractEntity from './svision/js/abstractEntity.js';
 import BorderEntity from './borderEntity.js';
 import MainImageEntity from './mainImageEntity.js';
-import ZXTextEntity from './svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js';
+import BannerTextEntity from './bannerTextEntity.js';
 /**/
 // begin code
 
@@ -47,7 +45,7 @@ export class MainModel extends AbstractModel {
     this.borderEntity.bkColor = this.app.platform.colorByName('black');
     this.mainImageEntity = new MainImageEntity(this.desktopEntity, 0, 0, 32*8, 24*8, this.flashState);
     this.desktopEntity.addEntity(this.mainImageEntity);
-    this.bannerEntity = new ZXTextEntity(this.mainImageEntity, 0, 18*8, 32*8, 1*8, this.bannerTxt, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), 0, false);
+    this.bannerEntity = new BannerTextEntity(this.mainImageEntity, 0, 18*8, 32*8, 1*8, this.bannerTxt, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'));
     this.mainImageEntity.addEntity(this.bannerEntity);
     if (this.app.audioManager.music > 0) {
       this.sendEvent(500, {'id': 'openAudioChannel', 'channel': 'music'});
@@ -73,18 +71,16 @@ export class MainModel extends AbstractModel {
         return true;
 
       case 'screechBegin':
-        this.bannerEntity.penColor = this.app.platform.colorByName('brightWhite');
-        this.bannerEntity.bkColor = this.app.platform.colorByName('brightBlue');
+        this.bannerEntity.setPenColor(this.app.platform.colorByName('brightWhite'));
+        this.bannerEntity.setBkColor(this.app.platform.colorByName('brightBlue'));
         this.screechDuration = event.data.duration;
         this.timer = this.app.now;
         this.sendEvent(0, {'id': 'setBorderAnimation', 'value': 'screech'});
         return true;
 
       case 'screechEnd':
-        this.bannerEntity.penColor = this.app.platform.colorByName('yellow');
-        this.bannerEntity.bkColor = this.app.platform.colorByName('black');
-        this.bannerEntity.x = 0;
-        this.bannerEntity.width = 32*8;
+        this.bannerEntity.setPenColor(this.app.platform.colorByName('yellow'));
+        this.bannerEntity.setBkColor(this.app.platform.colorByName('black'));
         this.mainImageEntity.attrStep = 0;
         this.timer = false;
         this.sendEvent(0, {'id': 'setBorderAnimation', 'value': false});
@@ -101,10 +97,7 @@ export class MainModel extends AbstractModel {
 
     if (this.timer != false) {
       if (timestamp-this.timer < this.screechDuration) {
-        var pos = Math.round((this.bannerTxt.length-32)*8*(timestamp-this.timer)/this.screechDuration);
-        this.bannerEntity.x = -pos;
-        this.bannerEntity.width = 32*8+pos;
-
+        this.bannerEntity.bannerPosition = Math.round((this.bannerTxt.length-32)*8*(timestamp-this.timer)/this.screechDuration);
         this.mainImageEntity.attrStep = Math.floor(((timestamp-this.timer)/(1000/15))%8)*3;
       }
     }

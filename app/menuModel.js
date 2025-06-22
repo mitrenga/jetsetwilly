@@ -98,7 +98,7 @@ export class MenuModel extends AbstractModel {
 
     this.bkEntity = new AbstractEntity(this.desktopEntity, 13, 22, 230, 144, false, 'rgba(223, 218, 208, 0.8)');
     this.desktopEntity.addEntity(this.bkEntity);
-    this.menuSelectedRow = new ZXTextEntity(this.bkEntity, 10, 10+this.selectedItem*16, 210, 12, '', false, 'rgba(0, 0, 0, 0.15)', 0, false);
+    this.menuSelectedRow = new AbstractEntity(this.bkEntity, 10, 10+this.selectedItem*16, 210, 12, false, 'rgba(0, 0, 0, 0.15)');
     this.bkEntity.addEntity(this.menuSelectedRow);
 
     for (var y = 0; y < this.menuItems.length; y++) {
@@ -147,10 +147,22 @@ export class MenuModel extends AbstractModel {
 
   refreshMenu() {
     for (var y = 0; y < this.menuItems.length; y++) {
-      this.menuEntities[y][0].text = this.menuItems[y].label;
-      this.menuEntities[y][1].text = this.menuParamValue(this.menuItems[y].event);
+      this.menuEntities[y][0].setText(this.menuItems[y].label);
+      this.menuEntities[y][1].setText(this.menuParamValue(this.menuItems[y].event));
     }
   } // refreshMenu
+
+  changeMenuItem(newItem) {
+    if (newItem < 0 || newItem >= this.menuItems.length) {
+      return;
+    }
+    this.menuEntities[this.selectedItem][0].setPenColor(this.penMenuItemColor);
+    this.menuEntities[this.selectedItem][1].setPenColor(this.penMenuItemColor);
+    this.selectedItem = newItem;
+    this.menuEntities[this.selectedItem][0].setPenColor(this.penSelectedMenuItemColor);
+    this.menuEntities[this.selectedItem][1].setPenColor(this.penSelectedMenuItemColor);
+    this.menuSelectedRow.y = 10+this.selectedItem*16;
+  } // changeMenuItem
 
   setData(data) {
     this.bodyEntities.forEach((entity, e) => {
@@ -163,21 +175,8 @@ export class MenuModel extends AbstractModel {
     super.setData(data);
   } // setData
 
-  changeMenuItem(newItem) {
-    if (newItem < 0 || newItem >= this.menuItems.length) {
-      return;
-    }
-    this.menuEntities[this.selectedItem][0].penColor = this.penMenuItemColor;
-    this.menuEntities[this.selectedItem][1].penColor = this.penMenuItemColor;
-    this.selectedItem = newItem;
-    this.menuEntities[this.selectedItem][0].penColor = this.penSelectedMenuItemColor;
-    this.menuEntities[this.selectedItem][1].penColor = this.penSelectedMenuItemColor;
-    this.menuSelectedRow.y = 10+this.selectedItem*16;
-} // changeMenuItem
-
   handleEvent(event) {
-    var result = super.handleEvent(event);
-    if (result == true) {
+    if (super.handleEvent(event)) {
       return true;
     }
 

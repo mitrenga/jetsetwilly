@@ -62,6 +62,15 @@ export class LogoEntity extends TextEntity {
     return charObject;
   } // getCharData
 
+  handleEvent(event) {
+    switch (event.id) {
+      case 'changeFlashState':
+        this.drawingCache[0].cleanCache();
+        break;
+    }
+    return super.handleEvent(event);
+  } // handleEvent
+
 } // class LogoEntity
 
 export default LogoEntity;
