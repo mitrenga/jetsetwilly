@@ -48,8 +48,8 @@ export class MainModel extends AbstractModel {
     this.bannerEntity = new BannerTextEntity(this.mainImageEntity, 0, 18*8, 32*8, 1*8, this.bannerTxt, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'));
     this.mainImageEntity.addEntity(this.bannerEntity);
     if (this.app.audioManager.music > 0) {
-      this.sendEvent(500, {'id': 'openAudioChannel', 'channel': 'music'});
-      this.sendEvent(750, {'id': 'playSound', 'channel': 'music', 'sound': 'titleScreenMelody', 'options': false});
+      this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'music'});
+      this.sendEvent(500, {'id': 'playSound', 'channel': 'music', 'sound': 'titleScreenMelody', 'options': false});
     }
     this.app.stack.flashState = false;
     this.sendEvent(330, {'id': 'changeFlashState'});

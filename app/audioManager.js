@@ -14,8 +14,8 @@ export class AudioManager extends AbstractAudioManager {
   constructor(app) {
     super(app);
     this.id = 'AudioManager';
-    this.sounds = Number(this.app.getCookie('audioChannelSounds', 0.3));
-    this.music = Number(this.app.getCookie('audioChannelMusic', 0.3));
+    this.sounds = Number(this.app.getCookie('audioChannelSounds', 0.2));
+    this.music = Number(this.app.getCookie('audioChannelMusic', 0.2));
   } // constructor
 
 createAudioHandler(channel) {

@@ -46,6 +46,14 @@ export class RoomModel extends AbstractModel {
     this.roomNameEntity = new ZXTextEntity(this.desktopEntity, 0, 16*8, 32*8, 8, '', this.app.platform.colorByName('brightYellow'), this.app.platform.colorByName('brightBlack'), 0, true);
     this.roomNameEntity.justify = 2;
     this.desktopEntity.addEntity(this.roomNameEntity);
+
+    if (this.app.audioManager.music > 0) {
+      this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'music'});
+      this.sendEvent(500, {'id': 'playSound', 'channel': 'music', 'sound': 'inGameMelody', 'options': {'repeat': true, 'lives': 7}});
+    }
+    if (this.app.audioManager.sounds > 0) {
+      this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'sounds'});
+    }
   } // init
 
   setData(data) {
