@@ -30,7 +30,7 @@ export class BannerTextEntity extends ZXTextEntity {
         this.cursorX += charData.width;
       }
     }
-    this.app.layout.paintCropCache(this, 0, -this.bannerPosition, 0);
+    this.app.layout.paintCropCache(this, 0, this.bannerPosition, 0, 0, 0);
   } // drawEntity
 
 } // class BannerTextEntity
