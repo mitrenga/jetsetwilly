@@ -167,10 +167,13 @@ export class MenuModel extends AbstractModel {
   setData(data) {
     this.bodyEntities.forEach((entity, e) => {
       entity.setGraphicsData(data.body);
+      entity.enablePaintWithVisibility();
     });
 
     this.headEntity.setGraphicsData(data.head);
+    this.headEntity.enablePaintWithVisibility();
     this.willyEntity.setGraphicsData(data.willy);
+    this.willyEntity.enablePaintWithVisibility();
     this.dataLoaded = true;
     super.setData(data);
   } // setData
@@ -285,6 +288,9 @@ export class MenuModel extends AbstractModel {
             this.headEntity.incFrame();
           }
           this.headX += this.headDirectionX;
+          if (this.headEntity.drawingCropCache != null && this.headX >= 0) {
+            this.headEntity.disablePaintWithVisibility();
+          }
           if (this.headDirectionX > 0 && this.headX > 235) {
             this.headDirectionX *= -1;
             this.headEntity.switchDirection();
@@ -295,7 +301,7 @@ export class MenuModel extends AbstractModel {
             }
           }
           if ((this.headDirectionX > 0 && this.headX > 235) ||
-              (this.headDirectionX < 0 && this.headX < 4)) {
+              (this.headDirectionX < 0 && this.headX < 6)) {
             this.headDirectionX *= -1;
             this.headEntity.switchDirection();
             this.headDirectionY = Math.round((Math.random()*4)-2)/2;
@@ -323,6 +329,9 @@ export class MenuModel extends AbstractModel {
           } else {
             this.willyEntity.x = this.headEntity.x+10;
           }
+          if (this.willyEntity.drawingCropCache != null && this.willyEntity.x >= 0) {
+            this.willyEntity.disablePaintWithVisibility();
+          }
           this.willyEntity.y = this.headEntity.y-11;
           this.willyEntity.direction = this.headEntity.direction;
           if (this.gameFrame == 1 || this.gameFrame == 4) {
@@ -336,6 +345,9 @@ export class MenuModel extends AbstractModel {
             entity.direction = this.track[this.bodyObjects[e].trackX].direction;
             if (this.gameFrame%4 == 0) {
               entity.incFrame();
+            }
+            if (entity.drawingCropCache != null && entity.x >= 0) {
+              entity.disablePaintWithVisibility();
             }
           });
           this.track.shift();
