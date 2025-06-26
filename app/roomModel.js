@@ -22,7 +22,24 @@ export class RoomModel extends AbstractModel {
     this.roomNameEntity = null;
     this.scoreEntity = null;
     this.adjoiningRoom = null;
-    this.worker = null;
+
+    this.initData = {};
+
+    this.worker = new Worker(this.app.importPath+'/gameWorker.js');
+    this.worker.onmessage = (event) => {
+      switch (event.data.id) {
+        case 'update':
+          Object.keys(event.data.gameData).forEach((objectsType) => {
+            event.data.gameData[objectsType].forEach((object, g) => {
+              this.gameAreaEntity.spriteEntities[objectsType][g].x = object.x+object.paintCorrectionsX;
+              this.gameAreaEntity.spriteEntities[objectsType][g].y = object.y+object.paintCorrectionsY;
+              this.gameAreaEntity.spriteEntities[objectsType][g].frame = object.frame;
+              this.gameAreaEntity.spriteEntities[objectsType][g].direction = object.direction;
+            });
+          });
+          break;
+      }
+    } // onmessage
 
     const http = new XMLHttpRequest();
     http.responser = this;
@@ -41,7 +58,7 @@ export class RoomModel extends AbstractModel {
     super.init();
 
     this.borderEntity.bkColor = this.app.platform.colorByName('black');
-    this.gameAreaEntity = new GameAreaEntity(this.desktopEntity, 0, 0, 32*8, 16*8, this.roomNumber);
+    this.gameAreaEntity = new GameAreaEntity(this.desktopEntity, 0, 0, 32*8, 16*8, this.roomNumber, this.initData);
     this.desktopEntity.addEntity(this.gameAreaEntity);
     this.roomNameEntity = new ZXTextEntity(this.desktopEntity, 0, 16*8, 32*8, 8, '', this.app.platform.colorByName('brightYellow'), this.app.platform.colorByName('brightBlack'), 0, true);
     this.roomNameEntity.justify = 2;
@@ -66,7 +83,7 @@ export class RoomModel extends AbstractModel {
     this.roomNameEntity.setText(data.name);
     this.borderEntity.bkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(data.borderColor), 7, 1);
     super.setData(data);
-    this.worker = new Worker(this.app.importPath+'/gameWorker.js');
+    this.worker.postMessage({'id': 'init', 'initData': this.initData});
   } // setData
 
   handleEvent(event) {
