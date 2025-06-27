@@ -56,17 +56,17 @@ export class RoomEntity extends AbstractEntity {
       if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(data.bkColor))) {
         bkColor = false;
       }
-      var direction = 0;
-      switch (rampData.direction) {
+      var gradient = 0;
+      switch (rampData.gradient) {
         case 'left':
-          direction = -1;
+          gradient = -1;
           break;
         case 'right':
-          direction = 1;
+          gradient = 1;
           break;
         }
       for (var pos = 0; pos < this.app.hexToInt(rampData.length); pos++) {
-        var rampEntity = new SpriteEntity(this, (rampData.location.x+pos*direction)*8, (rampData.location.y-pos)*8, penColor, bkColor, 0, 0);
+        var rampEntity = new SpriteEntity(this, (rampData.location.x+pos*gradient)*8, (rampData.location.y-pos)*8, penColor, bkColor, 0, 0);
         this.addEntity(rampEntity);
         rampEntity.setGraphicsDataFromHexStr('ramp', rampData.data.substring(2, 18));
       }

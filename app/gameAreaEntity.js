@@ -30,6 +30,8 @@ export class GameAreaEntity extends AbstractEntity {
     if (this.roomData) {
       if (this.drawingCache[0].needToRefresh(this, this.width, this.height)) {
         this.app.layout.paintRect(this.drawingCache[0].ctx, 0, 0, this.width, this.height, this.app.platform.zxColorByAttr(this.app.hexToInt(this.roomData.bkColor), 56, 8));
+
+        // layout
         this.roomData.layout.forEach((row, r) => {
           for (var column = 0; column < 32; column++) {
             var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
@@ -60,11 +62,41 @@ export class GameAreaEntity extends AbstractEntity {
             }
           }
         });
-      }
-    }
 
-    this.app.layout.paintCache(this, 0);
-    super.drawSubEntities();
+        // ramp
+        if ('ramp' in this.roomData.graphicData) {
+          var rampData = this.roomData.graphicData.ramp;
+          var gradient = 1;
+          if (rampData.gradient == 'left') {
+              gradient = -1;
+          }
+          if (this.graphicCache['ramp'].needToRefresh(this, 8, 8)) {
+            var attr = rampData.data.substring(0, 2);
+            var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(attr));
+            var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(attr)&63);
+            if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor))) {
+              bkColor = false;
+            }
+            if (bkColor != false) {
+              this.app.layout.paintRect(this.graphicCache['ramp'].ctx, 0, 0, 8, 8, bkColor);
+            }
+            for (var y = 0; y < 8; y++) {
+              var spriteLine = this.app.hexToBin(rampData.data.substring((y+1)*2, (y+1)*2+2));
+              for (var x = 0; x < 8; x++) {
+                if (spriteLine[x] == '1') {
+                  this.app.layout.paintRect(this.graphicCache['ramp'].ctx, x, y, 1, 1, penColor);
+                }
+              }
+            }
+          }
+          for (var pos = 0; pos < this.app.hexToInt(rampData.length); pos++) {
+            this.drawingCache[0].ctx.drawImage(this.graphicCache['ramp'].canvas, (rampData.location.x+pos*gradient)*8*this.app.layout.ratio, (rampData.location.y-pos)*8*this.app.layout.ratio);
+          }
+        }
+      }
+      this.app.layout.paintCache(this, 0);
+      super.drawSubEntities();
+    }
   } // drawEntity
 
   setData(data) {
@@ -78,6 +110,12 @@ export class GameAreaEntity extends AbstractEntity {
         this.graphicCache[key] = new DrawingCache(this.app);
       }
     });
+
+    // ramp
+    this.initData['ramps'] = [];
+    if ('ramp' in data.graphicData) {
+      this.graphicCache.ramp = new DrawingCache(this.app);
+    }
 
     // conveyor
     this.initData['conveyors'] = [];
