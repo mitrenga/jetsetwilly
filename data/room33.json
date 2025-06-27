@@ -50,7 +50,7 @@
             "attribute":"04",
             "limits":{
               "left":0,
-              "right":224
+              "right":222
             },
             "animationSpeed":0,
             "init":{
@@ -61,7 +61,7 @@
             }
         }
       ],
-      "width":10,
+      "width":12,
       "height":16,
       "paintCorrections":{
         "x":-6,
