@@ -21,6 +21,15 @@ function gameLoop() {
 
     if (counter%4 == 0) {
       counter4++;
+      // conveyors
+
+      gameData.conveyors.forEach((conveyor) => {
+        if (conveyor.frame == 3) {
+          conveyor.frame = 0;
+        } else {
+          conveyor.frame++;
+        }  
+      });
 
       // guardians
       gameData.guardians.forEach((guardian) => {

@@ -31,8 +31,16 @@ export class RoomModel extends AbstractModel {
         case 'update':
           Object.keys(event.data.gameData).forEach((objectsType) => {
             event.data.gameData[objectsType].forEach((object, g) => {
-              this.gameAreaEntity.spriteEntities[objectsType][g].x = object.x+object.paintCorrectionsX;
-              this.gameAreaEntity.spriteEntities[objectsType][g].y = object.y+object.paintCorrectionsY;
+              var x = object.x;
+              if ('paintCorrectionsX' in object) {
+                x += object.paintCorrectionsX;
+              }
+              this.gameAreaEntity.spriteEntities[objectsType][g].x = x;
+              var y = object.y;
+              if ('paintCorrectionsY' in object) {
+                y += object.paintCorrectionsY;
+              }
+              this.gameAreaEntity.spriteEntities[objectsType][g].y = y;
               this.gameAreaEntity.spriteEntities[objectsType][g].frame = object.frame;
               this.gameAreaEntity.spriteEntities[objectsType][g].direction = object.direction;
             });

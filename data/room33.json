@@ -26,15 +26,15 @@
     "item": "1F040A7787B1AA0A",
     "ramp": {
       "data": "0703000C003000C000",
-      "direction": "right",
+      "gradient": "right",
       "location": {"x": 9, "y": 12},
        "length": "08"
     },
     "conveyor": {
       "data": "3DA5000000000000FF",
-      "direction": "left",
+      "moving": "left",
       "location": {"x": 20, "y": 14},
-       "length": "04"
+      "length": "04"
     }
   },
   "adjoiningRoom": {

@@ -23,7 +23,7 @@ export class GameAreaEntity extends AbstractEntity {
     this.graphicCache = {};
     this.staticKinds = ['floor', 'wall', 'nasty'];
 
-    this.spriteEntities = {'guardians': []};
+    this.spriteEntities = {'conveyors': [], 'guardians': []};
   } // constructor
 
   drawEntity() {
@@ -79,9 +79,40 @@ export class GameAreaEntity extends AbstractEntity {
       }
     });
 
+    // conveyor
+    this.initData['conveyors'] = [];
+    if ('conveyor' in data.graphicData) {
+      var conveyorData = data.graphicData.conveyor;
+      var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(conveyorData.data.substring(0, 2)));
+      var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(conveyorData.data.substring(0, 2)));
+      if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(data.bkColor))) {
+        bkColor = false;
+      }
+      var entity = new SpriteEntity(this, conveyorData.location.x*8, conveyorData.location.y*8, penColor, bkColor, 0, 0);
+      entity.setFixSize(8, 8);
+      entity.setRepeatX(this.app.hexToInt(conveyorData.length));
+      entity.setGraphicsDataFromHexStr('conveyor', conveyorData.data.substring(2, 18));
+      entity.cloneSprite(0);
+      var rotateDirection = 1;
+      if (conveyorData.moving == 'right') {
+        rotateDirection = -1;
+      }
+      entity.rotateSpriteRow(1, 0, -2*rotateDirection);
+      entity.rotateSpriteRow(1, 2, 2*rotateDirection);
+      entity.cloneSprite(1);
+      entity.rotateSpriteRow(2, 0, -2*rotateDirection);
+      entity.rotateSpriteRow(2, 2, 2*rotateDirection);
+      entity.cloneSprite(2);
+      entity.rotateSpriteRow(3, 0, -2*rotateDirection);
+      entity.rotateSpriteRow(3, 2, 2*rotateDirection);
+      this.addEntity(entity);
+      this.spriteEntities.conveyors.push(entity);
+      this.initData.conveyors.push({'visible': true, 'moving': conveyorData.moving, 'x': conveyorData.location.x*8, 'y': conveyorData.location.y*8, 'length': conveyorData.length*8, 'height': 8, 'frame': 0, 'direction': 0});
+    }
+
     // guardians
+    this.initData['guardians'] = [];
     if ('guardians' in data) {
-      this.initData['guardians'] = [];
       ['horizontal', 'vertical'].forEach((guardianType) => {
         if (guardianType in data.guardians) {
           var guardianTypeData = data.guardians[guardianType];
