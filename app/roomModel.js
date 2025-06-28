@@ -25,7 +25,7 @@ export class RoomModel extends AbstractModel {
 
     this.initData = {};
 
-    this.worker = new Worker(this.app.importPath+'/gameWorker.js');
+    this.worker = new Worker(this.app.importPath+'/gameWorker.js?ver='+window.srcVersion);
     this.worker.onmessage = (event) => {
       switch (event.data.id) {
         case 'update':

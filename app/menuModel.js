@@ -278,7 +278,7 @@ export class MenuModel extends AbstractModel {
       this.timer = timestamp;
     } else {
       if (this.dataLoaded) {
-        var counter = Math.round((timestamp-this.timer)/(1000/15));
+        var counter = Math.round((timestamp-this.timer)/72);
         if (this.prevCounter != counter) {
           this.prevCounter = counter;
           this.gameFrame = this.app.rotateInc(this.gameFrame, 0, 14);

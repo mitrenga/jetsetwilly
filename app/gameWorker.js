@@ -5,13 +5,13 @@
 /**/
 // begin code
 
-var timer = null;
 var counter = 0;
 var counter2 = 0;
 var counter4 = 0;
 var gameData = null;
 
 function gameLoop() {
+  setTimeout(gameLoop, 18);
   if (gameData != null) {
     counter++;
 
@@ -77,7 +77,7 @@ onmessage = (event) => {
           gameData[type].push({...object});
         });
       });
-      timer = setInterval(gameLoop, 1000/60);  
+      gameLoop();
       break;
   }
 } // onmessage
