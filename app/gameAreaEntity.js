@@ -23,7 +23,7 @@ export class GameAreaEntity extends AbstractEntity {
     this.graphicCache = {};
     this.staticKinds = ['floor', 'wall', 'nasty'];
 
-    this.spriteEntities = {'conveyors': [], 'guardians': [], 'decorations': [], 'willy': []};
+    this.spriteEntities = {'conveyors': [], 'guardians': [], 'items': [], 'decorations': [], 'willy': []};
   } // constructor
 
   drawEntity() {
@@ -147,6 +147,19 @@ export class GameAreaEntity extends AbstractEntity {
       this.spriteEntities.conveyors.push(entity);
       this.initData.conveyors.push({'visible': true, 'moving': conveyorData.moving, 'x': conveyorData.location.x*8, 'y': conveyorData.location.y*8, 'length': conveyorData.length*8, 'height': 8, 'frame': 0, 'direction': 0});
     }
+
+    // items
+    this.initData.items = [];
+    var itemColor = 3;
+    this.app.items[this.roomNumber].forEach((item) => {
+      var penColor = this.app.platform.color(itemColor);
+      var entity = new SpriteEntity(this, item.x*8, item.y*8, penColor, false, 0, 0);
+      this.addEntity(entity);
+      entity.setGraphicsDataFromHexStr('item', data.graphicData.item);
+      this.spriteEntities.items.push(entity);
+      this.initData.items.push({'visible': true, 'x': item.x*8, 'y': item.y*8, 'frame': 0, 'direction': 0});
+      itemColor = this.app.rotateInc(itemColor, 3, 5);
+    });
 
     // guardians
     this.initData.guardians = [];
