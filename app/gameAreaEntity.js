@@ -129,7 +129,7 @@ export class GameAreaEntity extends AbstractEntity {
       var entity = new SpriteEntity(this, conveyorData.location.x*8, conveyorData.location.y*8, penColor, bkColor, 0, 0);
       entity.setFixSize(8, 8);
       entity.setRepeatX(this.app.hexToInt(conveyorData.length));
-      entity.setGraphicsDataFromHexStr('conveyor', conveyorData.data.substring(2, 18));
+      entity.setGraphicsDataFromHexStr(conveyorData.data.substring(2, 18));
       entity.cloneSprite(0);
       var rotateDirection = 1;
       if (conveyorData.moving == 'right') {
@@ -152,13 +152,24 @@ export class GameAreaEntity extends AbstractEntity {
     this.initData.items = [];
     var itemColor = 3;
     this.app.items[this.roomNumber].forEach((item) => {
-      var penColor = this.app.platform.color(itemColor);
-      var entity = new SpriteEntity(this, item.x*8, item.y*8, penColor, false, 0, 0);
+      var tmpColor = itemColor;
+      var penColor0 = this.app.platform.color(tmpColor);
+      tmpColor = this.app.rotateInc(tmpColor, 3, 6);
+      var penColor1 = this.app.platform.color(tmpColor);
+      tmpColor = this.app.rotateInc(tmpColor, 3, 6);
+      var penColor2 = this.app.platform.color(tmpColor);
+      tmpColor = this.app.rotateInc(tmpColor, 3, 6);
+      var penColor3 = this.app.platform.color(tmpColor);
+      var entity = new SpriteEntity(this, item.x*8, item.y*8, false, false, 0, 0);
       this.addEntity(entity);
-      entity.setGraphicsDataFromHexStr('item', data.graphicData.item);
+      entity.setColorsMap({'1': {0: penColor0, 1: penColor1, 2: penColor2, 3: penColor3}});
+      entity.setGraphicsDataFromHexStr(data.graphicData.item);
+      entity.cloneSprite(0);
+      entity.cloneSprite(0);
+      entity.cloneSprite(0);
       this.spriteEntities.items.push(entity);
       this.initData.items.push({'visible': true, 'x': item.x*8, 'y': item.y*8, 'frame': 0, 'direction': 0});
-      itemColor = this.app.rotateInc(itemColor, 3, 5);
+      itemColor = this.app.rotateInc(itemColor, 3, 6);
     });
 
     // guardians
