@@ -18,6 +18,7 @@
     },
     "width":10,
     "height":16,
+    "attribute":"07",
     "paintCorrections":{
        "x":-1,
        "y":0

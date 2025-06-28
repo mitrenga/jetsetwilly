@@ -23,7 +23,7 @@ export class GameAreaEntity extends AbstractEntity {
     this.graphicCache = {};
     this.staticKinds = ['floor', 'wall', 'nasty'];
 
-    this.spriteEntities = {'conveyors': [], 'guardians': []};
+    this.spriteEntities = {'conveyors': [], 'guardians': [], 'decorations': [], 'willy': []};
   } // constructor
 
   drawEntity() {
@@ -112,13 +112,13 @@ export class GameAreaEntity extends AbstractEntity {
     });
 
     // ramp
-    this.initData['ramps'] = [];
+    this.initData.ramps = [];
     if ('ramp' in data.graphicData) {
       this.graphicCache.ramp = new DrawingCache(this.app);
     }
 
     // conveyor
-    this.initData['conveyors'] = [];
+    this.initData.conveyors = [];
     if ('conveyor' in data.graphicData) {
       var conveyorData = data.graphicData.conveyor;
       var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(conveyorData.data.substring(0, 2)));
@@ -149,7 +149,7 @@ export class GameAreaEntity extends AbstractEntity {
     }
 
     // guardians
-    this.initData['guardians'] = [];
+    this.initData.guardians = [];
     if ('guardians' in data) {
       ['horizontal', 'vertical'].forEach((guardianType) => {
         if (guardianType in data.guardians) {
@@ -165,6 +165,28 @@ export class GameAreaEntity extends AbstractEntity {
         }
       });
     }
+
+    // decorations
+    this.initData.decorations = [];
+    if ('decorations' in data) {
+      data.decorations.forEach((decoration) => {
+        var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(decoration.attribute));
+        var entity = new SpriteEntity(this, decoration.x*8, decoration.y*8, penColor, false, 0, 0);
+        this.addEntity(entity);
+        entity.setGraphicsData(decoration);
+        this.spriteEntities.decorations.push(entity);
+        this.initData.decorations.push({'visible': true, 'kind': decoration.kind, 'x': decoration.x*8, 'y': decoration.y*8, 'frame': 0, 'direction': 0});
+      });
+    }
+
+    // Willy
+    this.initData.willy = [];
+    var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(data.willy.attribute));
+    var entity = new SpriteEntity(this, data.willy.init.x, data.willy.init.y, penColor, false, data.willy.init.frame, data.willy.init.direction);
+    this.addEntity(entity);
+    entity.setGraphicsData(data.willy);
+    this.spriteEntities.willy.push(entity);
+    this.initData.willy.push({'visible': true, 'x': data.willy.init.x, 'y': data.willy.init.y, 'width': data.willy.width, 'height': data.willy.height, 'frame': data.willy.init.frame, 'direction': data.willy.init.direction, 'paintCorrectionsX': data.willy.paintCorrections.x, 'paintCorrectionsY': data.willy.paintCorrections.y});
   } // setData
     
 } // class GameAreaEntity
