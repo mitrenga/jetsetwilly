@@ -33,33 +33,85 @@ function gameLoop() {
 
     // guardians
     gameData.guardians.forEach((guardian) => {
-      switch (guardian.direction) {
-        case 0:
-          if (guardian.x == guardian.limitRight)
-          {
-            guardian.direction = 1;
-          } else {
-            guardian.x += 2;
-            if (guardian.frame == 3) {
-              guardian.frame = 0;
-            } else {
-              guardian.frame++;
+      switch (guardian.type) {
+        case 'horizontal':
+          var toMove = false;
+          switch (guardian.speed) {
+            case 0:
+              toMove = true;
+              break;
+            case 1:
+              if (this.counter%2 == 0) {
+                toMove = true;
+              }
+              break;
+          }
+          if (toMove) {
+            switch (guardian.direction) {
+              case 0:
+                if (guardian.x == guardian.limitRight)
+                {
+                  guardian.direction = 1;
+                } else {
+                  guardian.x += 2;
+                  if (guardian.frame == 3) {
+                    guardian.frame = 0;
+                  } else {
+                    guardian.frame++;
+                  }
+                }
+                break;
+              case 1:
+                if (guardian.x == guardian.limitLeft)
+                {
+                  guardian.direction = 0;
+                } else {
+                  guardian.x -= 2;
+                  if (guardian.frame == 0) {
+                    guardian.frame = 3;
+                  } else {
+                    guardian.frame--;
+                  }
+                }
+                break;
             }
           }
           break;
-        case 1:
-          if (guardian.x == guardian.limitLeft)
-          {
-            guardian.direction = 0;
-          } else {
-            guardian.x -= 2;
-            if (guardian.frame == 0) {
-              guardian.frame = 3;
-            } else {
-              guardian.frame--;
-            }
+
+        case 'vertical':
+          switch (guardian.direction) {
+            case 0:
+              if (guardian.y+guardian.speed > guardian.limitDown) {
+                guardian.direction = 1;
+                guardian.frame = guardian.frames-guardian.frame-1;
+              }
+              break;
+            case 1:
+              if (guardian.y-guardian.speed < guardian.limitUp) {
+                guardian.direction = 0;
+                guardian.frame = guardian.frames-guardian.frame-1;
+              }
+              break;
           }
-          break;
+          switch (guardian.direction) {
+            case 0:
+              guardian.y += guardian.speed;
+              if (guardian.frame == guardian.frames-1) {
+                guardian.frame = 0;
+              } else {
+                guardian.frame++;
+              }
+              break;
+            case 1:
+              guardian.y -= guardian.speed;
+              if (guardian.frame == 0) {
+                guardian.frame = guardian.frames-1;
+              } else {
+                guardian.frame--;
+              }
+              break;
+          }
+          break;        
       }
     });
 
@@ -71,6 +123,7 @@ function gameLoop() {
         decoration.frame++;
       }
     });    
+
   }
   postMessage({'id': 'update', 'gameData': gameData});
 } // gameLoop

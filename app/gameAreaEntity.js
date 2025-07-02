@@ -168,27 +168,34 @@ export class GameAreaEntity extends AbstractEntity {
       entity.cloneSprite(0);
       entity.cloneSprite(0);
       this.spriteEntities.items.push(entity);
-      this.initData.items.push({'visible': true, 'x': item.x*8, 'y': item.y*8, 'frame': 0, 'direction': 0});
+      this.initData.items.push({'hide': false, 'x': item.x*8, 'y': item.y*8, 'frame': 0, 'direction': 0});
       itemColor = this.app.rotateInc(itemColor, 3, 6);
     });
 
     // guardians
-    this.initData.guardians = [];
-    if ('guardians' in data) {
-      ['horizontal', 'vertical'].forEach((guardianType) => {
-        if (guardianType in data.guardians) {
-          var guardianTypeData = data.guardians[guardianType];
-          guardianTypeData.figures.forEach((guardian) => {
+    this.initData['guardians'] = [];
+    ['horizontal', 'vertical'].forEach((guardianType) => {
+      if (guardianType in data.guardians) {
+        var guardianTypeData = data.guardians[guardianType];
+        guardianTypeData.forEach((guardianDefs) => {
+          guardianDefs.figures.forEach((guardian) => {
             var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(guardian.attribute));
-            var entity = new SpriteEntity(this, guardian.init.x+guardianTypeData.paintCorrections.x, guardian.init.y+guardianTypeData.paintCorrections.y, penColor, false, guardian.init.frame, guardian.init.direction);
+            var entity = new SpriteEntity(this, guardian.init.x+guardianDefs.paintCorrections.x, guardian.init.y+guardianDefs.paintCorrections.y, penColor, false, guardian.init.frame, guardian.init.direction);
+            entity.setGraphicsData(guardianDefs);
             this.addEntity(entity);
-            entity.setGraphicsData(guardianTypeData);
             this.spriteEntities.guardians.push(entity);
-            this.initData.guardians.push({'visible': true, 'type': guardianType, 'x': guardian.init.x, 'y': guardian.init.y, 'width': guardianTypeData.width, 'height': guardianTypeData.height, 'frame': guardian.init.frame, 'direction': guardian.init.direction, 'limitLeft': guardian.limits.left, 'limitRight': guardian.limits.right, 'paintCorrectionsX': guardianTypeData.paintCorrections.x, 'paintCorrectionsY': guardianTypeData.paintCorrections.y});
+            switch (guardianType) {
+              case 'horizontal':
+                this.initData.guardians.push({'type': guardianType, 'speed': guardian.speed, 'x': guardian.init.x, 'y': guardian.init.y, 'width': guardianDefs.width, 'height': guardianDefs.height, 'frame': guardian.init.frame, 'direction': guardian.init.direction, 'limitLeft': guardian.limits.left, 'limitRight': guardian.limits.right, 'paintCorrectionsX': guardianDefs.paintCorrections.x, 'paintCorrectionsY': guardianDefs.paintCorrections.y});
+                break;
+              case 'vertical':
+                this.initData.guardians.push({'type': guardianType, 'speed': guardian.speed, 'x': guardian.init.x, 'y': guardian.init.y, 'width': guardianDefs.width, 'height': guardianDefs.height, 'frame': guardian.init.frame, 'frames': guardianDefs.frames, 'direction': guardian.init.direction, 'limitUp': guardian.limits.up, 'limitDown': guardian.limits.down, 'paintCorrectionsX': guardianDefs.paintCorrections.x, 'paintCorrectionsY': guardianDefs.paintCorrections.y});
+                break;
+            }
           });
-        }
-      });
-    }
+        });
+      }
+    });
 
     // decorations
     this.initData.decorations = [];
@@ -199,7 +206,7 @@ export class GameAreaEntity extends AbstractEntity {
         this.addEntity(entity);
         entity.setGraphicsData(decoration);
         this.spriteEntities.decorations.push(entity);
-        this.initData.decorations.push({'visible': true, 'kind': decoration.kind, 'x': decoration.x*8, 'y': decoration.y*8, 'frame': 0, 'direction': 0});
+        this.initData.decorations.push({'hide': false, 'kind': decoration.kind, 'x': decoration.x*8, 'y': decoration.y*8, 'frame': 0, 'direction': 0});
       });
     }
 
@@ -210,7 +217,7 @@ export class GameAreaEntity extends AbstractEntity {
     this.addEntity(entity);
     entity.setGraphicsData(data.willy);
     this.spriteEntities.willy.push(entity);
-    this.initData.willy.push({'visible': true, 'x': data.willy.init.x, 'y': data.willy.init.y, 'width': data.willy.width, 'height': data.willy.height, 'frame': data.willy.init.frame, 'direction': data.willy.init.direction, 'paintCorrectionsX': data.willy.paintCorrections.x, 'paintCorrectionsY': data.willy.paintCorrections.y});
+    this.initData.willy.push({'x': data.willy.init.x, 'y': data.willy.init.y, 'width': data.willy.width, 'height': data.willy.height, 'frame': data.willy.init.frame, 'direction': data.willy.init.direction, 'paintCorrectionsX': data.willy.paintCorrections.x, 'paintCorrectionsY': data.willy.paintCorrections.y});
   } // setData
     
 } // class GameAreaEntity
