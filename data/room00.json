@@ -69,8 +69,8 @@
                   }
                }
             ],
-            "width":16,
-            "height":10,
+            "width":10,
+            "height":16,
             "paintCorrections":{
                "x":0,
                "y":0

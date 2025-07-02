@@ -174,28 +174,31 @@ export class GameAreaEntity extends AbstractEntity {
 
     // guardians
     this.initData['guardians'] = [];
-    ['horizontal', 'vertical'].forEach((guardianType) => {
-      if (guardianType in data.guardians) {
-        var guardianTypeData = data.guardians[guardianType];
-        guardianTypeData.forEach((guardianDefs) => {
-          guardianDefs.figures.forEach((guardian) => {
-            var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(guardian.attribute));
-            var entity = new SpriteEntity(this, guardian.init.x+guardianDefs.paintCorrections.x, guardian.init.y+guardianDefs.paintCorrections.y, penColor, false, guardian.init.frame, guardian.init.direction);
-            entity.setGraphicsData(guardianDefs);
-            this.addEntity(entity);
-            this.spriteEntities.guardians.push(entity);
-            switch (guardianType) {
-              case 'horizontal':
-                this.initData.guardians.push({'type': guardianType, 'speed': guardian.speed, 'x': guardian.init.x, 'y': guardian.init.y, 'width': guardianDefs.width, 'height': guardianDefs.height, 'frame': guardian.init.frame, 'direction': guardian.init.direction, 'limitLeft': guardian.limits.left, 'limitRight': guardian.limits.right, 'paintCorrectionsX': guardianDefs.paintCorrections.x, 'paintCorrectionsY': guardianDefs.paintCorrections.y});
-                break;
-              case 'vertical':
-                this.initData.guardians.push({'type': guardianType, 'speed': guardian.speed, 'x': guardian.init.x, 'y': guardian.init.y, 'width': guardianDefs.width, 'height': guardianDefs.height, 'frame': guardian.init.frame, 'frames': guardianDefs.frames, 'direction': guardian.init.direction, 'limitUp': guardian.limits.up, 'limitDown': guardian.limits.down, 'paintCorrectionsX': guardianDefs.paintCorrections.x, 'paintCorrectionsY': guardianDefs.paintCorrections.y});
-                break;
-            }
+    if ('guardians' in data) {
+      this.initData.guardians = [];
+      ['horizontal', 'vertical'].forEach((guardianType) => {
+        if (guardianType in data.guardians) {
+          var guardianTypeData = data.guardians[guardianType];
+          guardianTypeData.forEach((guardianDefs) => {
+            guardianDefs.figures.forEach((guardian) => {
+              var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(guardian.attribute));
+              var entity = new SpriteEntity(this, guardian.init.x+guardianDefs.paintCorrections.x, guardian.init.y+guardianDefs.paintCorrections.y, penColor, false, guardian.init.frame, guardian.init.direction);
+              entity.setGraphicsData(guardianDefs);
+              this.addEntity(entity);
+              this.spriteEntities.guardians.push(entity);
+              switch (guardianType) {
+                case 'horizontal':
+                  this.initData.guardians.push({'type': guardianType, 'speed': guardian.speed, 'x': guardian.init.x, 'y': guardian.init.y, 'width': guardianDefs.width, 'height': guardianDefs.height, 'frame': guardian.init.frame, 'direction': guardian.init.direction, 'limitLeft': guardian.limits.left, 'limitRight': guardian.limits.right, 'paintCorrectionsX': guardianDefs.paintCorrections.x, 'paintCorrectionsY': guardianDefs.paintCorrections.y});
+                  break;
+                case 'vertical':
+                  this.initData.guardians.push({'type': guardianType, 'speed': guardian.speed, 'x': guardian.init.x, 'y': guardian.init.y, 'width': guardianDefs.width, 'height': guardianDefs.height, 'frame': guardian.init.frame, 'frames': guardianDefs.frames, 'direction': guardian.init.direction, 'limitUp': guardian.limits.up, 'limitDown': guardian.limits.down, 'paintCorrectionsX': guardianDefs.paintCorrections.x, 'paintCorrectionsY': guardianDefs.paintCorrections.y});
+                  break;
+              }
+            });
           });
-        });
-      }
-    });
+        }
+      });
+    }
 
     // decorations
     this.initData.decorations = [];
