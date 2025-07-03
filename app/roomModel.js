@@ -27,23 +27,57 @@ export class RoomModel extends AbstractModel {
 
     this.worker = new Worker(this.app.importPath+'/gameWorker.js?ver='+window.srcVersion);
     this.worker.onmessage = (event) => {
+
       switch (event.data.id) {
         case 'update':
           Object.keys(event.data.gameData).forEach((objectsType) => {
-            event.data.gameData[objectsType].forEach((object, g) => {
-              var x = object.x;
-              if ('paintCorrectionsX' in object) {
-                x += object.paintCorrectionsX;
-              }
-              this.gameAreaEntity.spriteEntities[objectsType][g].x = x;
-              var y = object.y;
-              if ('paintCorrectionsY' in object) {
-                y += object.paintCorrectionsY;
-              }
-              this.gameAreaEntity.spriteEntities[objectsType][g].y = y;
-              this.gameAreaEntity.spriteEntities[objectsType][g].frame = object.frame;
-              this.gameAreaEntity.spriteEntities[objectsType][g].direction = object.direction;
-            });
+            switch (objectsType) {
+              case 'info':
+//                for (var l = 0; l < this.app.lives; l++) {
+//                  this.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
+//                  this.liveEntities[l].frame = event.data.gameData.info[3]%4;
+//                }
+                break;
+                
+              case 'floor':
+              case 'wall':
+              case 'nasty':
+              case 'ramps':
+                break;
+
+              default:  
+                event.data.gameData[objectsType].forEach((object, g) => {
+                  var x = object.x;
+                  if ('paintCorrectionsX' in object) {
+                    x += object.paintCorrectionsX;
+                  }
+                  this.gameAreaEntity.spriteEntities[objectsType][g].x = x;
+                  var y = object.y;
+                  if ('paintCorrectionsY' in object) {
+                    y += object.paintCorrectionsY;
+                  }
+                  this.gameAreaEntity.spriteEntities[objectsType][g].y = y;
+                  this.gameAreaEntity.spriteEntities[objectsType][g].frame = object.frame;
+                  this.gameAreaEntity.spriteEntities[objectsType][g].direction = object.direction;
+                  if ('width' in object) {
+                    var width = object.width;
+                    if ('paintCorrectionsX' in object) {
+                      width -= object.paintCorrectionsX;
+                    }
+                    this.gameAreaEntity.spriteEntities[objectsType][g].width = width;
+                  }
+                  if ('height' in object) {
+                    var height = object.height;
+                    if ('paintCorrectionsY' in object) {
+                      height -= object.paintCorrectionsY;
+                    }
+                    this.gameAreaEntity.spriteEntities[objectsType][g].height = height;
+                  }
+                  if ('hide' in object) {
+                    this.gameAreaEntity.spriteEntities[objectsType][g].hide = object.hide;
+                  }
+                });
+            }
           });
           break;
       }

@@ -26,13 +26,13 @@
     "nasty": "F566AA5FBC63AC6BA4",
     "ramp": {
       "data": "0F0102042810284080",
-      "direction": "right",
+      "gradient": "right",
       "location": {"x": 4, "y": 6},
        "length": "07"
     },
     "conveyor": {
       "data": "0EA5AABD6666666666",
-      "direction": "right",
+      "moving": "right",
       "location": {"x": 12, "y": 6},
        "length": "14"
     }

@@ -25,7 +25,7 @@
     "wall": "F3AA70AA6CB15FAA55",
     "ramp": {
       "data": "0703000C00340AC400",
-      "direction": "right",
+      "gradient": "right",
       "location": {"x": 9, "y": 15},
        "length": "05"
     }

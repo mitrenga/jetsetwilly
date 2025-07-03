@@ -110,11 +110,46 @@ export class GameAreaEntity extends AbstractEntity {
         this.graphicCache[key] = new DrawingCache(this.app);
       }
     });
+    // prepare drawing cache for ramp
+    if ('ramp' in data.graphicData) {
+      this.graphicCache.ramp = new DrawingCache(this.app);
+    }
+
+    // layout
+    this.initData.floor = [];
+    this.initData.wall = [];
+    this.initData.nasty = [];
+    data.layout.forEach((row, r) => {
+      for (var column = 0; column < 32; column++) {
+        var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
+        var idItem = [false, 'floor', 'wall', 'nasty'][item];
+        if (idItem !== false) {
+          switch (idItem) {
+            case 'floor':
+              this.initData.floor.push({'x': column*8, 'y': r*8, 'width': 8, 'height': 8});
+              break;
+            case 'wall':
+              this.initData.wall.push({'x': column*8, 'y': r*8, 'width': 8, 'height': 8});
+              break;
+            case 'nasty':
+              this.initData.nasty.push({'x': column*8, 'y': r*8, 'width': 8, 'height': 8});
+              break;
+          }
+        }
+      }
+    });
 
     // ramp
     this.initData.ramps = [];
     if ('ramp' in data.graphicData) {
-      this.graphicCache.ramp = new DrawingCache(this.app);
+      var rampData = data.graphicData.ramp;
+      var gradient = 1;
+      if (rampData.gradient == 'left') {
+          gradient = -1;
+      }
+      for (var pos = 0; pos < this.app.hexToInt(rampData.length)*8; pos++) {
+        this.initData.ramps.push({'gradient': rampData.gradient, 'x': rampData.location.x+pos*gradient, 'y': rampData.location.y-pos, 'width': 1, 'height': 1, 'frame': 0, 'direction': 0});
+      }
     }
 
     // conveyor

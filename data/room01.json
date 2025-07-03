@@ -26,7 +26,7 @@
       "nasty":"2F0384483003844830",
       "ramp":{
          "data":"0703030C0D3237C2C8",
-         "moving":"right",
+         "gradient":"right",
          "location":{
             "x":7,
             "y":14

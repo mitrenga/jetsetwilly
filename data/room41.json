@@ -26,7 +26,7 @@
     "nasty": "44241244AA55AA5BFF",
     "conveyor": {
       "data": "42F0AA3CAA55AA55AA",
-      "direction": "right",
+      "moving": "right",
       "location": {"x": 24, "y": 8},
        "length": "04"
     }

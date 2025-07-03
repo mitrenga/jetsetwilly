@@ -25,13 +25,13 @@
     "wall": "0D70077777003B0B7D",
     "ramp": {
       "data": "05C04070700C747705",
-      "direction": "left",
+      "gradient": "left",
       "location": {"x": 9, "y": 14},
        "length": "07"
     },
     "conveyor": {
       "data": "427B00ED00AA55AA55",
-      "direction": "right",
+      "moving": "right",
       "location": {"x": 0, "y": 13},
        "length": "02"
     }

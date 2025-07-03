@@ -26,13 +26,13 @@
     "item": "02142E552A452A14",
     "ramp": {
       "data": "050102040010204080",
-      "direction": "right",
+      "gradient": "right",
       "location": {"x": 0, "y": 13},
        "length": "0E"
     },
     "conveyor": {
       "data": "26C6AAA82A59240000",
-      "direction": "left",
+      "moving": "left",
       "location": {"x": 28, "y": 10},
        "length": "04"
     }

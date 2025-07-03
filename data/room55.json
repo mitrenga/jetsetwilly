@@ -25,7 +25,7 @@
     "wall": "0DA855A856CF2E26C1",
     "conveyor": {
       "data": "42A5FFBDAA55BA4583",
-      "direction": "left",
+      "moving": "left",
       "location": {"x": 26, "y": 3},
        "length": "03"
     }

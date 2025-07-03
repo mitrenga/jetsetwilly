@@ -27,13 +27,13 @@
     "item": "1824DBDB24181818",
     "ramp": {
       "data": "078040E030A8D42289",
-      "direction": "left",
+      "gradient": "left",
       "location": {"x": 4, "y": 14},
        "length": "02"
     },
     "conveyor": {
       "data": "0F705500BBAAAAAAAA",
-      "direction": "left",
+      "moving": "left",
       "location": {"x": 4, "y": 7},
        "length": "1A"
     }

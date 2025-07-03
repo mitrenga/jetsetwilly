@@ -27,7 +27,7 @@
     "item": "2018A9DB7E7E3C5A",
     "ramp": {
       "data": "0703000C003000C000",
-      "direction": "right",
+      "gradient": "right",
       "location": {"x": 13, "y": 12},
        "length": "02"
     }

@@ -27,7 +27,7 @@
     "item": "1824182C5E5EE766",
     "conveyor": {
       "data": "4228AA0A00555555FF",
-      "direction": "left",
+      "moving": "left",
       "location": {"x": 13, "y": 9},
        "length": "05"
     }

@@ -26,7 +26,7 @@
     "item": "0538458282824438",
     "ramp": {
       "data": "0703000C003000C000",
-      "direction": "right",
+      "gradient": "right",
       "location": {"x": 4, "y": 11},
        "length": "08"
     }

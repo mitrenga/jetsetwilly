@@ -27,13 +27,13 @@
     "item": "40A0F0F8FC7A2502",
     "ramp": {
       "data": "0FC08030200C080302",
-      "direction": "left",
+      "gradient": "left",
       "location": {"x": 31, "y": 11},
        "length": "0C"
     },
     "conveyor": {
       "data": "6BF0AA78FFAA55AA55",
-      "direction": "left",
+      "moving": "left",
       "location": {"x": 14, "y": 8},
        "length": "02"
     }

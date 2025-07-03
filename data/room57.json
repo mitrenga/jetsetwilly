@@ -27,7 +27,7 @@
     "item": "0810202112AC4020",
     "ramp": {
       "data": "070100060913066C98",
-      "direction": "right",
+      "gradient": "right",
       "location": {"x": 17, "y": 13},
        "length": "08"
     }
