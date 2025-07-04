@@ -106,6 +106,9 @@ export class RoomModel extends AbstractModel {
     this.roomNameEntity.justify = 2;
     this.desktopEntity.addEntity(this.roomNameEntity);
 
+    this.app.stack.flashState = false;
+    this.sendEvent(330, {'id': 'changeFlashState'});
+
     if (this.app.audioManager.music > 0) {
       this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'music'});
       this.sendEvent(500, {'id': 'playSound', 'channel': 'music', 'sound': 'inGameMelody', 'options': {'repeat': true, 'lives': 7}});
@@ -147,6 +150,12 @@ export class RoomModel extends AbstractModel {
             this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.borderEntity.bkColor));
             return true;
         }
+
+      case 'changeFlashState':
+        this.app.stack.flashState = !this.app.stack.flashState;
+        this.sendEvent(330, {'id': 'changeFlashState'});
+        return true;
+
     }
 
     return false;

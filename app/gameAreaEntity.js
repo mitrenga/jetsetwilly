@@ -24,10 +24,24 @@ export class GameAreaEntity extends AbstractEntity {
     this.staticKinds = ['floor', 'wall', 'nasty'];
 
     this.spriteEntities = {'conveyors': [], 'guardians': [], 'items': [], 'decorations': [], 'willy': []};
+
+    this.prevFlashState = false;
   } // constructor
 
   drawEntity() {
     if (this.roomData) {
+      var layoutObjects = [false, 'floor', 'wall', 'nasty'];
+      if (this.prevFlashState != this.app.stack.flashState) {
+        this.drawingCache[0].cleanCache();
+        layoutObjects.forEach((idItem) => {
+          if (idItem !== false && idItem in this.roomData.graphicData) {            
+            var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
+            if ((attr&128) == 128) {
+              this.graphicCache[idItem].cleanCache();
+            }
+          }
+        });
+      }
       if (this.drawingCache[0].needToRefresh(this, this.width, this.height)) {
         this.app.layout.paintRect(this.drawingCache[0].ctx, 0, 0, this.width, this.height, this.app.platform.zxColorByAttr(this.app.hexToInt(this.roomData.bkColor), 56, 8));
 
@@ -35,13 +49,18 @@ export class GameAreaEntity extends AbstractEntity {
         this.roomData.layout.forEach((row, r) => {
           for (var column = 0; column < 32; column++) {
             var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
-            var idItem = [false, 'floor', 'wall', 'nasty'][item];
+            var idItem = layoutObjects[item];
             if (idItem !== false) {
-              var attr = this.roomData.graphicData[idItem].substring(0, 2);
+              var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
               if (this.staticKinds.includes(idItem)) {
                 if (this.graphicCache[idItem].needToRefresh(this, 8, 8)) {
-                  var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(attr));
-                  var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(attr)&63);
+                  var penColor = this.app.platform.penColorByAttr(attr);
+                  var bkColor = this.app.platform.bkColorByAttr(attr);
+                  if (this.app.stack.flashState) {
+                    var tmpColor = penColor;
+                    penColor = bkColor;
+                    bkColor = tmpColor;
+                  }
                   if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor))) {
                     bkColor = false;
                   }
@@ -96,6 +115,7 @@ export class GameAreaEntity extends AbstractEntity {
       }
       this.app.layout.paintCache(this, 0);
       super.drawSubEntities();
+      this.prevFlashState = this.app.stack.flashState;
     }
   } // drawEntity
 
