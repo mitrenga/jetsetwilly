@@ -20,67 +20,58 @@ export class GameAreaEntity extends AbstractEntity {
     this.roomData = null;
 
     this.app.layout.newDrawingCache(this, 0); 
+    this.app.layout.newDrawingCache(this, 1); 
     this.graphicCache = {};
     this.staticKinds = ['floor', 'wall', 'nasty'];
 
     this.spriteEntities = {'conveyors': [], 'guardians': [], 'items': [], 'decorations': [], 'willy': []};
-
-    this.prevFlashState = false;
   } // constructor
 
   drawEntity() {
     if (this.roomData) {
       var layoutObjects = [false, 'floor', 'wall', 'nasty'];
-      if (this.prevFlashState != this.app.stack.flashState) {
-        this.drawingCache[0].cleanCache();
-        layoutObjects.forEach((idItem) => {
-          if (idItem !== false && idItem in this.roomData.graphicData) {            
-            var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
-            if ((attr&128) == 128) {
-              this.graphicCache[idItem].cleanCache();
-            }
-          }
-        });
-      }
-      if (this.drawingCache[0].needToRefresh(this, this.width, this.height)) {
-        this.app.layout.paintRect(this.drawingCache[0].ctx, 0, 0, this.width, this.height, this.app.platform.zxColorByAttr(this.app.hexToInt(this.roomData.bkColor), 56, 8));
 
-        // layout
-        this.roomData.layout.forEach((row, r) => {
-          for (var column = 0; column < 32; column++) {
-            var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
-            var idItem = layoutObjects[item];
-            if (idItem !== false) {
-              var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
-              if (this.staticKinds.includes(idItem)) {
-                if (this.graphicCache[idItem].needToRefresh(this, 8, 8)) {
-                  var penColor = this.app.platform.penColorByAttr(attr);
-                  var bkColor = this.app.platform.bkColorByAttr(attr);
-                  if (this.app.stack.flashState) {
-                    var tmpColor = penColor;
-                    penColor = bkColor;
-                    bkColor = tmpColor;
-                  }
-                  if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor))) {
-                    bkColor = false;
-                  }
-                  if (bkColor != false) {
-                    this.app.layout.paintRect(this.graphicCache[idItem].ctx, 0, 0, 8, 8, bkColor);
-                  }
-                  for (var y = 0; y < 8; y++) {
-                    var spriteLine = this.app.hexToBin(this.roomData.graphicData[idItem].substring((y+1)*2, (y+1)*2+2));
-                    for (var x = 0; x < 8; x++) {
-                      if (spriteLine[x] == '1') {
-                        this.app.layout.paintRect(this.graphicCache[idItem].ctx, x, y, 1, 1, penColor);
+      for (var f = 0; f < 2; f++) {
+        if (this.drawingCache[f].needToRefresh(this, this.width, this.height)) {
+          this.app.layout.paintRect(this.drawingCache[f].ctx, 0, 0, this.width, this.height, this.app.platform.zxColorByAttr(this.app.hexToInt(this.roomData.bkColor), 56, 8));
+
+          // layout
+          this.roomData.layout.forEach((row, r) => {
+            for (var column = 0; column < 32; column++) {
+              var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
+              var idItem = layoutObjects[item];
+              if (idItem !== false) {
+                var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
+                if (this.staticKinds.includes(idItem)) {
+                  if (this.graphicCache[idItem].needToRefresh(this, 8, 8)) {
+                    var penColor = this.app.platform.penColorByAttr(attr);
+                    var bkColor = this.app.platform.bkColorByAttr(attr);
+                    if (f == 1) {
+                      var tmpColor = penColor;
+                      penColor = bkColor;
+                      bkColor = tmpColor;
+                    }
+                    if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor))) {
+                      bkColor = false;
+                    }
+                    if (bkColor != false) {
+                      this.app.layout.paintRect(this.graphicCache[idItem].ctx, 0, 0, 8, 8, bkColor);
+                    }
+                    for (var y = 0; y < 8; y++) {
+                      var spriteLine = this.app.hexToBin(this.roomData.graphicData[idItem].substring((y+1)*2, (y+1)*2+2));
+                      for (var x = 0; x < 8; x++) {
+                        if (spriteLine[x] == '1') {
+                          this.app.layout.paintRect(this.graphicCache[idItem].ctx, x, y, 1, 1, penColor);
+                        }
                       }
                     }
                   }
                 }
+                this.drawingCache[f].ctx.drawImage(this.graphicCache[idItem].canvas, column*8*this.app.layout.ratio, r*8*this.app.layout.ratio);
               }
-              this.drawingCache[0].ctx.drawImage(this.graphicCache[idItem].canvas, column*8*this.app.layout.ratio, r*8*this.app.layout.ratio);
             }
-          }
-        });
+          });
+        }
 
         // ramp
         if ('ramp' in this.roomData.graphicData) {
@@ -109,13 +100,30 @@ export class GameAreaEntity extends AbstractEntity {
             }
           }
           for (var pos = 0; pos < this.app.hexToInt(rampData.length); pos++) {
-            this.drawingCache[0].ctx.drawImage(this.graphicCache['ramp'].canvas, (rampData.location.x+pos*gradient)*8*this.app.layout.ratio, (rampData.location.y-pos)*8*this.app.layout.ratio);
+            this.drawingCache[f].ctx.drawImage(this.graphicCache['ramp'].canvas, (rampData.location.x+pos*gradient)*8*this.app.layout.ratio, (rampData.location.y-pos)*8*this.app.layout.ratio);
           }
         }
+
+        layoutObjects.forEach((idItem) => {
+          if (idItem !== false && idItem in this.roomData.graphicData) {            
+            var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
+            if ((attr&128) == 128) {
+              this.graphicCache[idItem].cleanCache();
+            }
+          }
+        });
       }
-      this.app.layout.paintCache(this, 0);
+
+      switch (this.app.stack.flashState) {
+        case false:
+          this.app.layout.paintCache(this, 0);
+          break;
+        case true:
+          this.app.layout.paintCache(this, 1);
+          break;
+      }
+
       super.drawSubEntities();
-      this.prevFlashState = this.app.stack.flashState;
     }
   } // drawEntity
 
