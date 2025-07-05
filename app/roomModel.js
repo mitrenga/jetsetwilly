@@ -106,9 +106,6 @@ export class RoomModel extends AbstractModel {
     this.roomNameEntity.justify = 2;
     this.desktopEntity.addEntity(this.roomNameEntity);
 
-    this.app.stack.flashState = false;
-    this.sendEvent(330, {'id': 'changeFlashState'});
-
     if (this.app.audioManager.music > 0) {
       this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'music'});
       this.sendEvent(500, {'id': 'playSound', 'channel': 'music', 'sound': 'inGameMelody', 'options': {'repeat': true, 'lives': 7}});
@@ -127,6 +124,10 @@ export class RoomModel extends AbstractModel {
   setData(data) {
     this.roomNameEntity.setText(data.name);
     this.borderEntity.bkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(data.borderColor), 7, 1);
+    if ('flashingLayout' in data && data.flashingLayout) {
+      this.app.stack.flashState = false;
+      this.sendEvent(330, {'id': 'changeFlashState'});
+    }
     super.setData(data);
     this.worker.postMessage({'id': 'init', 'initData': this.initData});
   } // setData
@@ -140,7 +141,6 @@ export class RoomModel extends AbstractModel {
       case 'setRoomData':
         this.adjoiningRoom = event.data.adjoiningRoom;
         event.data.willy = this.app.globalData.willy;
-        event.data.initRoom = this.app.globalData.initRoom;
         this.setData(event.data);
         return true;
 
