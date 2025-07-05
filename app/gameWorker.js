@@ -96,7 +96,7 @@ function gameLoop() {
           switch (guardian.direction) {
             case 0:
               guardian.y += guardian.speed;
-              if (counter%[0,4,2,0,1][guardian.frames] == 0) {
+              if (counter%[0,4,2,1,1,1,1,1,1][guardian.frames] == 0) {
                 if (guardian.frame == guardian.frames-1) {
                   guardian.frame = 0;
                 } else {
@@ -106,7 +106,7 @@ function gameLoop() {
               break;
             case 1:
               guardian.y -= guardian.speed;
-              if (counter%[0,4,2,0,1][guardian.frames] == 0) {
+              if (counter%[0,4,2,1,1,1,1,1,1][guardian.frames] == 0) {
                 if (guardian.frame == 0) {
                   guardian.frame = guardian.frames-1;
                 } else {
