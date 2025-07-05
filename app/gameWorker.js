@@ -116,6 +116,33 @@ function gameLoop() {
               break;
           }
           break;        
+
+        case 'arrow':
+          switch (guardian.direction) {
+            case 0:
+              if (guardian.counter == guardian.maxCounter) {
+                guardian.counter = guardian.minCounter;
+              } else {
+                guardian.counter++;
+              }
+              break;
+            case 1:
+              if (guardian.counter == guardian.minCounter) {
+                guardian.counter = guardian.maxCounter;
+              } else {
+                guardian.counter--;
+              }
+              break;
+          }
+          var x = guardian.counter*guardian.speed;
+          if (x > 255) {
+            guardian.x = 0;
+            guardian.hide = true;
+          } else {
+            guardian.x = x;
+            guardian.hide = false;
+          }
+          break;
       }
     });
 

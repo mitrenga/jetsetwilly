@@ -152,15 +152,16 @@ export class GameAreaEntity extends AbstractEntity {
         var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
         var idItem = [false, 'floor', 'wall', 'nasty'][item];
         if (idItem !== false) {
+          var layoutInitData = {'x': column*8, 'y': r*8, 'width': 8, 'height': 8};
           switch (idItem) {
             case 'floor':
-              this.initData.floor.push({'x': column*8, 'y': r*8, 'width': 8, 'height': 8});
+              this.initData.floor.push(layoutInitData);
               break;
             case 'wall':
-              this.initData.wall.push({'x': column*8, 'y': r*8, 'width': 8, 'height': 8});
+              this.initData.wall.push(layoutInitData);
               break;
             case 'nasty':
-              this.initData.nasty.push({'x': column*8, 'y': r*8, 'width': 8, 'height': 8});
+              this.initData.nasty.push(layoutInitData);
               break;
           }
         }
@@ -176,7 +177,15 @@ export class GameAreaEntity extends AbstractEntity {
           gradient = -1;
       }
       for (var pos = 0; pos < this.app.hexToInt(rampData.length)*8; pos++) {
-        this.initData.ramps.push({'gradient': rampData.gradient, 'x': rampData.location.x+pos*gradient, 'y': rampData.location.y-pos, 'width': 1, 'height': 1, 'frame': 0, 'direction': 0});
+        this.initData.ramps.push({
+          'gradient': rampData.gradient,
+          'x': rampData.location.x+pos*gradient,
+          'y': rampData.location.y-pos,
+          'width': 1,
+          'height': 1,
+          'frame': 0,
+          'direction': 0
+        });
       }
     }
 
@@ -239,24 +248,50 @@ export class GameAreaEntity extends AbstractEntity {
     this.initData['guardians'] = [];
     if ('guardians' in data) {
       this.initData.guardians = [];
-      ['horizontal', 'vertical'].forEach((guardianType) => {
+      ['horizontal', 'vertical', 'arrow'].forEach((guardianType) => {
         if (guardianType in data.guardians) {
           var guardianTypeData = data.guardians[guardianType];
           guardianTypeData.forEach((guardianDefs) => {
             guardianDefs.figures.forEach((guardian) => {
               var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(guardian.attribute));
               var entity = new SpriteEntity(this, guardian.init.x+guardianDefs.paintCorrections.x, guardian.init.y+guardianDefs.paintCorrections.y, penColor, false, guardian.init.frame, guardian.init.direction);
+              if ('hide' in guardian.init) {
+                entity.hide = guardian.init.hide;
+              }
               entity.setGraphicsData(guardianDefs);
               this.addEntity(entity);
               this.spriteEntities.guardians.push(entity);
+              var guardianInitData = {
+                'type': guardianType,
+                'speed': guardian.speed,
+                'x': guardian.init.x,
+                'y': guardian.init.y,
+                'width': guardianDefs.width,
+                'height': guardianDefs.height,
+                'paintCorrectionsX': guardianDefs.paintCorrections.x,
+                'paintCorrectionsY': guardianDefs.paintCorrections.y,
+                'frame': guardian.init.frame,
+                'frames': guardianDefs.frames,
+                'direction': guardian.init.direction
+              };
               switch (guardianType) {
                 case 'horizontal':
-                  this.initData.guardians.push({'type': guardianType, 'speed': guardian.speed, 'x': guardian.init.x, 'y': guardian.init.y, 'width': guardianDefs.width, 'height': guardianDefs.height, 'frame': guardian.init.frame, 'direction': guardian.init.direction, 'limitLeft': guardian.limits.left, 'limitRight': guardian.limits.right, 'paintCorrectionsX': guardianDefs.paintCorrections.x, 'paintCorrectionsY': guardianDefs.paintCorrections.y});
+                  guardianInitData.limitLeft = guardian.limits.left;
+                  guardianInitData.limitRight = guardian.limits.right;
                   break;
                 case 'vertical':
-                  this.initData.guardians.push({'type': guardianType, 'speed': guardian.speed, 'x': guardian.init.x, 'y': guardian.init.y, 'width': guardianDefs.width, 'height': guardianDefs.height, 'frame': guardian.init.frame, 'frames': guardianDefs.frames, 'direction': guardian.init.direction, 'limitUp': guardian.limits.up, 'limitDown': guardian.limits.down, 'paintCorrectionsX': guardianDefs.paintCorrections.x, 'paintCorrectionsY': guardianDefs.paintCorrections.y});
+                  guardianInitData.limitUp = guardian.limits.up;
+                  guardianInitData.limitDown = guardian.limits.down;
+                  break;
+                case 'arrow':
+                  guardianInitData.hide = guardian.init.hide;
+                  guardianInitData.counter = guardian.init.counter;
+                  guardianInitData.minCounter = guardian.minCounter;
+                  guardianInitData.maxCounter = guardian.maxCounter;
+                  guardianInitData.soundWhenCounter = guardian.soundWhenCounter;
                   break;
               }
+              this.initData.guardians.push(guardianInitData);
             });
           });
         }
@@ -283,7 +318,17 @@ export class GameAreaEntity extends AbstractEntity {
     this.addEntity(entity);
     entity.setGraphicsData(data.willy);
     this.spriteEntities.willy.push(entity);
-    this.initData.willy.push({'x': data.willy.init.x, 'y': data.willy.init.y, 'width': data.willy.width, 'height': data.willy.height, 'frame': data.willy.init.frame, 'direction': data.willy.init.direction, 'paintCorrectionsX': data.willy.paintCorrections.x, 'paintCorrectionsY': data.willy.paintCorrections.y});
+    this.initData.willy.push({
+      'x': data.willy.init.x,
+      'y': data.willy.init.y,
+      'width': data.willy.width,
+      'height': data.willy.height,
+      'paintCorrectionsX': data.willy.paintCorrections.x,
+      'paintCorrectionsY': data.willy.paintCorrections.y,
+      'frame': data.willy.init.frame,
+      'frames': data.willy.init.frames,
+      'direction': data.willy.init.direction
+    });
   } // setData
     
   updateData(data, objectsType) {
@@ -319,7 +364,7 @@ export class GameAreaEntity extends AbstractEntity {
       }
     });
   } // updateData
-    
+
 } // class GameAreaEntity
 
 export default GameAreaEntity;
