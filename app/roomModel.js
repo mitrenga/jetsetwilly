@@ -45,38 +45,8 @@ export class RoomModel extends AbstractModel {
               case 'ramps':
                 break;
 
-              default:  
-                event.data.gameData[objectsType].forEach((object, g) => {
-                  var x = object.x;
-                  if ('paintCorrectionsX' in object) {
-                    x += object.paintCorrectionsX;
-                  }
-                  this.gameAreaEntity.spriteEntities[objectsType][g].x = x;
-                  var y = object.y;
-                  if ('paintCorrectionsY' in object) {
-                    y += object.paintCorrectionsY;
-                  }
-                  this.gameAreaEntity.spriteEntities[objectsType][g].y = y;
-                  this.gameAreaEntity.spriteEntities[objectsType][g].frame = object.frame;
-                  this.gameAreaEntity.spriteEntities[objectsType][g].direction = object.direction;
-                  if ('width' in object) {
-                    var width = object.width;
-                    if ('paintCorrectionsX' in object) {
-                      width -= object.paintCorrectionsX;
-                    }
-                    this.gameAreaEntity.spriteEntities[objectsType][g].width = width;
-                  }
-                  if ('height' in object) {
-                    var height = object.height;
-                    if ('paintCorrectionsY' in object) {
-                      height -= object.paintCorrectionsY;
-                    }
-                    this.gameAreaEntity.spriteEntities[objectsType][g].height = height;
-                  }
-                  if ('hide' in object) {
-                    this.gameAreaEntity.spriteEntities[objectsType][g].hide = object.hide;
-                  }
-                });
+              default:
+                this.gameAreaEntity.updateData(event.data, objectsType);
             }
           });
           break;
@@ -107,7 +77,7 @@ export class RoomModel extends AbstractModel {
     this.desktopEntity.addEntity(this.roomNameEntity);
 
     this.sendEvent(330, {'id': 'changeFlashState'});
-    
+
     if (this.app.audioManager.music > 0) {
       this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'music'});
       this.sendEvent(500, {'id': 'playSound', 'channel': 'music', 'sound': 'inGameMelody', 'options': {'repeat': true, 'lives': 7}});

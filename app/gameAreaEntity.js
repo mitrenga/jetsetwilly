@@ -286,6 +286,40 @@ export class GameAreaEntity extends AbstractEntity {
     this.initData.willy.push({'x': data.willy.init.x, 'y': data.willy.init.y, 'width': data.willy.width, 'height': data.willy.height, 'frame': data.willy.init.frame, 'direction': data.willy.init.direction, 'paintCorrectionsX': data.willy.paintCorrections.x, 'paintCorrectionsY': data.willy.paintCorrections.y});
   } // setData
     
+  updateData(data, objectsType) {
+    data.gameData[objectsType].forEach((object, g) => {
+      var x = object.x;
+      if ('paintCorrectionsX' in object) {
+        x += object.paintCorrectionsX;
+      }
+      this.spriteEntities[objectsType][g].x = x;
+      var y = object.y;
+      if ('paintCorrectionsY' in object) {
+        y += object.paintCorrectionsY;
+      }
+      this.spriteEntities[objectsType][g].y = y;
+      this.spriteEntities[objectsType][g].frame = object.frame;
+      this.spriteEntities[objectsType][g].direction = object.direction;
+      if ('width' in object) {
+        var width = object.width;
+        if ('paintCorrectionsX' in object) {
+          width -= object.paintCorrectionsX;
+        }
+        this.spriteEntities[objectsType][g].width = width;
+      }
+      if ('height' in object) {
+        var height = object.height;
+        if ('paintCorrectionsY' in object) {
+          height -= object.paintCorrectionsY;
+        }
+        this.spriteEntities[objectsType][g].height = height;
+      }
+      if ('hide' in object) {
+        this.spriteEntities[objectsType][g].hide = object.hide;
+      }
+    });
+  } // updateData
+    
 } // class GameAreaEntity
 
 export default GameAreaEntity;
