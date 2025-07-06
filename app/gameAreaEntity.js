@@ -220,30 +220,6 @@ export class GameAreaEntity extends AbstractEntity {
       this.initData.conveyors.push({'visible': true, 'moving': conveyorData.moving, 'x': conveyorData.location.x*8, 'y': conveyorData.location.y*8, 'length': conveyorData.length*8, 'height': 8, 'frame': 0, 'direction': 0});
     }
 
-    // items
-    this.initData.items = [];
-    var itemColor = 3;
-    this.app.items[this.roomNumber].forEach((item) => {
-      var tmpColor = itemColor;
-      var penColor0 = this.app.platform.color(tmpColor);
-      tmpColor = this.app.rotateInc(tmpColor, 3, 6);
-      var penColor1 = this.app.platform.color(tmpColor);
-      tmpColor = this.app.rotateInc(tmpColor, 3, 6);
-      var penColor2 = this.app.platform.color(tmpColor);
-      tmpColor = this.app.rotateInc(tmpColor, 3, 6);
-      var penColor3 = this.app.platform.color(tmpColor);
-      var entity = new SpriteEntity(this, item.x*8, item.y*8, false, false, 0, 0);
-      this.addEntity(entity);
-      entity.setColorsMap({'1': {0: penColor0, 1: penColor1, 2: penColor2, 3: penColor3}});
-      entity.setGraphicsDataFromHexStr(data.graphicData.item);
-      entity.cloneSprite(0);
-      entity.cloneSprite(0);
-      entity.cloneSprite(0);
-      this.spriteEntities.items.push(entity);
-      this.initData.items.push({'hide': false, 'x': item.x*8, 'y': item.y*8, 'frame': 0, 'direction': 0});
-      itemColor = this.app.rotateInc(itemColor, 3, 6);
-    });
-
     // guardians
     this.initData['guardians'] = [];
     if ('guardians' in data) {
@@ -300,6 +276,31 @@ export class GameAreaEntity extends AbstractEntity {
         }
       });
     }
+
+    // items
+    this.initData.items = [];
+    var itemColor = 3;
+    this.app.items[this.roomNumber].forEach((item) => {
+      var tmpColor = itemColor;
+      var penColor0 = this.app.platform.color(tmpColor);
+      tmpColor = this.app.rotateInc(tmpColor, 3, 6);
+      var penColor1 = this.app.platform.color(tmpColor);
+      tmpColor = this.app.rotateInc(tmpColor, 3, 6);
+      var penColor2 = this.app.platform.color(tmpColor);
+      tmpColor = this.app.rotateInc(tmpColor, 3, 6);
+      var penColor3 = this.app.platform.color(tmpColor);
+      var entity = new SpriteEntity(this, item.x*8, item.y*8, false, false, 0, 0);
+      this.addEntity(entity);
+      entity.setColorsMap({'1': {0: penColor0, 1: penColor1, 2: penColor2, 3: penColor3}});
+      entity.setGraphicsDataFromHexStr(data.graphicData.item);
+      entity.cloneSprite(0);
+      entity.cloneSprite(0);
+      entity.cloneSprite(0);
+      this.spriteEntities.items.push(entity);
+      this.initData.items.push({'hide': false, 'x': item.x*8, 'y': item.y*8, 'frame': 0, 'direction': 0});
+      itemColor = this.app.rotateInc(itemColor, 3, 6);
+    });
+
 
     // decorations
     this.initData.decorations = [];
