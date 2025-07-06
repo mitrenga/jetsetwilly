@@ -2,7 +2,7 @@
    "name":"Rescue Esmerelda",
    "bkColor":"10",
    "borderColor":"01",
-   "joinItemsColor":true,
+   "matchColorsOfItems":true,
    "layout":[
       "0000000000000802",
       "0000000000000802",
