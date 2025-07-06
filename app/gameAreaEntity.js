@@ -248,7 +248,7 @@ export class GameAreaEntity extends AbstractEntity {
     this.initData['guardians'] = [];
     if ('guardians' in data) {
       this.initData.guardians = [];
-      ['horizontal', 'vertical', 'arrow'].forEach((guardianType) => {
+      ['horizontal', 'vertical', 'arrow', 'maria'].forEach((guardianType) => {
         if (guardianType in data.guardians) {
           var guardianTypeData = data.guardians[guardianType];
           guardianTypeData.forEach((guardianDefs) => {
@@ -289,6 +289,9 @@ export class GameAreaEntity extends AbstractEntity {
                   guardianInitData.minCounter = guardian.minCounter;
                   guardianInitData.maxCounter = guardian.maxCounter;
                   guardianInitData.soundWhenCounter = guardian.soundWhenCounter;
+                  break;
+                case 'maria':
+                  guardianInitData.hide = guardian.init.hide;
                   break;
               }
               this.initData.guardians.push(guardianInitData);

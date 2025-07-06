@@ -83,13 +83,11 @@ function gameLoop() {
             case 0:
               if (guardian.y+guardian.speed > guardian.limitDown) {
                 guardian.direction = 1;
-                guardian.frame = guardian.frames-guardian.frame-1;
               }
               break;
             case 1:
               if (guardian.y-guardian.speed < guardian.limitUp) {
                 guardian.direction = 0;
-                guardian.frame = guardian.frames-guardian.frame-1;
               }
               break;
           }
@@ -143,6 +141,26 @@ function gameLoop() {
             guardian.hide = false;
           }
           break;
+
+        case 'maria':
+          guardian.direction = 0;
+          if (counter%[0,4,2,1,1,1,1,1,1][guardian.frames] == 0) {
+            if (guardian.frame == guardian.frames-1) {
+              guardian.frame = 0;
+            } else {
+              guardian.frame++;
+            }
+          }
+          
+          guardian.direction = 0;
+          if (gameData.willy[0].y < 104) {
+            guardian.direction = 1;
+          }
+          if (gameData.willy[0].y < 96) {
+            guardian.direction = 2;
+          }
+          break;        
+      
       }
     });
 
