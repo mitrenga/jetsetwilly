@@ -33,25 +33,21 @@ function gameLoop() {
         case 0:
           if (firstElement.frame == firstElement.frames-1) {
             firstElement.direction = 1;
+          } else {
+            firstElement.frame += 2;
+            if (firstElement.frame > -20 && firstElement.frame < 20) {
+              firstElement.frame += 2;
+            }
           }
           break;
         case 1:
           if (firstElement.frame == 1-firstElement.frames) {
             firstElement.direction = 0;
-          }
-          break;
-      }
-      switch (firstElement.direction) {
-        case 0:
-          firstElement.frame += 2;
-          if (firstElement.frame > -20 && firstElement.frame < 20) {
-            firstElement.frame += 2;
-          }
-          break;
-        case 1:
-          firstElement.frame -= 2;
-          if (firstElement.frame > -20 && firstElement.frame < 20) {
+          } else {
             firstElement.frame -= 2;
+            if (firstElement.frame > -20 && firstElement.frame < 20) {
+              firstElement.frame -= 2;
+            }
           }
           break;
       }
