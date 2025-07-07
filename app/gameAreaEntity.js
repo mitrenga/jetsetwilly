@@ -24,7 +24,11 @@ export class GameAreaEntity extends AbstractEntity {
     this.graphicCache = {};
     this.staticKinds = ['floor', 'wall', 'nasty'];
 
-    this.spriteEntities = {'conveyors': [], 'guardians': [], 'items': [], 'decorations': [], 'willy': []};
+    this.spriteEntities = {'conveyors': [], 'rope': [], 'guardians': [], 'items': [], 'decorations': [], 'willy': []};
+    this.ropeRelativeCoordinates = [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1,1,2,1,1,2,2,3,2,3,2,3,3,3,3,3,3],
+      [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,2,3,2,3,2,3,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
+    ];
   } // constructor
 
   drawEntity() {
@@ -218,6 +222,33 @@ export class GameAreaEntity extends AbstractEntity {
       this.addEntity(entity);
       this.spriteEntities.conveyors.push(entity);
       this.initData.conveyors.push({'visible': true, 'moving': conveyorData.moving, 'x': conveyorData.location.x*8, 'y': conveyorData.location.y*8, 'length': conveyorData.length*8, 'height': 8, 'frame': 0, 'direction': 0});
+    }
+
+    // rope
+    this.initData.rope = []
+    if ('rope' in data) {
+      var color = this.app.platform.penColorByAttr(this.app.hexToInt(data.rope.attribute));
+      var x = data.rope.init.x;
+      var y = data.rope.init.y;
+      var ptr = data.rope.init.frame;
+      for (var r = 0; r <= data.rope.length; r++) {
+        var entity = new AbstractEntity(this, x, y, 1, 1, false, color);
+        this.addEntity(entity);
+        this.spriteEntities.rope.push(entity);
+        var ropeInitData = {
+          'x': x,
+          'y': y
+        };
+        if (r == 0) {
+          ropeInitData.frame = data.rope.init.frame;
+          ropeInitData.frames = data.rope.frames;       
+          ropeInitData.direction = data.rope.init.direction;   
+        }
+        this.initData.rope.push(ropeInitData);
+        x += this.ropeRelativeCoordinates[0][ptr];
+        y += this.ropeRelativeCoordinates[1][ptr];
+        ptr++;
+      }
     }
 
     // guardians

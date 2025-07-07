@@ -7,9 +7,13 @@
 
 var counter = 0;
 var gameData = null;
+var ropeRelativeCoordinates = [
+  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1,1,2,1,1,2,2,3,2,3,2,3,3,3,3,3,3],
+  [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,2,3,2,3,2,3,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
+];
 
 function gameLoop() {
-  setTimeout(gameLoop, 72);
+  setTimeout(gameLoop, 720);
   if (gameData != null) {
     counter++;
 
@@ -21,6 +25,51 @@ function gameLoop() {
         conveyor.frame++;
       }  
     });
+
+    //rope
+    if (gameData.rope.length > 0) {
+      var firstElement = gameData.rope[0];
+      switch (firstElement.direction) {
+        case 0:
+          if (firstElement.frame == firstElement.frames-1) {
+            firstElement.direction = 1;
+          }
+          break;
+        case 1:
+          if (firstElement.frame == 1-firstElement.frames) {
+            firstElement.direction = 0;
+          }
+          break;
+      }
+      switch (firstElement.direction) {
+        case 0:
+          firstElement.frame += 2;
+          if (firstElement.frame > -20 && firstElement.frame < 20) {
+            firstElement.frame += 2;
+          }
+          break;
+        case 1:
+          firstElement.frame -= 2;
+          if (firstElement.frame > -20 && firstElement.frame < 20) {
+            firstElement.frame -= 2;
+          }
+          break;
+      }
+      var x = firstElement.x;
+      var y = firstElement.y;
+      var ptr = Math.abs(firstElement.frame);
+      for (var r = 1; r < gameData.rope.length; r++) {
+        if (firstElement.frame < 0) {
+          x -= ropeRelativeCoordinates[0][ptr];
+        } else {
+          x += ropeRelativeCoordinates[0][ptr];
+        }
+        y += ropeRelativeCoordinates[1][ptr];
+        gameData.rope[r].x = x;
+        gameData.rope[r].y = y;
+        ptr++;
+      }
+    }
 
     // guardians
     gameData.guardians.forEach((guardian) => {

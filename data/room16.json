@@ -1,43 +1,57 @@
 {
-  "name": "We must perform a Quirkafleeg",
-  "bkColor": "06",
-  "borderColor": "02",
-  "layout": [
-     "0000000000000000",
-     "0000000000000000",
-     "0000000000000000",
-     "0000000000000000",
-     "0000000000000000",
-     "0000000000000000",
-     "0000000000000000",
-     "0000000000000000",
-     "0000000000000000",
-     "AA000000000002AA",
-     "AA400000000002AA",
-     "AA400000000002AA",
-     "AA400000000002AA",
-     "AA400000000002AA",
-     "AA400000000002AA",
-     "AA7FFFFFFFFFFEAA"
-  ],
-  "graphicData": {
-    "floor": "3833BBDDCC5599DDEE",
-    "wall": "0D27F600DCD1047780",
-    "nasty": "4540E44E444444EEFF",
-    "item": "1824182C5E5EE766",
-    "ramp": {
-      "data": "0780402030A8642211",
-      "gradient": "left",
-      "location": {"x": 4, "y": 9},
-       "length": "01"
-    }
-  },
-  "adjoiningRoom": {
-    "left": "11",
-    "right": "0F",
-    "above": "32",
-    "below": false
-  },
+   "name":"We must perform a Quirkafleeg",
+   "bkColor":"06",
+   "borderColor":"02",
+   "layout":[
+      "0000000000000000",
+      "0000000000000000",
+      "0000000000000000",
+      "0000000000000000",
+      "0000000000000000",
+      "0000000000000000",
+      "0000000000000000",
+      "0000000000000000",
+      "0000000000000000",
+      "AA000000000002AA",
+      "AA400000000002AA",
+      "AA400000000002AA",
+      "AA400000000002AA",
+      "AA400000000002AA",
+      "AA400000000002AA",
+      "AA7FFFFFFFFFFEAA"
+   ],
+   "graphicData":{
+      "floor":"3833BBDDCC5599DDEE",
+      "wall":"0D27F600DCD1047780",
+      "nasty":"4540E44E444444EEFF",
+      "item":"1824182C5E5EE766",
+      "ramp":{
+         "data":"0780402030A8642211",
+         "gradient":"left",
+         "location":{
+            "x":4,
+            "y":9
+         },
+         "length":"01"
+      }
+   },
+   "adjoiningRoom":{
+      "left":"11",
+      "right":"0F",
+      "above":"32",
+      "below":false
+   },
+   "rope":{
+      "attribute":"06",
+      "length":32,
+      "frames": 55,
+      "init":{
+         "x":128,
+         "y":0,
+         "direction":1,
+         "frame":34
+      }
+   },
    "guardians":{
       "horizontal":[
          {
@@ -225,7 +239,7 @@
                   "init":{
                      "x":0,
                      "y":66,
-                     "hide": true,
+                     "hide":true,
                      "counter":208,
                      "direction":0,
                      "frame":0
@@ -241,14 +255,13 @@
             "frames":1,
             "directions":1,
             "sprite":[
-              [
-                "#-----#-",
-                "########",
-                "#-----#-"
-              ]
+               [
+                  "#-----#-",
+                  "########",
+                  "#-----#-"
+               ]
             ]
          }
       ]
    }
 }
-
