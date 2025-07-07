@@ -13,7 +13,7 @@ var ropeRelativeCoordinates = [
 ];
 
 function gameLoop() {
-  setTimeout(gameLoop, 720);
+  setTimeout(gameLoop, 72);
   if (gameData != null) {
     counter++;
 
