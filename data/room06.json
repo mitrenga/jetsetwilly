@@ -26,8 +26,8 @@
     "nasty": "32BF5C583028584830"
   },
   "adjoiningRoom": {
-    "left": "0E",
-    "right": "05",
+    "left": false,
+    "right": false,
     "above": false,
     "below": false
   },

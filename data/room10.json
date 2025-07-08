@@ -33,7 +33,7 @@
   },
   "adjoiningRoom": {
     "left": "0B",
-    "right": "09",
+    "right": false,
     "above": false,
     "below": "05"
   }

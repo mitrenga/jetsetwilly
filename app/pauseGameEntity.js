@@ -15,6 +15,10 @@ export class PauseGameEntity extends AbstractEntity {
     super(parentEntity, x, y, width, height, false, false);
     this.id = 'PauseGameEntity';
     this.borderColor = borderColor;
+    this.selectedButtonColor = this.app.platform.colorByName('yellow');
+    if (this.borderColor == this.selectedButtonColor) {
+      this.selectedButtonColor = this.app.platform.colorByName('brightWhite');
+    }
     this.buttons = [];
     this.selectedButton = 0;
   } // constructor
@@ -29,7 +33,7 @@ export class PauseGameEntity extends AbstractEntity {
     var titleEntity = new MiniTextEntity(this, 0, 0, this.width, 9, 'PAUSE', this.app.platform.colorByName('brightBlack'), this.app.platform.colorByName('brightWhite'), 1, 2);
     titleEntity.justify = 2;
     this.addEntity(titleEntity);
-    this.buttons[0] = new ZXButtonEntity(this, 10, 19, this.width-20, 14, 'RESUME GAME', 'closePauseGame', ['Escape'], this.app.platform.colorByName('black'), this.app.platform.colorByName('yellow'), 0, true);
+    this.buttons[0] = new ZXButtonEntity(this, 10, 19, this.width-20, 14, 'RESUME GAME', 'closePauseGame', ['Escape'], this.app.platform.colorByName('black'), this.selectedButtonColor, 0, true);
     this.buttons[0].margin = 3;
     this.buttons[0].justify = 0;
     this.addEntity(this.buttons[0]);
@@ -59,14 +63,14 @@ export class PauseGameEntity extends AbstractEntity {
             if (this.selectedButton < this.buttons.length-1) {
               this.buttons[this.selectedButton].setBkColor(this.app.platform.colorByName('white'));
               this.selectedButton++;
-              this.buttons[this.selectedButton].setBkColor(this.app.platform.colorByName('yellow'));
+              this.buttons[this.selectedButton].setBkColor(this.selectedButtonColor);
             }
             return true;
           case 'ArrowUp':
             if (this.selectedButton > 0) {
               this.buttons[this.selectedButton].setBkColor(this.app.platform.colorByName('white'));
               this.selectedButton--;
-              this.buttons[this.selectedButton].setBkColor(this.app.platform.colorByName('yellow'));
+              this.buttons[this.selectedButton].setBkColor(this.selectedButtonColor);
             }
             return true;
           }
