@@ -108,7 +108,9 @@ export class RoomModel extends AbstractModel {
     switch (event.id) {
       case 'setRoomData':
         this.adjoiningRoom = event.data.adjoiningRoom;
-        event.data.willy = this.app.globalData.willy;
+        if (!('willy' in event.data)) {
+          event.data.willy = this.app.globalData.willy;
+        }
         this.setData(event.data);
         return true;
 
