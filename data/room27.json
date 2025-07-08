@@ -31,7 +31,8 @@
             "x":17,
             "y":13
          },
-         "length":"07"
+         "length":"07",
+         "moving":"left"
       }
    },
    "adjoiningRoom":{
