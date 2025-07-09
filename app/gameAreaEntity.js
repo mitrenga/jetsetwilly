@@ -414,7 +414,7 @@ export class GameAreaEntity extends AbstractEntity {
       }
       this.spriteEntities[objectsType][o].y = y;
       var flashShiftFrames = 0;
-      if ('flashShiftFrames' in object && this.app.stack.flashState) {
+      if (('flashShiftFrames' in object) && this.app.stack.flashState) {
         flashShiftFrames = object.flashShiftFrames;
       }
       this.spriteEntities[objectsType][o].frame = object.frame+flashShiftFrames;
