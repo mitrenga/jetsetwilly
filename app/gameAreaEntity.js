@@ -197,14 +197,30 @@ export class GameAreaEntity extends AbstractEntity {
     this.initData.conveyors = [];
     if ('conveyor' in data.graphicData) {
       var conveyorData = data.graphicData.conveyor;
-      var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(conveyorData.data.substring(0, 2)));
-      var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(conveyorData.data.substring(0, 2)));
+      var attr = this.app.hexToInt(conveyorData.data.substring(0, 2));
+      var penColor = this.app.platform.penColorByAttr(attr);
+      var bkColor = this.app.platform.bkColorByAttr(attr);
       if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(data.bkColor))) {
         bkColor = false;
       }
-      var entity = new SpriteEntity(this, conveyorData.location.x*8, conveyorData.location.y*8, penColor, bkColor, 0, 0);
+      var entity = new SpriteEntity(this, conveyorData.location.x*8, conveyorData.location.y*8, false, false, 0, 0);
       entity.setFixSize(8, 8);
       entity.setRepeatX(this.app.hexToInt(conveyorData.length));
+      var colorsMap = {'1': {0: penColor, 1: penColor, 2: penColor, 3: penColor}};
+      if (bkColor !== false) {
+        colorsMap['0'] = {0: bkColor, 1: bkColor, 2: bkColor, 3: bkColor};
+      }
+      if ((attr & 128) == 128) {
+        colorsMap['0'][4] = penColor;
+        colorsMap['0'][5] = penColor;
+        colorsMap['0'][6] = penColor;
+        colorsMap['0'][7] = penColor;
+        colorsMap['1'][4] = bkColor;
+        colorsMap['1'][5] = bkColor;
+        colorsMap['1'][6] = bkColor;
+        colorsMap['1'][7] = bkColor;
+      }
+      entity.setColorsMap(colorsMap);
       entity.setGraphicsDataFromHexStr(conveyorData.data.substring(2, 18));
       entity.cloneSprite(0);
       var rotateDirection = 1;
@@ -219,9 +235,26 @@ export class GameAreaEntity extends AbstractEntity {
       entity.cloneSprite(2);
       entity.rotateSpriteRow(3, 0, -2*rotateDirection);
       entity.rotateSpriteRow(3, 2, 2*rotateDirection);
+      var conveyorInitData = {
+        'visible': true,
+        'moving': conveyorData.moving,
+        'x': conveyorData.location.x*8,
+        'y': conveyorData.location.y*8,
+        'length': conveyorData.length*8,
+        'height': 8,
+        'frame': 0,
+        'direction': 0
+      };
+      if ((attr & 128) == 128) {
+        entity.cloneSprite(0);
+        entity.cloneSprite(1);
+        entity.cloneSprite(2);
+        entity.cloneSprite(3);
+        conveyorInitData.flash = true;
+      }
       this.addEntity(entity);
       this.spriteEntities.conveyors.push(entity);
-      this.initData.conveyors.push({'visible': true, 'moving': conveyorData.moving, 'x': conveyorData.location.x*8, 'y': conveyorData.location.y*8, 'length': conveyorData.length*8, 'height': 8, 'frame': 0, 'direction': 0});
+      this.initData.conveyors.push(conveyorInitData);
     }
 
     // rope
@@ -369,35 +402,39 @@ export class GameAreaEntity extends AbstractEntity {
   } // setData
     
   updateData(data, objectsType) {
-    data.gameData[objectsType].forEach((object, g) => {
+    data.gameData[objectsType].forEach((object, o) => {
       var x = object.x;
       if ('paintCorrectionsX' in object) {
         x += object.paintCorrectionsX;
       }
-      this.spriteEntities[objectsType][g].x = x;
+      this.spriteEntities[objectsType][o].x = x;
       var y = object.y;
       if ('paintCorrectionsY' in object) {
         y += object.paintCorrectionsY;
       }
-      this.spriteEntities[objectsType][g].y = y;
-      this.spriteEntities[objectsType][g].frame = object.frame;
-      this.spriteEntities[objectsType][g].direction = object.direction;
+      this.spriteEntities[objectsType][o].y = y;
+      var flashShift = 0;
+      if ('flash' in object && object.flash && this.app.stack.flashState) {
+        flashShift = this.spriteEntities[objectsType][o].framesCount/2;
+      }
+      this.spriteEntities[objectsType][o].frame = object.frame+flashShift;
+      this.spriteEntities[objectsType][o].direction = object.direction;
       if ('width' in object) {
         var width = object.width;
         if ('paintCorrectionsX' in object) {
           width -= object.paintCorrectionsX;
         }
-        this.spriteEntities[objectsType][g].width = width;
+        this.spriteEntities[objectsType][o].width = width;
       }
       if ('height' in object) {
         var height = object.height;
         if ('paintCorrectionsY' in object) {
           height -= object.paintCorrectionsY;
         }
-        this.spriteEntities[objectsType][g].height = height;
+        this.spriteEntities[objectsType][o].height = height;
       }
       if ('hide' in object) {
-        this.spriteEntities[objectsType][g].hide = object.hide;
+        this.spriteEntities[objectsType][o].hide = object.hide;
       }
     });
   } // updateData
