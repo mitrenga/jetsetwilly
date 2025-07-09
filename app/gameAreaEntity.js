@@ -250,7 +250,7 @@ export class GameAreaEntity extends AbstractEntity {
         entity.cloneSprite(1);
         entity.cloneSprite(2);
         entity.cloneSprite(3);
-        conveyorInitData.flash = true;
+        conveyorInitData.flashShiftFrames = 4;
       }
       this.addEntity(entity);
       this.spriteEntities.conveyors.push(entity);
@@ -413,11 +413,11 @@ export class GameAreaEntity extends AbstractEntity {
         y += object.paintCorrectionsY;
       }
       this.spriteEntities[objectsType][o].y = y;
-      var flashShift = 0;
-      if ('flash' in object && object.flash && this.app.stack.flashState) {
-        flashShift = this.spriteEntities[objectsType][o].framesCount/2;
+      var flashShiftFrames = 0;
+      if ('flashShiftFrames' in object && this.app.stack.flashState) {
+        flashShiftFrames = object.flashShiftFrames;
       }
-      this.spriteEntities[objectsType][o].frame = object.frame+flashShift;
+      this.spriteEntities[objectsType][o].frame = object.frame+flashShiftFrames;
       this.spriteEntities[objectsType][o].direction = object.direction;
       if ('width' in object) {
         var width = object.width;
