@@ -203,25 +203,11 @@ export class GameAreaEntity extends AbstractEntity {
       if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(data.bkColor))) {
         bkColor = false;
       }
-      var entity = new SpriteEntity(this, conveyorData.location.x*8, conveyorData.location.y*8, false, false, 0, 0);
+      var entity = new SpriteEntity(this, conveyorData.location.x*8, conveyorData.location.y*8, penColor, bkColor, 0, 0);
       entity.setFixSize(8, 8);
       entity.setRepeatX(this.app.hexToInt(conveyorData.length));
-      var colorsMap = {'1': {0: penColor, 1: penColor, 2: penColor, 3: penColor}};
-      if (bkColor !== false) {
-        colorsMap['0'] = {0: bkColor, 1: bkColor, 2: bkColor, 3: bkColor};
-      }
-      if ((attr & 128) == 128) {
-        colorsMap['0'][4] = penColor;
-        colorsMap['0'][5] = penColor;
-        colorsMap['0'][6] = penColor;
-        colorsMap['0'][7] = penColor;
-        colorsMap['1'][4] = bkColor;
-        colorsMap['1'][5] = bkColor;
-        colorsMap['1'][6] = bkColor;
-        colorsMap['1'][7] = bkColor;
-      }
-      entity.setColorsMap(colorsMap);
-      entity.setGraphicsDataFromHexStr(conveyorData.data.substring(2, 18));
+      var conveyorSpriteData = conveyorData.data.substring(2, 18);
+      entity.setGraphicsDataFromHexStr(conveyorSpriteData);
       entity.cloneSprite(0);
       var rotateDirection = 1;
       if (conveyorData.moving == 'right') {
@@ -246,10 +232,22 @@ export class GameAreaEntity extends AbstractEntity {
         'direction': 0
       };
       if ((attr & 128) == 128) {
-        entity.cloneSprite(0);
-        entity.cloneSprite(1);
-        entity.cloneSprite(2);
-        entity.cloneSprite(3);
+        var reverseSpriteData = '';
+        for (var s = 0; s < 8; s++) {
+          var hexStr = this.app.intToHex((this.app.hexToInt(conveyorSpriteData.substring(s*2, s*2+2))^255));
+          hexStr.padStart(2, '0');
+          reverseSpriteData = reverseSpriteData+hexStr;
+        }
+        entity.addGraphicsDataFromHexStr(reverseSpriteData);
+        entity.cloneSprite(4);
+        entity.rotateSpriteRow(5, 0, -2*rotateDirection);
+        entity.rotateSpriteRow(5, 2, 2*rotateDirection);
+        entity.cloneSprite(5);
+        entity.rotateSpriteRow(6, 0, -2*rotateDirection);
+        entity.rotateSpriteRow(6, 2, 2*rotateDirection);
+        entity.cloneSprite(6);
+        entity.rotateSpriteRow(7, 0, -2*rotateDirection);
+        entity.rotateSpriteRow(7, 2, 2*rotateDirection);
         conveyorInitData.flashShiftFrames = 4;
       }
       this.addEntity(entity);
