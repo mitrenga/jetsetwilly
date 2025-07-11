@@ -55,14 +55,6 @@
                   }
                }
             ],
-            "width":10,
-            "height":16,
-            "paintCorrections":{
-               "x":0,
-               "y":0
-            },
-            "frames":4,
-            "directions":1,
             "width":12,
             "height":16,
             "paintCorrections":{
