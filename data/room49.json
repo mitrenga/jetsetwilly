@@ -41,7 +41,7 @@
   "adjoiningRoom": {
     "left": "33",
     "right": "13",
-    "above": false,
+    "above": "34",
     "below": false
   },
    "guardians":{
