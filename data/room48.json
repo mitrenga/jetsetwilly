@@ -317,7 +317,7 @@
                {
                   "attribute":"45",
                   "limits":{
-                     "up":8,
+                     "up":0,
                      "down":64
                   },
                   "speed":2,
