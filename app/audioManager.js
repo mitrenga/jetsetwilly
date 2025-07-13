@@ -2,10 +2,12 @@
 const { AbstractAudioManager } = await import('./svision/js/abstractAudioManager.js?ver='+window.srcVersion);
 const { AudioWorkletHandler } = await import('./svision/js/audioWorkletHandler.js?ver='+window.srcVersion);
 const { AudioScriptProcessorHandler } = await import('./svision/js/audioScriptProcessorHandler.js?ver='+window.srcVersion);
+const { AudioDisableHandler } = await import('./svision/js/audioDisableHandler.js?ver='+window.srcVersion);
 /*/
 import AbstractAudioManager from './svision/js/abstractAudioManager.js';
 import AudioWorkletHandler from './svision/js/audioWorkletHandler.js';
 import AudioScriptProcessorHandler from './svision/js/audioScriptProcessorHandler.js';
+import AudioDisableHandler from './svision/js/audioDisableHandler.js';
 /**/
 // begin code
 
@@ -20,6 +22,21 @@ export class AudioManager extends AbstractAudioManager {
 
 createAudioHandler(channel) {
     var audioHandler = false;
+
+    var volume = 0.0;
+    switch (channel) {
+      case 'music':
+        volume = this.music;
+        break;
+      case 'sounds':
+      case 'extra':
+        volume = this.sounds;
+        break;
+    }
+
+    if (volume == 0.0) {
+      return new AudioDisableHandler(this.app);
+    }
 
     if (this.unsupportedAudioChannel == false) {
       this.unsupportedAudioChannel = this.app.getCookie('unsupportedAudioChannel', false);
@@ -42,7 +59,7 @@ createAudioHandler(channel) {
   } // createAudioHandler
 
   audioData(channel, sound, options) {
-    var sampleRate = this.channels[channel].ctx.sampleRate;
+    var sampleRate = this.channels[channel].getSampleRate();
     switch (sound) {
       case 'titleScreenMelody': return this.titleScreenMelody(sampleRate);
       case 'screechSound': return this.screechSound(sampleRate);
