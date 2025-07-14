@@ -1,13 +1,17 @@
 /**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
+const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { ZXTextEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js?ver='+window.srcVersion);
 const { GameAreaEntity } = await import('./gameAreaEntity.js?ver='+window.srcVersion);
 const { PauseGameEntity } = await import('./pauseGameEntity.js?ver='+window.srcVersion);
+const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
+import AbstractEntity from './svision/js/abstractEntity.js';
 import ZXTextEntity from '././svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js';
 import GameAreaEntity from './gameAreaEntity.js';
 import PauseGameEntity from './pauseGameEntity.js';
+import SpriteEntity from '././svision/js/platform/canvas2D/spriteEntity.js';
 /**/
 // begin code
 
@@ -21,9 +25,11 @@ export class RoomModel extends AbstractModel {
     this.roomEntity = null;
     this.roomNameEntity = null;
     this.scoreEntity = null;
+    this.liveEntities = [];
+    this.liveColors = ['brightCyan', 'yellow', 'green', 'blue', 'cyan', 'brightMagenta', 'brightGreen'];
     this.adjoiningRoom = null;
 
-    this.initData = {};
+    this.initData = {'info': [0, 0, 0, 0]};
 
     this.worker = new Worker(this.app.importPath+'/gameWorker.js?ver='+window.srcVersion);
     this.worker.onmessage = (event) => {
@@ -33,10 +39,10 @@ export class RoomModel extends AbstractModel {
           Object.keys(event.data.gameData).forEach((objectsType) => {
             switch (objectsType) {
               case 'info':
-//                for (var l = 0; l < this.app.lives; l++) {
-//                  this.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
-//                  this.liveEntities[l].frame = event.data.gameData.info[3]%4;
-//                }
+                for (var l = 0; l < this.app.lives; l++) {
+                  this.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
+                  this.liveEntities[l].frame = event.data.gameData.info[3]%4;
+                }
                 break;
                 
               case 'floor':
@@ -75,6 +81,36 @@ export class RoomModel extends AbstractModel {
     this.roomNameEntity = new ZXTextEntity(this.desktopEntity, 0, 16*8, 32*8, 8, '', this.app.platform.colorByName('brightYellow'), this.app.platform.colorByName('brightBlack'), 0, true);
     this.roomNameEntity.justify = 2;
     this.desktopEntity.addEntity(this.roomNameEntity);
+    this.desktopEntity.addEntity(new AbstractEntity(this.desktopEntity, 0, 17*8, 32*8, 7*8, false, this.app.platform.colorByName('black')));
+    var itemsCollectedEntity = new ZXTextEntity(this.desktopEntity, 1*8, 18*8, 13*8, 8, 'Items collected', false, false, 0, true);
+    itemsCollectedEntity.penColorsMap = {
+      0: this.app.platform.colorByName('blue'),
+      1: this.app.platform.colorByName('red'),
+      2: this.app.platform.colorByName('magenta'),
+      3: this.app.platform.colorByName('green'),
+      4: this.app.platform.colorByName('cyan'),
+      5: this.app.platform.colorByName('white')
+    };
+    this.desktopEntity.addEntity(itemsCollectedEntity);
+    this.desktopEntity.addEntity(new ZXTextEntity(this.desktopEntity, 15*8, 18*8, 3*8, 8, '000', this.app.platform.colorByName('white'), false, 0, true));
+    this.desktopEntity.addEntity(new ZXTextEntity(this.desktopEntity, 20*8, 18*8, 4*8, 8, 'Time', this.app.platform.colorByName('white'), false, 0, true));
+    var timeEntity = new ZXTextEntity(this.desktopEntity, 25*8, 18*8, 6*8, 8, ' 7:00am', false, false, 0, true);
+    timeEntity.justify = 1;
+    timeEntity.penColorsMap = {
+      0: this.app.platform.colorByName('white'),
+      1: this.app.platform.colorByName('yellow'),
+      2: this.app.platform.colorByName('green'),
+      3: this.app.platform.colorByName('cyan'),
+      4: this.app.platform.colorByName('magenta'),
+      5: this.app.platform.colorByName('red'),
+      6: this.app.platform.colorByName('blue')
+    };
+    this.desktopEntity.addEntity(timeEntity);
+    for (var l = 0; l < this.app.lives; l++) {
+      this.liveEntities[l] = new SpriteEntity(this.desktopEntity, l*16, 21*8, this.app.platform.colorByName(this.liveColors[l]), false, 0, 0);
+      this.desktopEntity.addEntity(this.liveEntities[l]);
+    }
+
 
     this.sendEvent(330, {'id': 'changeFlashState'});
 
@@ -96,6 +132,9 @@ export class RoomModel extends AbstractModel {
   setData(data) {
     this.roomNameEntity.setText(data.name);
     this.borderEntity.bkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(data.borderColor), 7, 1);
+    for (var l = 0; l < this.app.lives; l++) {
+      this.liveEntities[l].setGraphicsData(data.willy);
+    }
     super.setData(data);
     this.worker.postMessage({'id': 'init', 'initData': this.initData});
   } // setData

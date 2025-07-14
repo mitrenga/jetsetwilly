@@ -6,6 +6,9 @@
 // begin code
 
 var counter = 0;
+var counter2 = 0;
+var counter4 = 0;
+var counter6 = 0;
 var gameData = null;
 var ropeRelativeCoordinates = [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1,1,2,1,1,2,2,3,2,3,2,3,3,3,3,3,3],
@@ -14,8 +17,18 @@ var ropeRelativeCoordinates = [
 
 function gameLoop() {
   setTimeout(gameLoop, 72);
+
   if (gameData != null) {
     counter++;
+    if (counter%2 == 0) {
+      counter2++;
+    }
+    if (counter%4 == 0) {
+      counter4++;
+    }
+    if (counter%6 == 0) {
+      counter6++;
+    }
 
     // conveyors
     gameData.conveyors.forEach((conveyor) => {
@@ -218,7 +231,13 @@ function gameLoop() {
       }
     });    
 
+    // game counters
+    gameData.info[0] = counter;
+    gameData.info[1] = counter2;
+    gameData.info[2] = counter4;
+    gameData.info[3] = counter6;
   }
+
   postMessage({'id': 'update', 'gameData': gameData});
 } // gameLoop
 
@@ -226,11 +245,15 @@ onmessage = (event) => {
   switch (event.data.id) {
     case 'init':
       gameData = {};
-      Object.keys(event.data.initData).forEach((type) => {
-        gameData[type] = [];
-        event.data.initData[type].forEach((object) => {
-          gameData[type].push({...object});
-        });
+      Object.keys(event.data.initData).forEach((objectsType) => {
+        gameData[objectsType] = [];
+        if (objectsType != 'info') {
+          event.data.initData[objectsType].forEach((object) => {
+            gameData[objectsType].push({...object});
+          });
+        } else {
+          gameData.info = [...event.data.initData.info];
+        }
       });
       gameLoop();
       break;

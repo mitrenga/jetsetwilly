@@ -29,6 +29,7 @@ export class GameApp extends AbstractApp {
     this.audioManager = new AudioManager(this);
     
     this.roomNumber = false;
+    this.lives = 7;
     this.globalData = false;
     this.items = [];
     this.model = this.newModel('ResetModel');
