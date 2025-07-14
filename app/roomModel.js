@@ -99,8 +99,8 @@ export class RoomModel extends AbstractModel {
     timeEntity.penColorsMap = {
       0: this.app.platform.colorByName('white'),
       1: this.app.platform.colorByName('yellow'),
-      2: this.app.platform.colorByName('green'),
-      3: this.app.platform.colorByName('cyan'),
+      2: this.app.platform.colorByName('cyan'),
+      3: this.app.platform.colorByName('green'),
       4: this.app.platform.colorByName('magenta'),
       5: this.app.platform.colorByName('red'),
       6: this.app.platform.colorByName('blue')
