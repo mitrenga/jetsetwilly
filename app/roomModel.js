@@ -45,9 +45,16 @@ export class RoomModel extends AbstractModel {
                   this.liveEntities[l].frame = event.data.gameData.info[3]%4;
                 }
                 var hour = 7+Math.floor(event.data.gameData.info[0]/15360);
+                if (hour > 23) {
+                  this.sendEvent(0, 'gameOver');
+                }
                 var minute = Math.floor(event.data.gameData.info[0]%15360/256);
-                var timeStr = (hour%12).toString().padStart(2, ' ')+':'+minute.toString().padStart(2, '0');
-                if (hour > 12) {
+                var hour12 = hour%12;
+                if (hour12 == 0) {
+                  hour12 = 12;
+                }
+                var timeStr = hour12.toString().padStart(2, ' ')+':'+minute.toString().padStart(2, '0');
+                if (hour > 11) {
                   timeStr = timeStr+'pm';
                 } else {
                   timeStr = timeStr+'am';
@@ -93,28 +100,13 @@ export class RoomModel extends AbstractModel {
     this.desktopEntity.addEntity(this.roomNameEntity);
     this.desktopEntity.addEntity(new AbstractEntity(this.desktopEntity, 0, 17*8, 32*8, 7*8, false, this.app.platform.colorByName('black')));
     var itemsCollectedEntity = new ZXTextEntity(this.desktopEntity, 1*8, 18*8, 13*8, 8, 'Items collected', false, false, 0, true);
-    itemsCollectedEntity.penColorsMap = {
-      0: this.app.platform.colorByName('blue'),
-      1: this.app.platform.colorByName('red'),
-      2: this.app.platform.colorByName('magenta'),
-      3: this.app.platform.colorByName('green'),
-      4: this.app.platform.colorByName('cyan'),
-      5: this.app.platform.colorByName('white')
-    };
+    itemsCollectedEntity.penColorsMap = {0:1, 1:2, 2:3, 3:4, 4:5, 5:6};
     this.desktopEntity.addEntity(itemsCollectedEntity);
     this.desktopEntity.addEntity(new ZXTextEntity(this.desktopEntity, 15*8, 18*8, 3*8, 8, '000', this.app.platform.colorByName('white'), false, 0, true));
     this.desktopEntity.addEntity(new ZXTextEntity(this.desktopEntity, 20*8, 18*8, 4*8, 8, 'Time', this.app.platform.colorByName('white'), false, 0, true));
     this.timeEntity = new ZXTextEntity(this.desktopEntity, 25*8, 18*8, 6*8, 8, ' 7:00am', false, false, 0, true);
     this.timeEntity.justify = 1;
-    this.timeEntity.penColorsMap = {
-      0: this.app.platform.colorByName('white'),
-      1: this.app.platform.colorByName('yellow'),
-      2: this.app.platform.colorByName('cyan'),
-      3: this.app.platform.colorByName('green'),
-      4: this.app.platform.colorByName('magenta'),
-      5: this.app.platform.colorByName('red'),
-      6: this.app.platform.colorByName('blue')
-    };
+    this.timeEntity.penColorsMap = {0:7, 1:6, 2:5, 3:4, 4:3, 5:2, 6:1};
     this.desktopEntity.addEntity(this.timeEntity);
     for (var l = 0; l < this.app.lives; l++) {
       this.liveEntities[l] = new SpriteEntity(this.desktopEntity, l*16, 21*8, this.app.platform.colorByName(this.liveColors[l]), false, 0, 0);
@@ -169,6 +161,13 @@ export class RoomModel extends AbstractModel {
             this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.borderEntity.bkColor));
             return true;
         }
+
+      case 'gameOver':
+        this.app.model.shutdown();
+        this.app.model = this.app.newModel('MainModel');
+        this.app.model.init();
+        this.app.resizeApp();
+        return true;
 
       case 'changeFlashState':
         this.app.stack.flashState = !this.app.stack.flashState;
