@@ -46,7 +46,7 @@ export class RoomModel extends AbstractModel {
                 }
                 var hour = 7+Math.floor(event.data.gameData.info[0]/15360);
                 if (hour > 23) {
-                  this.sendEvent(0, 'gameOver');
+                  this.sendEvent(0, {'id': 'gameOver'});
                 }
                 var minute = Math.floor(event.data.gameData.info[0]%15360/256);
                 var hour12 = hour%12;
