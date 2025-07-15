@@ -27,6 +27,7 @@ export class RoomModel extends AbstractModel {
     this.scoreEntity = null;
     this.liveEntities = [];
     this.liveColors = ['brightCyan', 'yellow', 'green', 'blue', 'cyan', 'brightMagenta', 'brightGreen'];
+    this.timeEntity = null;
     this.adjoiningRoom = null;
 
     this.initData = {'info': [0, 0, 0, 0]};
@@ -43,6 +44,15 @@ export class RoomModel extends AbstractModel {
                   this.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
                   this.liveEntities[l].frame = event.data.gameData.info[3]%4;
                 }
+                var hour = 7+Math.floor(event.data.gameData.info[0]/15360);
+                var minute = Math.floor(event.data.gameData.info[0]%15360/256);
+                var timeStr = (hour%12).toString().padStart(2, ' ')+':'+minute.toString().padStart(2, '0');
+                if (hour > 12) {
+                  timeStr = timeStr+'pm';
+                } else {
+                  timeStr = timeStr+'am';
+                }
+                this.timeEntity.setText(timeStr);
                 break;
                 
               case 'floor':
@@ -94,9 +104,9 @@ export class RoomModel extends AbstractModel {
     this.desktopEntity.addEntity(itemsCollectedEntity);
     this.desktopEntity.addEntity(new ZXTextEntity(this.desktopEntity, 15*8, 18*8, 3*8, 8, '000', this.app.platform.colorByName('white'), false, 0, true));
     this.desktopEntity.addEntity(new ZXTextEntity(this.desktopEntity, 20*8, 18*8, 4*8, 8, 'Time', this.app.platform.colorByName('white'), false, 0, true));
-    var timeEntity = new ZXTextEntity(this.desktopEntity, 25*8, 18*8, 6*8, 8, ' 7:00am', false, false, 0, true);
-    timeEntity.justify = 1;
-    timeEntity.penColorsMap = {
+    this.timeEntity = new ZXTextEntity(this.desktopEntity, 25*8, 18*8, 6*8, 8, ' 7:00am', false, false, 0, true);
+    this.timeEntity.justify = 1;
+    this.timeEntity.penColorsMap = {
       0: this.app.platform.colorByName('white'),
       1: this.app.platform.colorByName('yellow'),
       2: this.app.platform.colorByName('cyan'),
@@ -105,7 +115,7 @@ export class RoomModel extends AbstractModel {
       5: this.app.platform.colorByName('red'),
       6: this.app.platform.colorByName('blue')
     };
-    this.desktopEntity.addEntity(timeEntity);
+    this.desktopEntity.addEntity(this.timeEntity);
     for (var l = 0; l < this.app.lives; l++) {
       this.liveEntities[l] = new SpriteEntity(this.desktopEntity, l*16, 21*8, this.app.platform.colorByName(this.liveColors[l]), false, 0, 0);
       this.desktopEntity.addEntity(this.liveEntities[l]);
