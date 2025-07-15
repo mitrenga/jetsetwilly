@@ -127,7 +127,7 @@ export class MainModel extends AbstractModel {
     if (this.timer != false) {
       if (timestamp-this.timer < this.screechDuration) {
         this.bannerEntity.bannerPosition = Math.round((this.bannerTxt.length-32)*8*(timestamp-this.timer)/this.screechDuration);
-        this.mainImageEntity.attrStep = Math.floor(((timestamp-this.timer)/72)%8)*3;
+        this.mainImageEntity.attrStep = Math.floor(((timestamp-this.timer)/77)%8)*3;
       }
     }
 
