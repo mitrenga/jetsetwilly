@@ -167,6 +167,7 @@ export class RoomModel extends AbstractModel {
             this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.borderEntity.bkColor));
             return true;
         }
+        break;
 
       case 'gameOver':
         this.app.model.shutdown();
