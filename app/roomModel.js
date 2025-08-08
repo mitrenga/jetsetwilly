@@ -166,6 +166,31 @@ export class RoomModel extends AbstractModel {
           case 'Escape':
             this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.borderEntity.bkColor));
             return true;
+          case 'ArrowRight':
+            this.worker.postMessage({'id': 'controls', 'action': 'right', 'value': true});
+            return true;
+          case 'ArrowLeft':
+            this.worker.postMessage({'id': 'controls', 'action': 'left', 'value': true});
+            return true;
+          case 'ArrowUp':
+          case ' ':
+            this.worker.postMessage({'id': 'controls', 'action': 'jump', 'value': true});
+            return true;
+        }
+        break;
+
+      case 'keyRelease':
+        switch (event.key) {
+          case 'ArrowRight':
+            this.worker.postMessage({'id': 'controls', 'action': 'right', 'value': false});
+            return true;
+          case 'ArrowLeft':
+            this.worker.postMessage({'id': 'controls', 'action': 'left', 'value': false});
+            return true;
+          case 'ArrowUp':
+          case ' ':
+            this.worker.postMessage({'id': 'controls', 'action': 'jump', 'value': false});
+            return true;
         }
         break;
 

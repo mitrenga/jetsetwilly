@@ -14,6 +14,10 @@ var ropeRelativeCoordinates = [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1,1,2,1,1,2,2,3,2,3,2,3,3,3,3,3,3],
   [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,2,3,2,3,2,3,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
 ];
+var controls = {'left': false, 'right': false, 'jump': false};
+var jumpCounter = 0;
+var jumpDirection = 0;
+var jumpMap = [0, -4, -4, -3, -3, -2, -2, -1, -1, 0, 1, 1, 2, 2, 3, 3, 4, 4];
 
 function gameLoop() {
   setTimeout(gameLoop, 77);
@@ -78,6 +82,48 @@ function gameLoop() {
         gameData.rope[r].y = y;
         ptr++;
       }
+    }
+
+    // Willy
+    var moveDirection = 0;
+    if (jumpCounter == jumpMap.length-1) {
+      jumpCounter = 0;
+      jumpDirection = 0;
+    }
+    if ((controls.right && !controls.left && jumpCounter == 0) || (jumpCounter > 0 && jumpDirection == 1)) {
+      if (gameData.willy[0].direction == 1) {
+        gameData.willy[0].direction = 0;
+      } else {
+        moveDirection = 1;
+        gameData.willy[0].x += 2;
+        if (gameData.willy[0].frame == 3) {
+          gameData.willy[0].frame = 0;
+        } else {
+          gameData.willy[0].frame++;
+        }
+      }
+    }
+    if ((controls.left && !controls.right && jumpCounter == 0) || (jumpCounter > 0 && jumpDirection == -1)) {
+      if (gameData.willy[0].direction == 0) {
+        gameData.willy[0].direction = 1;
+      } else {
+        moveDirection = -1;
+        gameData.willy[0].x -= 2;
+        if (gameData.willy[0].frame == 0) {
+          gameData.willy[0].frame = 3;
+        } else {
+          gameData.willy[0].frame--;
+        }
+      }
+    }
+    if (jumpCounter > 0) {
+      jumpCounter++;
+      gameData.willy[0].y += jumpMap[jumpCounter]; 
+    }
+    else if (controls.jump) {
+      jumpCounter++;
+      jumpDirection = moveDirection;
+      gameData.willy[0].y += jumpMap[jumpCounter]; 
     }
 
     // guardians
@@ -257,5 +303,10 @@ onmessage = (event) => {
       });
       gameLoop();
       break;
-  }
+
+    case 'controls':
+      controls[event.data.action] = event.data.value;
+      break;
+
+    }
 } // onmessage
