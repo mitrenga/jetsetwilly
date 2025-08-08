@@ -24,7 +24,7 @@ export class GameAreaEntity extends AbstractEntity {
     this.graphicCache = {};
     this.staticKinds = ['floor', 'wall', 'nasty'];
 
-    this.spriteEntities = {'conveyors': [], 'rope': [], 'guardians': [], 'items': [], 'decorations': [], 'willy': []};
+    this.spriteEntities = {'conveyors': [], 'ropes': [], 'guardians': [], 'items': [], 'decorations': [], 'willy': []};
     this.ropeRelativeCoordinates = [
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1,1,2,1,1,2,2,3,2,3,2,3,3,3,3,3,3],
       [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,2,3,2,3,2,3,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
@@ -148,9 +148,9 @@ export class GameAreaEntity extends AbstractEntity {
     }
 
     // layout
-    this.initData.floor = [];
-    this.initData.wall = [];
-    this.initData.nasty = [];
+    this.initData.floors = [];
+    this.initData.walls = [];
+    this.initData.nasties = [];
     data.layout.forEach((row, r) => {
       for (var column = 0; column < 32; column++) {
         var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
@@ -159,13 +159,13 @@ export class GameAreaEntity extends AbstractEntity {
           var layoutInitData = {'x': column*8, 'y': r*8, 'width': 8, 'height': 8};
           switch (idItem) {
             case 'floor':
-              this.initData.floor.push(layoutInitData);
+              this.initData.floors.push(layoutInitData);
               break;
             case 'wall':
-              this.initData.wall.push(layoutInitData);
+              this.initData.walls.push(layoutInitData);
               break;
             case 'nasty':
-              this.initData.nasty.push(layoutInitData);
+              this.initData.nasties.push(layoutInitData);
               break;
           }
         }
@@ -256,7 +256,7 @@ export class GameAreaEntity extends AbstractEntity {
     }
 
     // rope
-    this.initData.rope = []
+    this.initData.ropes = []
     if ('rope' in data) {
       var color = this.app.platform.penColorByAttr(this.app.hexToInt(data.rope.attribute));
       var x = data.rope.init.x;
@@ -265,7 +265,7 @@ export class GameAreaEntity extends AbstractEntity {
       for (var r = 0; r <= data.rope.length; r++) {
         var entity = new AbstractEntity(this, x, y, 1, 1, false, color);
         this.addEntity(entity);
-        this.spriteEntities.rope.push(entity);
+        this.spriteEntities.ropes.push(entity);
         var ropeInitData = {
           'x': x,
           'y': y
@@ -275,7 +275,7 @@ export class GameAreaEntity extends AbstractEntity {
           ropeInitData.frames = data.rope.frames;       
           ropeInitData.direction = data.rope.init.direction;   
         }
-        this.initData.rope.push(ropeInitData);
+        this.initData.ropes.push(ropeInitData);
         x += this.ropeRelativeCoordinates[0][ptr];
         y += this.ropeRelativeCoordinates[1][ptr];
         ptr++;

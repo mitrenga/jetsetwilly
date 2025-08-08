@@ -62,9 +62,9 @@ export class RoomModel extends AbstractModel {
                 this.timeEntity.setText(timeStr);
                 break;
                 
-              case 'floor':
-              case 'wall':
-              case 'nasty':
+              case 'floors':
+              case 'walls':
+              case 'nasties':
               case 'ramps':
                 break;
 

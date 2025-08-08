@@ -44,8 +44,8 @@ function gameLoop() {
     });
 
     //rope
-    if (gameData.rope.length > 0) {
-      var firstElement = gameData.rope[0];
+    if (gameData.ropes.length > 0) {
+      var firstElement = gameData.ropes[0];
       switch (firstElement.direction) {
         case 0:
           if (firstElement.frame == firstElement.frames-1) {
@@ -71,15 +71,15 @@ function gameLoop() {
       var x = firstElement.x;
       var y = firstElement.y;
       var ptr = Math.abs(firstElement.frame);
-      for (var r = 1; r < gameData.rope.length; r++) {
+      for (var r = 1; r < gameData.ropes.length; r++) {
         if (firstElement.frame < 0) {
           x -= ropeRelativeCoordinates[0][ptr];
         } else {
           x += ropeRelativeCoordinates[0][ptr];
         }
         y += ropeRelativeCoordinates[1][ptr];
-        gameData.rope[r].x = x;
-        gameData.rope[r].y = y;
+        gameData.ropes[r].x = x;
+        gameData.ropes[r].y = y;
         ptr++;
       }
     }
@@ -93,7 +93,7 @@ function gameLoop() {
     if ((controls.right && !controls.left && jumpCounter == 0) || (jumpCounter > 0 && jumpDirection == 1)) {
       if (gameData.willy[0].direction == 1) {
         gameData.willy[0].direction = 0;
-      } else {
+      } else if (canGoRight(2)) {
         moveDirection = 1;
         gameData.willy[0].x += 2;
         if (gameData.willy[0].frame == 3) {
@@ -106,7 +106,7 @@ function gameLoop() {
     if ((controls.left && !controls.right && jumpCounter == 0) || (jumpCounter > 0 && jumpDirection == -1)) {
       if (gameData.willy[0].direction == 0) {
         gameData.willy[0].direction = 1;
-      } else {
+      } else if (canGoLeft(2)) {
         moveDirection = -1;
         gameData.willy[0].x -= 2;
         if (gameData.willy[0].frame == 0) {
@@ -286,6 +286,24 @@ function gameLoop() {
 
   postMessage({'id': 'update', 'gameData': gameData});
 } // gameLoop
+
+function checkTouchWithObjectsArray(x, y, width, height, objects) {
+  for (var o = 0; o < objects.length; o++) {
+    var obj = objects[o];
+    if (!(x+width <= obj.x || y+height <= obj.y || x >= obj.x+obj.width || y >= obj.y+obj.height)) {
+      return true;
+    }
+  }
+  return false;
+} // checkTouchWithObjectsArray
+
+function canGoRight(step) {
+  return !checkTouchWithObjectsArray(gameData.willy[0].x+step, gameData.willy[0].y, 10, 16, gameData.walls);
+} // canGoRight
+
+function canGoLeft(step) {
+  return !checkTouchWithObjectsArray(gameData.willy[0].x-step, gameData.willy[0].y, 10, 16, gameData.walls);
+} // canGoLeft
 
 onmessage = (event) => {
   switch (event.data.id) {
