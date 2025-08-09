@@ -70,6 +70,7 @@ createAudioHandler(channel) {
       case 'screechSound': return this.screechSound(sampleRate);
       case 'inGameMelody': return this.inGameMelody(sampleRate, options.lives);
       case 'jumpSound': return this.jumpSound(sampleRate);
+      case 'itemSound': return this.itemSound(sampleRate);
       case 'tapePilotToneSound': return this.tapePilotToneSound(sampleRate);
       case 'tapeRndDataSound': return this.tapeRndDataSound(sampleRate);
       case 'basicBeepsSound': return this.basicBeepsSound(sampleRate);
@@ -258,8 +259,6 @@ createAudioHandler(channel) {
     
     var k = Math.round(sampleRate/658)/100;
     fragments.push(Math.round(sampleRate/13.78125));
-    var frame = 0;
-    var lastPos = -1;
     
     for (var x = 0; x < 18; x++) {
       var d = Math.round(2*(1+Math.abs(7-x))*k);
@@ -282,6 +281,31 @@ createAudioHandler(channel) {
     this.audioDataCache.sounds.jumpSound = {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds};
     return this.audioDataCache.sounds.jumpSound;
   } // jumpSound
+
+  itemSound(sampleRate) {
+    var fragments = [];
+    var pulses = new Uint8Array(64);
+    var pulsesCounter = 0;
+    
+    var k = Math.round(sampleRate/2400)/100;
+
+    var c = 128;
+    do {
+      var b = 144-c;
+      var p = Math.round(b*k)
+      fragments.push(p);
+      if (pulsesCounter == pulses.length) {
+        pulses = this.extendArray(pulses, 10);
+      }
+      pulses[pulsesCounter] = fragments.length-1;
+      pulsesCounter++;
+      c = c-2;
+    } while (c > 0);
+
+    pulses = this.resizeArray(pulses, pulsesCounter);
+    this.audioDataCache.extra.itemSound = {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds};
+    return this.audioDataCache.extra.itemSound;
+  } // itemSound
 
   tapePilotToneSound(sampleRate) {
     // T-state is 1/3500000 = 0.0000002867 sec. 

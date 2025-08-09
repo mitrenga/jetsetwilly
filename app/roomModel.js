@@ -132,6 +132,7 @@ export class RoomModel extends AbstractModel {
     }
     if (this.app.audioManager.sounds > 0) {
       this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'sounds'});
+      this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'extra'});
     }
   } // init
 

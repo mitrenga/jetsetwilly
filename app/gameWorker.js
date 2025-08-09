@@ -278,6 +278,10 @@ function gameLoop() {
       }
     });    
 
+    checkTouchItems();
+    checkTouchNasties();
+    checkTouchGuardians();
+
     // game counters
     gameData.info[0] = counter;
     gameData.info[1] = counter2;
@@ -291,11 +295,13 @@ function gameLoop() {
 function checkTouchWithObjectsArray(x, y, width, height, objects) {
   for (var o = 0; o < objects.length; o++) {
     var obj = objects[o];
-    if (!(x+width <= obj.x || y+height <= obj.y || x >= obj.x+obj.width || y >= obj.y+obj.height)) {
-      return true;
+    if (!('hide' in obj) || !obj.hide) {
+      if (!(x+width <= obj.x || y+height <= obj.y || x >= obj.x+obj.width || y >= obj.y+obj.height)) {
+        return o+1;
+      }
     }
   }
-  return false;
+  return 0;
 } // checkTouchWithObjectsArray
 
 function canGoRight(step) {
@@ -305,6 +311,20 @@ function canGoRight(step) {
 function canGoLeft(step) {
   return !checkTouchWithObjectsArray(gameData.willy[0].x-step, gameData.willy[0].y, 10, 16, gameData.walls);
 } // canGoLeft
+
+function checkTouchItems() {
+  var touchId = checkTouchWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, gameData.items);
+  if (touchId) {
+    gameData.items[touchId-1].hide = true;
+    postMessage({'id': 'playSound', 'channel': 'extra', 'sound': 'itemSound'});
+  }
+} // checkTouchItems
+
+function checkTouchNasties() {
+} // checkTouchNasties
+
+function checkTouchGuardians() {
+} // checkTouchGuardians
 
 onmessage = (event) => {
   switch (event.data.id) {
