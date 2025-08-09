@@ -124,6 +124,7 @@ function gameLoop() {
       jumpCounter++;
       jumpDirection = moveDirection;
       gameData.willy[0].y += jumpMap[jumpCounter]; 
+      postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'jumpSound'});
     }
 
     // guardians

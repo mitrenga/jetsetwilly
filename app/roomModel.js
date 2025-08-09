@@ -73,6 +73,10 @@ export class RoomModel extends AbstractModel {
             }
           });
           break;
+
+        case 'playSound':
+          this.sendEvent(0, {'id': 'playSound', 'channel': event.data.channel, 'sound': event.data.sound, 'options': false});
+          break;
       }
     } // onmessage
 
