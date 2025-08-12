@@ -70,6 +70,7 @@ createAudioHandler(channel) {
       case 'screechSound': return this.screechSound(sampleRate);
       case 'inGameMelody': return this.inGameMelody(sampleRate, options.lives);
       case 'jumpSound': return this.jumpSound(sampleRate);
+      case 'fallingSound': return this.fallingSound(sampleRate);
       case 'itemSound': return this.itemSound(sampleRate);
       case 'tapePilotToneSound': return this.tapePilotToneSound(sampleRate);
       case 'tapeRndDataSound': return this.tapeRndDataSound(sampleRate);
@@ -254,16 +255,40 @@ createAudioHandler(channel) {
 
   jumpSound(sampleRate) {
     var fragments = [];
-    var pulses = new Uint8Array(30*18+18);
+    var pulses = new Uint8Array(30*18+18+33*27);
     var pulsesCounter = 0;
     
     var k = Math.round(sampleRate/658)/100;
-    fragments.push(Math.round(sampleRate/13.78125));
+    fragments.push(Math.round(sampleRate/12.6));
     
     for (var x = 0; x < 18; x++) {
       var d = Math.round(2*(1+Math.abs(7-x))*k);
       fragments.push(d);
-      for (var o = 0; o < 30; o++) {
+      for (var o = 0; o < 29; o++) {
+        if (pulsesCounter == pulses.length) {
+          pulses = this.extendArray(pulses, 100);
+        }
+        pulses[pulsesCounter] = fragments.length-1;
+        pulsesCounter++;
+      }
+      if (pulsesCounter == pulses.length) {
+        pulses = this.extendArray(pulses, 100);
+      }
+      pulses[pulsesCounter] = 0;
+      pulsesCounter++;
+    }
+
+    k = Math.round(sampleRate/441)/100;
+    
+    var p = 4;
+    for (var x = 0; x < 27; x++) {
+      var d = Math.round(7+2.2*p*k);
+      p++;
+      if (p == 16) {
+        p = 12;
+      }
+      fragments.push(d);
+      for (var o = 0; o < 31; o++) {
         if (pulsesCounter == pulses.length) {
           pulses = this.extendArray(pulses, 100);
         }
@@ -281,6 +306,42 @@ createAudioHandler(channel) {
     this.audioDataCache.sounds.jumpSound = {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds};
     return this.audioDataCache.sounds.jumpSound;
   } // jumpSound
+
+
+  fallingSound(sampleRate) {
+    var fragments = [];
+    var pulses = new Uint8Array(32*27);
+    var pulsesCounter = 0;
+    
+    var k = Math.round(sampleRate/441)/100;
+    fragments.push(Math.round(sampleRate/12.6));
+    
+    var p = 0;
+    for (var x = 0; x < 27; x++) {
+      var d = Math.round(7+2.2*p*k);
+      p++;
+      if (p == 16) {
+        p = 12;
+      }
+      fragments.push(d);
+      for (var o = 0; o < 31; o++) {
+        if (pulsesCounter == pulses.length) {
+          pulses = this.extendArray(pulses, 100);
+        }
+        pulses[pulsesCounter] = fragments.length-1;
+        pulsesCounter++;
+      }
+      if (pulsesCounter == pulses.length) {
+        pulses = this.extendArray(pulses, 100);
+      }
+      pulses[pulsesCounter] = 0;
+      pulsesCounter++;
+    }
+
+    pulses = this.resizeArray(pulses, pulsesCounter);
+    this.audioDataCache.sounds.fallingSound = {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds};
+    return this.audioDataCache.sounds.fallingSound;
+  } // fallingSound
 
   itemSound(sampleRate) {
     var fragments = [];
