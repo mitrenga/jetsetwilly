@@ -30,7 +30,7 @@ export class RoomModel extends AbstractModel {
     this.timeEntity = null;
     this.adjoiningRoom = null;
 
-    this.initData = {'info': [0, 0, 0, 0]};
+    this.initData = {'info': [0, 0, 0, 0, false, false]};
 
     this.worker = new Worker(this.app.importPath+'/gameWorker.js?ver='+window.srcVersion);
     this.worker.onmessage = (event) => {
@@ -46,6 +46,9 @@ export class RoomModel extends AbstractModel {
                 }
                 var hour = 7+Math.floor(event.data.gameData.info[0]/15360);
                 if (hour > 23) {
+                  this.sendEvent(0, {'id': 'gameOver'});
+                }
+                if (event.data.gameData.info[5]) {
                   this.sendEvent(0, {'id': 'gameOver'});
                 }
                 var minute = Math.floor(event.data.gameData.info[0]%15360/256);
@@ -76,6 +79,10 @@ export class RoomModel extends AbstractModel {
 
         case 'playSound':
           this.sendEvent(0, {'id': 'playSound', 'channel': event.data.channel, 'sound': event.data.sound, 'options': false});
+          break;
+
+        case 'stopChannel':
+          this.sendEvent(0, {'id': 'stopChannel', 'channel': event.data.channel});
           break;
       }
     } // onmessage

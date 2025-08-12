@@ -17,7 +17,8 @@ var ropeRelativeCoordinates = [
 var controls = {'left': false, 'right': false, 'jump': false};
 var jumpCounter = 0;
 var jumpDirection = 0;
-var jumpMap = [0, -4, -4, -3, -3, -2, -2, -1, -1, 0, 1, 1, 2, 2, 3, 3, 4, 4];
+var jumpMap = [-4, -4, -3, -3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4];
+var fallingCounter = 0;
 
 function gameLoop() {
   setTimeout(gameLoop, 77);
@@ -85,46 +86,83 @@ function gameLoop() {
     }
 
     // Willy
-    var moveDirection = 0;
-    if (jumpCounter == jumpMap.length-1) {
-      jumpCounter = 0;
-      jumpDirection = 0;
-    }
-    if ((controls.right && !controls.left && jumpCounter == 0) || (jumpCounter > 0 && jumpDirection == 1)) {
-      if (gameData.willy[0].direction == 1) {
-        gameData.willy[0].direction = 0;
-      } else if (canGoRight(2)) {
-        moveDirection = 1;
-        gameData.willy[0].x += 2;
-        if (gameData.willy[0].frame == 3) {
-          gameData.willy[0].frame = 0;
+    if (!gameData.info[4]) { // if not demo
+      if (jumpCounter == jumpMap.length) {
+        jumpCounter = 0;
+        jumpDirection = 0;
+        fallingCounter = 1;
+      }      
+      var standingOn = checkStandingWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]);
+      if (fallingCounter) {
+        if (standingOn.length) {
+          fallingCounter = 0;
         } else {
-          gameData.willy[0].frame++;
+          gameData.willy[0].y += 4;
+          fallingCounter++;
+        }
+      } else {
+        if (jumpCounter == 0 && standingOn.length == 0) {
+          fallingCounter = 1;
         }
       }
-    }
-    if ((controls.left && !controls.right && jumpCounter == 0) || (jumpCounter > 0 && jumpDirection == -1)) {
-      if (gameData.willy[0].direction == 0) {
-        gameData.willy[0].direction = 1;
-      } else if (canGoLeft(2)) {
-        moveDirection = -1;
-        gameData.willy[0].x -= 2;
-        if (gameData.willy[0].frame == 0) {
-          gameData.willy[0].frame = 3;
-        } else {
-          gameData.willy[0].frame--;
+      if (jumpCounter && jumpMap[jumpCounter] >= 0) {
+        if (standingOn.length) {
+          jumpCounter = 0;
+          jumpDirection = 0;
+          postMessage({'id': 'stopChannel', 'channel': 'sounds'});
         }
       }
-    }
-    if (jumpCounter > 0) {
-      jumpCounter++;
-      gameData.willy[0].y += jumpMap[jumpCounter]; 
-    }
-    else if (controls.jump) {
-      jumpCounter++;
-      jumpDirection = moveDirection;
-      gameData.willy[0].y += jumpMap[jumpCounter]; 
-      postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'jumpSound'});
+      if (jumpCounter > 0) {
+        if (jumpMap[jumpCounter] > 0 || canMove(0, jumpMap[jumpCounter])) {
+          jumpCounter++;
+          gameData.willy[0].y += jumpMap[jumpCounter-1]; 
+        } else {
+          jumpCounter = 0;
+          jumpDirection = 0;
+          fallingCounter = 1;
+          postMessage({'id': 'stopChannel', 'channel': 'sounds'});
+        }
+      }
+      if ((controls.right && !controls.left && jumpCounter == 0 && fallingCounter == 0) || (jumpCounter > 0 && jumpDirection == 1)) {
+        if (gameData.willy[0].direction == 1) {
+          gameData.willy[0].direction = 0;
+        } else {
+          jumpDirection = 1;
+          if (canMove(2, 0)) {
+            gameData.willy[0].x += 2;
+            if (gameData.willy[0].frame == 3) {
+              gameData.willy[0].frame = 0;
+            } else {
+              gameData.willy[0].frame++;
+            }
+          }
+        }
+      }
+      if ((controls.left && !controls.right && jumpCounter == 0 && fallingCounter == 0) || (jumpCounter > 0 && jumpDirection == -1)) {
+        if (gameData.willy[0].direction == 0) {
+          gameData.willy[0].direction = 1;
+        } else {
+          jumpDirection = -1;
+          if (canMove(-2, 0)) {
+            gameData.willy[0].x -= 2;
+            if (gameData.willy[0].frame == 0) {
+              gameData.willy[0].frame = 3;
+            } else {
+              gameData.willy[0].frame--;
+            }
+          }
+        }
+      }
+      if (jumpCounter == 0 && fallingCounter == 0 && controls.jump) {
+        if (canMove(0, jumpMap[jumpCounter])) {
+          jumpCounter = 1;
+          gameData.willy[0].y += jumpMap[jumpCounter-1];
+          postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'jumpSound'});
+        }
+      }
+      if (jumpCounter == 0) {
+        jumpDirection = 0;
+      }
     }
 
     // guardians
@@ -279,8 +317,7 @@ function gameLoop() {
     });    
 
     checkTouchItems();
-    checkTouchNasties();
-    checkTouchGuardians();
+    checkCrash();
 
     // game counters
     gameData.info[0] = counter;
@@ -292,39 +329,70 @@ function gameLoop() {
   postMessage({'id': 'update', 'gameData': gameData});
 } // gameLoop
 
-function checkTouchWithObjectsArray(x, y, width, height, objects) {
-  for (var o = 0; o < objects.length; o++) {
-    var obj = objects[o];
-    if (!('hide' in obj) || !obj.hide) {
-      if (!(x+width <= obj.x || y+height <= obj.y || x >= obj.x+obj.width || y >= obj.y+obj.height)) {
-        return o+1;
+function checkTouchWithObjectsArray(x, y, width, height, objectsArray) {
+  for (var a = 0; a < objectsArray.length; a++) {
+    var objects = objectsArray[a];
+    for (var o = 0; o < objects.length; o++) {
+      var obj = objects[o];
+      if (!('hide' in obj) || !obj.hide) {
+        if (!(x+width <= obj.x || y+height <= obj.y || x >= obj.x+obj.width || y >= obj.y+obj.height)) {
+          return o+1;
+        }
       }
     }
   }
   return 0;
 } // checkTouchWithObjectsArray
 
-function canGoRight(step) {
-  return !checkTouchWithObjectsArray(gameData.willy[0].x+step, gameData.willy[0].y, 10, 16, gameData.walls);
-} // canGoRight
+function checkInsideWithObjectsArray(x, y, width, height, objectsArray) {
+  for (var a = 0; a < objectsArray.length; a++) {
+    var objects = objectsArray[a];
+    for (var o = 0; o < objects.length; o++) {
+      var obj = objects[o];
+      if (!('hide' in obj) || !obj.hide) {
+        if (x >= obj.x && y >= obj.y && x+width <= obj.x+obj.width && y+height <= obj.y+obj.height) {
+          return o+1;
+        }
+      }
+    }
+  }
+  return 0;
+} // checkInsideWithObjectsArray
 
-function canGoLeft(step) {
-  return !checkTouchWithObjectsArray(gameData.willy[0].x-step, gameData.willy[0].y, 10, 16, gameData.walls);
-} // canGoLeft
+function checkStandingWithObjectsArray(x, y, width, height, objectsArray) {
+  var result = [];
+  for (var a = 0; a < objectsArray.length; a++) {
+    var objects = objectsArray[a];
+    for (var o = 0; o < objects.length; o++) {
+      var obj = objects[o];
+      if (!('hide' in obj) || !obj.hide) {
+        if (!(x+width <= obj.x || x >= obj.x+obj.width) && y+height == obj.y) {
+          result.push(obj);
+        }
+      }
+    }
+  }
+  return result;
+} // checkStandingWithObjectsArray
+
+function canMove(moveX, moveY) {
+  return !checkTouchWithObjectsArray(gameData.willy[0].x+moveX, gameData.willy[0].y+moveY, 10, 16, [gameData.walls]);
+} // canMove
 
 function checkTouchItems() {
-  var touchId = checkTouchWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, gameData.items);
+  var touchId = checkTouchWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.items]);
   if (touchId) {
     gameData.items[touchId-1].hide = true;
     postMessage({'id': 'playSound', 'channel': 'extra', 'sound': 'itemSound'});
   }
 } // checkTouchItems
 
-function checkTouchNasties() {
-} // checkTouchNasties
-
-function checkTouchGuardians() {
-} // checkTouchGuardians
+function checkCrash() {
+  if (checkTouchWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.nasties, gameData.guardians])) {
+    gameData.info[5] = true;
+  }
+  return 0;
+} // checkCrash
 
 onmessage = (event) => {
   switch (event.data.id) {

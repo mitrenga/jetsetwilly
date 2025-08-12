@@ -226,7 +226,7 @@ export class GameAreaEntity extends AbstractEntity {
         'moving': conveyorData.moving,
         'x': conveyorData.location.x*8,
         'y': conveyorData.location.y*8,
-        'length': conveyorData.length*8,
+        'width': conveyorData.length*8,
         'height': 8,
         'frame': 0,
         'direction': 0
