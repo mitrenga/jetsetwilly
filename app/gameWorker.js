@@ -87,12 +87,15 @@ function gameLoop() {
 
     // Willy
     if (!gameData.info[4]) { // if not demo
+
       if (jumpCounter == jumpMap.length) {
         jumpCounter = 0;
         jumpDirection = 0;
         fallingCounter = 1;
       }      
+
       var standingOn = checkStandingWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]);
+
       if (fallingCounter) {
         if (standingOn.length) {
           fallingCounter = 0;
@@ -105,6 +108,7 @@ function gameLoop() {
           fallingCounter = 1;
         }
       }
+
       if (jumpCounter && jumpMap[jumpCounter] >= 0) {
         if (standingOn.length) {
           jumpCounter = 0;
@@ -112,6 +116,7 @@ function gameLoop() {
           postMessage({'id': 'stopChannel', 'channel': 'sounds'});
         }
       }
+
       if (jumpCounter > 0) {
         if (jumpMap[jumpCounter] > 0 || canMove(0, jumpMap[jumpCounter])) {
           jumpCounter++;
@@ -123,6 +128,7 @@ function gameLoop() {
           postMessage({'id': 'stopChannel', 'channel': 'sounds'});
         }
       }
+
       if ((controls.right && !controls.left && jumpCounter == 0 && fallingCounter == 0) || (jumpCounter > 0 && jumpDirection == 1)) {
         if (gameData.willy[0].direction == 1) {
           gameData.willy[0].direction = 0;
@@ -138,6 +144,7 @@ function gameLoop() {
           }
         }
       }
+
       if ((controls.left && !controls.right && jumpCounter == 0 && fallingCounter == 0) || (jumpCounter > 0 && jumpDirection == -1)) {
         if (gameData.willy[0].direction == 0) {
           gameData.willy[0].direction = 1;
@@ -153,6 +160,7 @@ function gameLoop() {
           }
         }
       }
+
       if (jumpCounter == 0 && fallingCounter == 0 && controls.jump) {
         if (canMove(0, jumpMap[jumpCounter])) {
           jumpCounter = 1;
@@ -160,6 +168,7 @@ function gameLoop() {
           postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'jumpSound'});
         }
       }
+      
       if (jumpCounter == 0) {
         jumpDirection = 0;
       }
