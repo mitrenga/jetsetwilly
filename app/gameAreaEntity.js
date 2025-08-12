@@ -32,13 +32,13 @@ export class GameAreaEntity extends AbstractEntity {
   } // constructor
 
   drawEntity() {
+    super.drawEntity();
+
     if (this.roomData) {
       var layoutObjects = [false, 'floor', 'wall', 'nasty'];
 
       for (var f = 0; f < 2; f++) {
         if (this.drawingCache[f].needToRefresh(this, this.width, this.height)) {
-          this.app.layout.paintRect(this.drawingCache[f].ctx, 0, 0, this.width, this.height, this.app.platform.zxColorByAttr(this.app.hexToInt(this.roomData.bkColor), 56, 8));
-
           // layout
           this.roomData.layout.forEach((row, r) => {
             for (var column = 0; column < 32; column++) {
@@ -126,13 +126,32 @@ export class GameAreaEntity extends AbstractEntity {
           this.app.layout.paintCache(this, 1);
           break;
       }
-
-      super.drawSubEntities();
     }
   } // drawEntity
 
   setData(data) {
     this.roomData = data;
+
+    this.bkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(this.roomData.bkColor), 56, 8);
+
+    // Willy
+    this.initData.willy = [];
+    var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(data.willy.attribute));
+    var entity = new SpriteEntity(this, data.willy.init.x, data.willy.init.y, penColor, false, data.willy.init.frame, data.willy.init.direction);
+    this.addEntity(entity);
+    entity.setGraphicsData(data.willy);
+    this.spriteEntities.willy.push(entity);
+    this.initData.willy.push({
+      'x': data.willy.init.x,
+      'y': data.willy.init.y,
+      'width': data.willy.width,
+      'height': data.willy.height,
+      'paintCorrectionsX': data.willy.paintCorrections.x,
+      'paintCorrectionsY': data.willy.paintCorrections.y,
+      'frame': data.willy.init.frame,
+      'frames': data.willy.init.frames,
+      'direction': data.willy.init.direction
+    });
 
     // prepare drawing caches for layout
     this.drawingCache[0].cleanCache();
@@ -378,25 +397,6 @@ export class GameAreaEntity extends AbstractEntity {
         this.initData.decorations.push({'hide': false, 'kind': decoration.kind, 'x': decoration.x*8, 'y': decoration.y*8, 'frame': 0, 'direction': 0});
       });
     }
-
-    // Willy
-    this.initData.willy = [];
-    var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(data.willy.attribute));
-    var entity = new SpriteEntity(this, data.willy.init.x, data.willy.init.y, penColor, false, data.willy.init.frame, data.willy.init.direction);
-    this.addEntity(entity);
-    entity.setGraphicsData(data.willy);
-    this.spriteEntities.willy.push(entity);
-    this.initData.willy.push({
-      'x': data.willy.init.x,
-      'y': data.willy.init.y,
-      'width': data.willy.width,
-      'height': data.willy.height,
-      'paintCorrectionsX': data.willy.paintCorrections.x,
-      'paintCorrectionsY': data.willy.paintCorrections.y,
-      'frame': data.willy.init.frame,
-      'frames': data.willy.init.frames,
-      'direction': data.willy.init.direction
-    });
   } // setData
     
   updateData(data, objectsType) {
