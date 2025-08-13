@@ -241,14 +241,13 @@ export class GameAreaEntity extends AbstractEntity {
       entity.rotateSpriteRow(3, 0, -2*rotateDirection);
       entity.rotateSpriteRow(3, 2, 2*rotateDirection);
       var conveyorInitData = {
-        'visible': true,
-        'moving': conveyorData.moving,
         'x': conveyorData.location.x*8,
         'y': conveyorData.location.y*8,
         'width': conveyorData.length*8,
         'height': 8,
         'frame': 0,
-        'direction': 0
+        'direction': 0,
+        'moving': conveyorData.moving
       };
       if ((attr & 128) == 128) {
         var reverseSpriteData = '';

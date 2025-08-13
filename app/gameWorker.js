@@ -19,6 +19,7 @@ var jumpCounter = 0;
 var jumpDirection = 0;
 var jumpMap = [-4, -4, -3, -3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4];
 var fallingCounter = 0;
+var movingDirection = 0;
 
 function gameLoop() {
   setTimeout(gameLoop, 77);
@@ -94,7 +95,21 @@ function gameLoop() {
         fallingCounter = 1;
       }      
 
+      movingDirection = 0;
       var standingOn = checkStandingWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]);
+
+      standingOn.forEach((object) => {
+        if ('moving' in object) {
+          switch (object.moving) {
+            case 'right':
+              movingDirection = 1;
+              break;
+            case 'left':
+              movingDirection = -1;
+              break;
+          }
+        }
+      });
 
       if (fallingCounter) {
         if (standingOn.length) {
@@ -131,7 +146,7 @@ function gameLoop() {
         }
       }
 
-      if ((controls.right && !controls.left && jumpCounter == 0 && fallingCounter == 0) || (jumpCounter > 0 && jumpDirection == 1)) {
+      if ((controls.right && !controls.left && jumpCounter == 0 && fallingCounter == 0) || (jumpCounter > 0 && jumpDirection == 1) || (movingDirection == 1)) {
         if (gameData.willy[0].direction == 1) {
           gameData.willy[0].direction = 0;
         } else {
@@ -147,7 +162,7 @@ function gameLoop() {
         }
       }
 
-      if ((controls.left && !controls.right && jumpCounter == 0 && fallingCounter == 0) || (jumpCounter > 0 && jumpDirection == -1)) {
+      if ((controls.left && !controls.right && jumpCounter == 0 && fallingCounter == 0) || (jumpCounter > 0 && jumpDirection == -1) || (movingDirection == -1)) {
         if (gameData.willy[0].direction == 0) {
           gameData.willy[0].direction = 1;
         } else {
@@ -372,6 +387,11 @@ function checkInsideWithObjectsArray(x, y, width, height, objectsArray) {
 
 function checkStandingWithObjectsArray(x, y, width, height, objectsArray) {
   var result = [];
+
+  if (jumpCounter && jumpMap[jumpCounter] < 0) {
+    return result;
+  }
+
   for (var a = 0; a < objectsArray.length; a++) {
     var objects = objectsArray[a];
     for (var o = 0; o < objects.length; o++) {
