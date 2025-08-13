@@ -19,7 +19,9 @@ var jumpCounter = 0;
 var jumpDirection = 0;
 var jumpMap = [-4, -4, -3, -3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4];
 var fallingCounter = 0;
-var movingDirection = 0;
+var fallingDirection = 0;
+var mustMovingDirection = 0;
+var canMovingDirection = 0;
 
 function gameLoop() {
   setTimeout(gameLoop, 77);
@@ -87,33 +89,43 @@ function gameLoop() {
     }
 
     // Willy
-    if (!gameData.info[4]) { // if not demo
+    /*if (!gameData.info[4])*/ { // if not demo
 
       if (jumpCounter == jumpMap.length) {
         jumpCounter = 0;
+        fallingDirection = jumpDirection;
         jumpDirection = 0;
         fallingCounter = 1;
       }      
 
-      movingDirection = 0;
+      canMovingDirection = 0;
+
       var standingOn = checkStandingWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]);
 
       standingOn.forEach((object) => {
         if ('moving' in object) {
           switch (object.moving) {
             case 'right':
-              movingDirection = 1;
+              canMovingDirection = 1;
               break;
             case 'left':
-              movingDirection = -1;
+              canMovingDirection = -1;
               break;
           }
         }
       });
+      
+      if (!canMovingDirection) {
+        mustMovingDirection = 0;
+      }
 
       if (fallingCounter) {
         if (standingOn.length) {
           fallingCounter = 0;
+          if (canMovingDirection == fallingDirection) {
+            mustMovingDirection = canMovingDirection;
+          }
+          fallingDirection = 0;
           postMessage({'id': 'stopChannel', 'channel': 'sounds'});
         } else {
           gameData.willy[0].y += 4;
@@ -122,6 +134,7 @@ function gameLoop() {
       } else {
         if (jumpCounter == 0 && standingOn.length == 0) {
           fallingCounter = 1;
+          fallingDirection = 0;
           postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'fallingSound'});
         }
       }
@@ -129,6 +142,9 @@ function gameLoop() {
       if (jumpCounter && jumpMap[jumpCounter] >= 0) {
         if (standingOn.length) {
           jumpCounter = 0;
+          if (canMovingDirection == jumpDirection) {
+            mustMovingDirection = canMovingDirection;
+          }
           jumpDirection = 0;
           postMessage({'id': 'stopChannel', 'channel': 'sounds'});
         }
@@ -142,11 +158,19 @@ function gameLoop() {
           jumpCounter = 0;
           jumpDirection = 0;
           fallingCounter = 1;
+          fallingDirection = 0;
           postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'fallingSound'});
         }
       }
 
-      if ((controls.right && !controls.left && jumpCounter == 0 && fallingCounter == 0) || (jumpCounter > 0 && jumpDirection == 1) || (movingDirection == 1)) {
+      if (canMovingDirection == 1 && !controls.left) {
+        mustMovingDirection = 1;
+      }
+      if (canMovingDirection == -1 && !controls.right) {
+        mustMovingDirection = -1;
+      }
+
+      if ((controls.right && !controls.left && !jumpCounter && !fallingCounter && mustMovingDirection == 0) || (jumpCounter && jumpDirection == 1) || (mustMovingDirection == 1)) {
         if (gameData.willy[0].direction == 1) {
           gameData.willy[0].direction = 0;
         } else {
@@ -162,7 +186,7 @@ function gameLoop() {
         }
       }
 
-      if ((controls.left && !controls.right && jumpCounter == 0 && fallingCounter == 0) || (jumpCounter > 0 && jumpDirection == -1) || (movingDirection == -1)) {
+      if ((controls.left && !controls.right && !jumpCounter && !fallingCounter && mustMovingDirection == 0) || (jumpCounter && jumpDirection == -1) || (mustMovingDirection == -1)) {
         if (gameData.willy[0].direction == 0) {
           gameData.willy[0].direction = 1;
         } else {

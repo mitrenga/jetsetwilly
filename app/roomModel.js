@@ -30,7 +30,15 @@ export class RoomModel extends AbstractModel {
     this.timeEntity = null;
     this.adjoiningRoom = null;
 
-    this.initData = {'info': [0, 0, 0, 0, false, false]};
+    this.initData = {'info': [
+      0, // counter
+      0, // counter2
+      0, // counter4
+      0, // counter6
+      false, // demo
+      false, // crash
+      0 // score
+    ]};
 
     this.worker = new Worker(this.app.importPath+'/gameWorker.js?ver='+window.srcVersion);
     this.worker.onmessage = (event) => {
