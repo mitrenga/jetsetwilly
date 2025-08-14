@@ -199,17 +199,25 @@ export class GameAreaEntity extends AbstractEntity {
       if (rampData.gradient == 'left') {
           gradient = -1;
       }
-      for (var pos = 0; pos < this.app.hexToInt(rampData.length)*8; pos++) {
-        this.initData.ramps.push({
-          'gradient': rampData.gradient,
-          'x': rampData.location.x+pos*gradient,
-          'y': rampData.location.y-pos,
-          'width': 1,
-          'height': 1,
-          'frame': 0,
-          'direction': 0
-        });
+      var rampLength = this.app.hexToInt(rampData.length);
+      var rampInitData = {
+        'gradient': rampData.gradient,
+        'width': rampLength*8,
+        'height': rampLength*8,
+        'frame': 0,
+        'direction': 0
+      };
+      switch (rampData.gradient) {
+        case 'right':
+          rampInitData.x = rampData.location.x*8;
+          rampInitData.y = (rampData.location.y-rampLength+1)*8;
+          break;
+        case 'left':
+          rampInitData.x = (rampData.location.x-rampLength+1)*8;
+          rampInitData.y = (rampData.location.y-rampLength+1)*8;
+          break;
       }
+      this.initData.ramps.push(rampInitData);
     }
 
     // conveyor
@@ -243,7 +251,7 @@ export class GameAreaEntity extends AbstractEntity {
       var conveyorInitData = {
         'x': conveyorData.location.x*8,
         'y': conveyorData.location.y*8,
-        'width': conveyorData.length*8,
+        'width': this.app.hexToInt(conveyorData.length)*8,
         'height': 8,
         'frame': 0,
         'direction': 0,
