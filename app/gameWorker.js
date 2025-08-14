@@ -28,13 +28,13 @@ function gameLoop() {
 
   if (gameData != null) {
     counter++;
-    if (counter%2 == 0) {
+    if (!(counter%2)) {
       counter2++;
     }
-    if (counter%4 == 0) {
+    if (!(counter%4)) {
       counter4++;
     }
-    if (counter%6 == 0) {
+    if (!(counter%6)) {
       counter6++;
     }
 
@@ -132,7 +132,7 @@ function gameLoop() {
           fallingCounter++;
         }
       } else {
-        if (jumpCounter == 0 && standingOn.length == 0) {
+        if (!jumpCounter && !standingOn.length) {
           fallingCounter = 1;
           fallingDirection = 0;
           postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'fallingSound'});
@@ -170,7 +170,7 @@ function gameLoop() {
         mustMovingDirection = -1;
       }
 
-      if ((controls.right && !controls.left && !jumpCounter && !fallingCounter && mustMovingDirection == 0) || (jumpCounter && jumpDirection == 1) || (mustMovingDirection == 1)) {
+      if ((controls.right && !controls.left && !jumpCounter && !fallingCounter && !mustMovingDirection) || (jumpCounter && jumpDirection == 1) || (mustMovingDirection == 1)) {
         if (gameData.willy[0].direction == 1) {
           gameData.willy[0].direction = 0;
         } else {
@@ -186,7 +186,7 @@ function gameLoop() {
         }
       }
 
-      if ((controls.left && !controls.right && !jumpCounter && !fallingCounter && mustMovingDirection == 0) || (jumpCounter && jumpDirection == -1) || (mustMovingDirection == -1)) {
+      if ((controls.left && !controls.right && !jumpCounter && !fallingCounter && !mustMovingDirection) || (jumpCounter && jumpDirection == -1) || (mustMovingDirection == -1)) {
         if (gameData.willy[0].direction == 0) {
           gameData.willy[0].direction = 1;
         } else {
@@ -202,7 +202,7 @@ function gameLoop() {
         }
       }
 
-      if (jumpCounter == 0 && fallingCounter == 0 && controls.jump) {
+      if (!jumpCounter && !fallingCounter && controls.jump) {
         if (canMove(0, jumpMap[jumpCounter])) {
           jumpCounter = 1;
           gameData.willy[0].y += jumpMap[jumpCounter-1];
@@ -210,7 +210,7 @@ function gameLoop() {
         }
       }
 
-      if (jumpCounter == 0) {
+      if (!jumpCounter) {
         jumpDirection = 0;
       }
     }
@@ -225,7 +225,7 @@ function gameLoop() {
               toMove = true;
               break;
             case 1:
-              if (this.counter%2 == 0) {
+              if (!(this.counter%2)) {
                 toMove = true;
               }
               break;
@@ -278,7 +278,7 @@ function gameLoop() {
           switch (guardian.direction) {
             case 0:
               guardian.y += guardian.speed;
-              if (counter%[0,4,2,1,1,1,1,1,1][guardian.frames] == 0) {
+              if (!(counter%[0,4,2,1,1,1,1,1,1][guardian.frames])) {
                 if (guardian.frame == guardian.frames-1) {
                   guardian.frame = 0;
                 } else {
@@ -288,7 +288,7 @@ function gameLoop() {
               break;
             case 1:
               guardian.y -= guardian.speed;
-              if (counter%[0,4,2,1,1,1,1,1,1][guardian.frames] == 0) {
+              if (!(counter%[0,4,2,1,1,1,1,1,1][guardian.frames])) {
                 if (guardian.frame == 0) {
                   guardian.frame = guardian.frames-1;
                 } else {
@@ -328,7 +328,7 @@ function gameLoop() {
 
         case 'maria':
           guardian.direction = 0;
-          if (counter%[0,4,2,1,1,1,1,1,1][guardian.frames] == 0) {
+          if (!(counter%[0,4,2,1,1,1,1,1,1][guardian.frames])) {
             if (guardian.frame == guardian.frames-1) {
               guardian.frame = 0;
             } else {
