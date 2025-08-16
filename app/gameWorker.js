@@ -102,6 +102,10 @@ function gameLoop() {
       canMovingDirection = 0;
 
       var standingOn = checkStandingWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]);
+      var standingOnRamps = checkStandingOnRamps(gameData.willy[0].x, gameData.willy[0].y, 10, 16);
+      if (standingOnRamps.length) {
+        standingOn = [...standingOn, ...gameData.ramps]; 
+      }
 
       standingOn.forEach((object) => {
         if ('moving' in object) {
@@ -181,8 +185,10 @@ function gameLoop() {
           gameData.willy[0].direction = 0;
         } else {
           jumpDirection = 1;
-          if (canMove(2, 0)) {
+          var moveY = rampMovement(2, gameData.willy[0].x, gameData.willy[0].y, 10, 16);
+          if (canMove(2, moveY)) {
             gameData.willy[0].x += 2;
+            gameData.willy[0].y += moveY;
             if (gameData.willy[0].frame == 3) {
               gameData.willy[0].frame = 0;
             } else {
@@ -201,8 +207,10 @@ function gameLoop() {
           gameData.willy[0].direction = 1;
         } else {
           jumpDirection = -1;
-          if (canMove(-2, 0)) {
+          var moveY = rampMovement(-2, gameData.willy[0].x, gameData.willy[0].y, 10, 16);
+          if (canMove(-2, moveY)) {
             gameData.willy[0].x -= 2;
+            gameData.willy[0].y += moveY;
             if (gameData.willy[0].frame == 0) {
               gameData.willy[0].frame = 3;
             } else {
@@ -460,6 +468,43 @@ function checkCrash() {
   }
   return 0;
 } // checkCrash
+
+function rampMovement(move, x, y, width, height) {
+  if (!jumpCounter) {
+    for (var o = 0; o < gameData.ramps.length; o++) {
+      var obj = gameData.ramps[o];
+      switch (obj.gradient) {
+        case 'right':
+          if ((checkTouchWithObjectsArray(x+move, y-move, width+Math.abs(move), height+Math.abs(move), [[obj]])) && (y+height == obj.y+obj.height-x-width+obj.x)) {
+            return -move;
+          }
+          break;
+        case 'left':
+          break;
+      }
+    }
+  }
+  return 0;
+} // rampMovement
+
+function checkStandingOnRamps(x, y, width, height) {
+  var result = [];
+  for (var o = 0; o < gameData.ramps.length; o++) {
+    var obj = gameData.ramps[o];
+    switch (obj.gradient) {
+      case 'right':
+        if (y+height >= obj.y && y+height < obj.y+obj.height) {
+          if (y+height == obj.y+obj.height-x-width+obj.x) {
+            result.push(gameData.ramps[o+1]);
+          }
+        }
+        break;
+      case 'left':
+        break;
+    }
+  }
+  return result;
+} // checkStandingOnRamps
 
 onmessage = (event) => {
   switch (event.data.id) {
