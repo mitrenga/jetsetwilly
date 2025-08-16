@@ -470,16 +470,20 @@ function checkCrash() {
 } // checkCrash
 
 function rampMovement(move, x, y, width, height) {
-  if (!jumpCounter) {
+  if (!jumpCounter && !controls.jump) {
+    var absMove = Math.abs(move);
     for (var o = 0; o < gameData.ramps.length; o++) {
       var obj = gameData.ramps[o];
       switch (obj.gradient) {
         case 'right':
-          if ((checkTouchWithObjectsArray(x+move, y-move, width+Math.abs(move), height+Math.abs(move), [[obj]])) && (y+height == obj.y+obj.height-x-width+obj.x)) {
+          if ((checkTouchWithObjectsArray(x+move, y-move, width+absMove, height+absMove, [[obj]])) && (y+height == obj.y+obj.height-x-width+obj.x)) {
             return -move;
           }
           break;
         case 'left':
+          if ((checkTouchWithObjectsArray(x+move-absMove, y+move, width+absMove, height+absMove, [[obj]])) && (y+height == obj.y+obj.height+x-obj.x-obj.width)) {
+            return move;
+          }
           break;
       }
     }
@@ -500,6 +504,11 @@ function checkStandingOnRamps(x, y, width, height) {
         }
         break;
       case 'left':
+        if (y+height >= obj.y && y+height < obj.y+obj.height) {
+          if (y+height == obj.y+obj.height+x-obj.x-obj.width) {
+            result.push(gameData.ramps[o+1]);
+          }
+        }
         break;
     }
   }
