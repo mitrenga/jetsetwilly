@@ -40,7 +40,9 @@ function gameLoop() {
     }
     conveyors();
     ropes();
-    willy();
+    if (!gameData.info[4]) { // if not demo
+      willy();
+    }
     guardians();
     items();
     decorations();
@@ -109,149 +111,146 @@ function ropes() {
 } // ropes
 
 function willy() {
-  if (!gameData.info[4]) { // if not demo
+  if (jumpCounter == jumpMap.length) {
+    jumpCounter = 0;
+    fallingDirection = jumpDirection;
+    jumpDirection = 0;
+    fallingCounter = 1;
+  }      
 
-    if (jumpCounter == jumpMap.length) {
+  canMovingDirection = 0;
+
+  var standingOn = checkStandingWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]);
+  var standingOnRamps = checkStandingOnRamps(gameData.willy[0].x, gameData.willy[0].y, 10, 16);
+  if (standingOnRamps.length) {
+    standingOn = [...standingOn, ...gameData.ramps]; 
+  }
+
+  standingOn.forEach((object) => {
+    if ('moving' in object) {
+      switch (object.moving) {
+        case 'right':
+          canMovingDirection = 1;
+          break;
+        case 'left':
+          canMovingDirection = -1;
+          break;
+      }
+    }
+  });
+  
+  if (!canMovingDirection) {
+    mustMovingDirection = 0;
+  }
+
+  if (fallingCounter) {
+    if (standingOn.length) {
+      fallingCounter = 0;
+      if (canMovingDirection == fallingDirection) {
+        mustMovingDirection = canMovingDirection;
+      }
+      fallingDirection = 0;
+      postMessage({'id': 'stopChannel', 'channel': 'sounds'});
+    } else {
+      gameData.willy[0].y += 4;
+      fallingCounter++;
+    }
+  } else {
+    if (!jumpCounter && !standingOn.length) {
+      fallingCounter = 1;
+      fallingDirection = 0;
+      postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'fallingSound'});
+    }
+  }
+
+  if (jumpCounter && jumpMap[jumpCounter] > 1) {
+    if (standingOn.length) {
       jumpCounter = 0;
-      fallingDirection = jumpDirection;
+      if (canMovingDirection == jumpDirection) {
+        mustMovingDirection = canMovingDirection;
+      }
+      jumpDirection = 0;
+      postMessage({'id': 'stopChannel', 'channel': 'sounds'});
+    }
+  }
+
+  if (jumpCounter > 0) {
+    if (canMove(0, jumpMap[jumpCounter])) {
+      jumpCounter++;
+      gameData.willy[0].y += jumpMap[jumpCounter-1]; 
+    } else {
+      jumpCounter = 0;
       jumpDirection = 0;
       fallingCounter = 1;
-    }      
-
-    canMovingDirection = 0;
-
-    var standingOn = checkStandingWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]);
-    var standingOnRamps = checkStandingOnRamps(gameData.willy[0].x, gameData.willy[0].y, 10, 16);
-    if (standingOnRamps.length) {
-      standingOn = [...standingOn, ...gameData.ramps]; 
+      fallingDirection = 0;
+      postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'fallingSound'});
     }
+  }
 
-    standingOn.forEach((object) => {
-      if ('moving' in object) {
-        switch (object.moving) {
-          case 'right':
-            canMovingDirection = 1;
-            break;
-          case 'left':
-            canMovingDirection = -1;
-            break;
-        }
-      }
-    });
-    
-    if (!canMovingDirection) {
-      mustMovingDirection = 0;
-    }
+  if (canMovingDirection == 1 && !controls.left) {
+    mustMovingDirection = 1;
+  }
+  if (canMovingDirection == -1 && !controls.right) {
+    mustMovingDirection = -1;
+  }
 
-    if (fallingCounter) {
-      if (standingOn.length) {
-        fallingCounter = 0;
-        if (canMovingDirection == fallingDirection) {
-          mustMovingDirection = canMovingDirection;
-        }
-        fallingDirection = 0;
-        postMessage({'id': 'stopChannel', 'channel': 'sounds'});
-      } else {
-        gameData.willy[0].y += 4;
-        fallingCounter++;
-      }
+  var newDirection = 0;
+  if ((controls.right && !controls.left && !jumpCounter && !fallingCounter && !mustMovingDirection && (!canMovingDirection || (canMovingDirection == -1 && previousDirection == 1))) ||
+      (jumpCounter && jumpDirection == 1) ||
+      (mustMovingDirection == 1)) {
+
+    newDirection = 1;
+    if (gameData.willy[0].direction == 1) {
+      gameData.willy[0].direction = 0;
     } else {
-      if (!jumpCounter && !standingOn.length) {
-        fallingCounter = 1;
-        fallingDirection = 0;
-        postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'fallingSound'});
-      }
-    }
-
-    if (jumpCounter && jumpMap[jumpCounter] > 1) {
-      if (standingOn.length) {
-        jumpCounter = 0;
-        if (canMovingDirection == jumpDirection) {
-          mustMovingDirection = canMovingDirection;
-        }
-        jumpDirection = 0;
-        postMessage({'id': 'stopChannel', 'channel': 'sounds'});
-      }
-    }
-
-    if (jumpCounter > 0) {
-      if (canMove(0, jumpMap[jumpCounter])) {
-        jumpCounter++;
-        gameData.willy[0].y += jumpMap[jumpCounter-1]; 
-      } else {
-        jumpCounter = 0;
-        jumpDirection = 0;
-        fallingCounter = 1;
-        fallingDirection = 0;
-        postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'fallingSound'});
-      }
-    }
-
-    if (canMovingDirection == 1 && !controls.left) {
-      mustMovingDirection = 1;
-    }
-    if (canMovingDirection == -1 && !controls.right) {
-      mustMovingDirection = -1;
-    }
-
-    var newDirection = 0;
-    if ((controls.right && !controls.left && !jumpCounter && !fallingCounter && !mustMovingDirection && (!canMovingDirection || (canMovingDirection == -1 && previousDirection == 1))) ||
-        (jumpCounter && jumpDirection == 1) ||
-        (mustMovingDirection == 1)) {
-
-      newDirection = 1;
-      if (gameData.willy[0].direction == 1) {
-        gameData.willy[0].direction = 0;
-      } else {
-        jumpDirection = 1;
-        var moveY = rampMovement(2, gameData.willy[0].x, gameData.willy[0].y, 10, 16);
-        if (canMove(2, moveY)) {
-          gameData.willy[0].x += 2;
-          gameData.willy[0].y += moveY;
-          if (gameData.willy[0].frame == 3) {
-            gameData.willy[0].frame = 0;
-          } else {
-            gameData.willy[0].frame++;
-          }
+      jumpDirection = 1;
+      var moveY = rampMovement(2, gameData.willy[0].x, gameData.willy[0].y, 10, 16);
+      if (canMove(2, moveY)) {
+        gameData.willy[0].x += 2;
+        gameData.willy[0].y += moveY;
+        if (gameData.willy[0].frame == 3) {
+          gameData.willy[0].frame = 0;
+        } else {
+          gameData.willy[0].frame++;
         }
       }
     }
+  }
 
-    if ((controls.left && !controls.right && !jumpCounter && !fallingCounter && !mustMovingDirection && (!canMovingDirection || (canMovingDirection == 1 && previousDirection == -1))) ||
-        (jumpCounter && jumpDirection == -1) ||
-        (mustMovingDirection == -1)) {
+  if ((controls.left && !controls.right && !jumpCounter && !fallingCounter && !mustMovingDirection && (!canMovingDirection || (canMovingDirection == 1 && previousDirection == -1))) ||
+      (jumpCounter && jumpDirection == -1) ||
+      (mustMovingDirection == -1)) {
 
-      newDirection = -1;
-      if (gameData.willy[0].direction == 0) {
-        gameData.willy[0].direction = 1;
-      } else {
-        jumpDirection = -1;
-        var moveY = rampMovement(-2, gameData.willy[0].x, gameData.willy[0].y, 10, 16);
-        if (canMove(-2, moveY)) {
-          gameData.willy[0].x -= 2;
-          gameData.willy[0].y += moveY;
-          if (gameData.willy[0].frame == 0) {
-            gameData.willy[0].frame = 3;
-          } else {
-            gameData.willy[0].frame--;
-          }
+    newDirection = -1;
+    if (gameData.willy[0].direction == 0) {
+      gameData.willy[0].direction = 1;
+    } else {
+      jumpDirection = -1;
+      var moveY = rampMovement(-2, gameData.willy[0].x, gameData.willy[0].y, 10, 16);
+      if (canMove(-2, moveY)) {
+        gameData.willy[0].x -= 2;
+        gameData.willy[0].y += moveY;
+        if (gameData.willy[0].frame == 0) {
+          gameData.willy[0].frame = 3;
+        } else {
+          gameData.willy[0].frame--;
         }
       }
     }
+  }
 
-    previousDirection = newDirection;
+  previousDirection = newDirection;
 
-    if (!jumpCounter && !fallingCounter && controls.jump) {
-      if (canMove(0, jumpMap[jumpCounter])) {
-        jumpCounter = 1;
-        gameData.willy[0].y += jumpMap[jumpCounter-1];
-        postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'jumpSound'});
-      }
+  if (!jumpCounter && !fallingCounter && controls.jump) {
+    if (canMove(0, jumpMap[jumpCounter])) {
+      jumpCounter = 1;
+      gameData.willy[0].y += jumpMap[jumpCounter-1];
+      postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'jumpSound'});
     }
+  }
 
-    if (!jumpCounter) {
-      jumpDirection = 0;
-    }
+  if (!jumpCounter) {
+    jumpDirection = 0;
   }
 } // willy
 
