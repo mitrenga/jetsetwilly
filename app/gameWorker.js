@@ -38,268 +38,245 @@ function gameLoop() {
     if (!(counter%6)) {
       counter6++;
     }
+    conveyors();
+    ropes();
+    willy();
+    guardians();
+    items();
+    decorations();
+    checkTouchItems();
+    checkCrash();
+    gameData.info[0] = counter;
+    gameData.info[1] = counter2;
+    gameData.info[2] = counter4;
+    gameData.info[3] = counter6;
+  }
+  postMessage({'id': 'update', 'gameData': gameData});
+} // gameLoop
 
-    // conveyors
-    gameData.conveyors.forEach((conveyor) => {
-      if (conveyor.frame == 3) {
-        conveyor.frame = 0;
-      } else {
-        conveyor.frame++;
-      }  
-    });
+function conveyors() {
+  gameData.conveyors.forEach((conveyor) => {
+    if (conveyor.frame == 3) {
+      conveyor.frame = 0;
+    } else {
+      conveyor.frame++;
+    }  
+  });
+} // conveyors
 
-    //rope
-    if (gameData.ropes.length > 0) {
-      var firstElement = gameData.ropes[0];
-      switch (firstElement.direction) {
-        case 0:
-          if (firstElement.frame == firstElement.frames-1) {
-            firstElement.direction = 1;
-          } else {
-            firstElement.frame += 2;
-            if (firstElement.frame > -20 && firstElement.frame < 20) {
-              firstElement.frame += 2;
-            }
-          }
-          break;
-        case 1:
-          if (firstElement.frame == 1-firstElement.frames) {
-            firstElement.direction = 0;
-          } else {
-            firstElement.frame -= 2;
-            if (firstElement.frame > -20 && firstElement.frame < 20) {
-              firstElement.frame -= 2;
-            }
-          }
-          break;
-      }
-      var x = firstElement.x;
-      var y = firstElement.y;
-      var ptr = Math.abs(firstElement.frame);
-      for (var r = 1; r < gameData.ropes.length; r++) {
-        if (firstElement.frame < 0) {
-          x -= ropeRelativeCoordinates[0][ptr];
+function ropes() {
+  if (gameData.ropes.length > 0) {
+    var firstElement = gameData.ropes[0];
+    switch (firstElement.direction) {
+      case 0:
+        if (firstElement.frame == firstElement.frames-1) {
+          firstElement.direction = 1;
         } else {
-          x += ropeRelativeCoordinates[0][ptr];
+          firstElement.frame += 2;
+          if (firstElement.frame > -20 && firstElement.frame < 20) {
+            firstElement.frame += 2;
+          }
         }
-        y += ropeRelativeCoordinates[1][ptr];
-        gameData.ropes[r].x = x;
-        gameData.ropes[r].y = y;
-        ptr++;
+        break;
+      case 1:
+        if (firstElement.frame == 1-firstElement.frames) {
+          firstElement.direction = 0;
+        } else {
+          firstElement.frame -= 2;
+          if (firstElement.frame > -20 && firstElement.frame < 20) {
+            firstElement.frame -= 2;
+          }
+        }
+        break;
+    }
+    var x = firstElement.x;
+    var y = firstElement.y;
+    var ptr = Math.abs(firstElement.frame);
+    for (var r = 1; r < gameData.ropes.length; r++) {
+      if (firstElement.frame < 0) {
+        x -= ropeRelativeCoordinates[0][ptr];
+      } else {
+        x += ropeRelativeCoordinates[0][ptr];
+      }
+      y += ropeRelativeCoordinates[1][ptr];
+      gameData.ropes[r].x = x;
+      gameData.ropes[r].y = y;
+      ptr++;
+    }
+  }
+} // ropes
+
+function willy() {
+  if (!gameData.info[4]) { // if not demo
+
+    if (jumpCounter == jumpMap.length) {
+      jumpCounter = 0;
+      fallingDirection = jumpDirection;
+      jumpDirection = 0;
+      fallingCounter = 1;
+    }      
+
+    canMovingDirection = 0;
+
+    var standingOn = checkStandingWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]);
+    var standingOnRamps = checkStandingOnRamps(gameData.willy[0].x, gameData.willy[0].y, 10, 16);
+    if (standingOnRamps.length) {
+      standingOn = [...standingOn, ...gameData.ramps]; 
+    }
+
+    standingOn.forEach((object) => {
+      if ('moving' in object) {
+        switch (object.moving) {
+          case 'right':
+            canMovingDirection = 1;
+            break;
+          case 'left':
+            canMovingDirection = -1;
+            break;
+        }
+      }
+    });
+    
+    if (!canMovingDirection) {
+      mustMovingDirection = 0;
+    }
+
+    if (fallingCounter) {
+      if (standingOn.length) {
+        fallingCounter = 0;
+        if (canMovingDirection == fallingDirection) {
+          mustMovingDirection = canMovingDirection;
+        }
+        fallingDirection = 0;
+        postMessage({'id': 'stopChannel', 'channel': 'sounds'});
+      } else {
+        gameData.willy[0].y += 4;
+        fallingCounter++;
+      }
+    } else {
+      if (!jumpCounter && !standingOn.length) {
+        fallingCounter = 1;
+        fallingDirection = 0;
+        postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'fallingSound'});
       }
     }
 
-    // Willy
-    /*if (!gameData.info[4])*/ { // if not demo
-
-      if (jumpCounter == jumpMap.length) {
+    if (jumpCounter && jumpMap[jumpCounter] > 1) {
+      if (standingOn.length) {
         jumpCounter = 0;
-        fallingDirection = jumpDirection;
+        if (canMovingDirection == jumpDirection) {
+          mustMovingDirection = canMovingDirection;
+        }
+        jumpDirection = 0;
+        postMessage({'id': 'stopChannel', 'channel': 'sounds'});
+      }
+    }
+
+    if (jumpCounter > 0) {
+      if (canMove(0, jumpMap[jumpCounter])) {
+        jumpCounter++;
+        gameData.willy[0].y += jumpMap[jumpCounter-1]; 
+      } else {
+        jumpCounter = 0;
         jumpDirection = 0;
         fallingCounter = 1;
-      }      
-
-      canMovingDirection = 0;
-
-      var standingOn = checkStandingWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]);
-      var standingOnRamps = checkStandingOnRamps(gameData.willy[0].x, gameData.willy[0].y, 10, 16);
-      if (standingOnRamps.length) {
-        standingOn = [...standingOn, ...gameData.ramps]; 
-      }
-
-      standingOn.forEach((object) => {
-        if ('moving' in object) {
-          switch (object.moving) {
-            case 'right':
-              canMovingDirection = 1;
-              break;
-            case 'left':
-              canMovingDirection = -1;
-              break;
-          }
-        }
-      });
-      
-      if (!canMovingDirection) {
-        mustMovingDirection = 0;
-      }
-
-      if (fallingCounter) {
-        if (standingOn.length) {
-          fallingCounter = 0;
-          if (canMovingDirection == fallingDirection) {
-            mustMovingDirection = canMovingDirection;
-          }
-          fallingDirection = 0;
-          postMessage({'id': 'stopChannel', 'channel': 'sounds'});
-        } else {
-          gameData.willy[0].y += 4;
-          fallingCounter++;
-        }
-      } else {
-        if (!jumpCounter && !standingOn.length) {
-          fallingCounter = 1;
-          fallingDirection = 0;
-          postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'fallingSound'});
-        }
-      }
-
-      if (jumpCounter && jumpMap[jumpCounter] >= 0) {
-        if (standingOn.length) {
-          jumpCounter = 0;
-          if (canMovingDirection == jumpDirection) {
-            mustMovingDirection = canMovingDirection;
-          }
-          jumpDirection = 0;
-          postMessage({'id': 'stopChannel', 'channel': 'sounds'});
-        }
-      }
-
-      if (jumpCounter > 0) {
-        if (jumpMap[jumpCounter] > 0 || canMove(0, jumpMap[jumpCounter])) {
-          jumpCounter++;
-          gameData.willy[0].y += jumpMap[jumpCounter-1]; 
-        } else {
-          jumpCounter = 0;
-          jumpDirection = 0;
-          fallingCounter = 1;
-          fallingDirection = 0;
-          postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'fallingSound'});
-        }
-      }
-
-      if (canMovingDirection == 1 && !controls.left) {
-        mustMovingDirection = 1;
-      }
-      if (canMovingDirection == -1 && !controls.right) {
-        mustMovingDirection = -1;
-      }
-
-      var newDirection = 0;
-      if ((controls.right && !controls.left && !jumpCounter && !fallingCounter && !mustMovingDirection && (!canMovingDirection || (canMovingDirection == -1 && previousDirection == 1))) ||
-          (jumpCounter && jumpDirection == 1) ||
-          (mustMovingDirection == 1)) {
-
-        newDirection = 1;
-        if (gameData.willy[0].direction == 1) {
-          gameData.willy[0].direction = 0;
-        } else {
-          jumpDirection = 1;
-          var moveY = rampMovement(2, gameData.willy[0].x, gameData.willy[0].y, 10, 16);
-          if (canMove(2, moveY)) {
-            gameData.willy[0].x += 2;
-            gameData.willy[0].y += moveY;
-            if (gameData.willy[0].frame == 3) {
-              gameData.willy[0].frame = 0;
-            } else {
-              gameData.willy[0].frame++;
-            }
-          }
-        }
-      }
-
-      if ((controls.left && !controls.right && !jumpCounter && !fallingCounter && !mustMovingDirection && (!canMovingDirection || (canMovingDirection == 1 && previousDirection == -1))) ||
-          (jumpCounter && jumpDirection == -1) ||
-          (mustMovingDirection == -1)) {
-
-        newDirection = -1;
-        if (gameData.willy[0].direction == 0) {
-          gameData.willy[0].direction = 1;
-        } else {
-          jumpDirection = -1;
-          var moveY = rampMovement(-2, gameData.willy[0].x, gameData.willy[0].y, 10, 16);
-          if (canMove(-2, moveY)) {
-            gameData.willy[0].x -= 2;
-            gameData.willy[0].y += moveY;
-            if (gameData.willy[0].frame == 0) {
-              gameData.willy[0].frame = 3;
-            } else {
-              gameData.willy[0].frame--;
-            }
-          }
-        }
-      }
-
-      previousDirection = newDirection;
-
-      if (!jumpCounter && !fallingCounter && controls.jump) {
-        if (canMove(0, jumpMap[jumpCounter])) {
-          jumpCounter = 1;
-          gameData.willy[0].y += jumpMap[jumpCounter-1];
-          postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'jumpSound'});
-        }
-      }
-
-      if (!jumpCounter) {
-        jumpDirection = 0;
+        fallingDirection = 0;
+        postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'fallingSound'});
       }
     }
 
-    // guardians
-    gameData.guardians.forEach((guardian) => {
-      switch (guardian.type) {
-        case 'horizontal':
-          var toMove = false;
-          switch (guardian.speed) {
-            case 0:
-              toMove = true;
-              break;
-            case 1:
-              if (!(this.counter%2)) {
-                toMove = true;
-              }
-              break;
-          }
-          if (toMove) {
-            switch (guardian.direction) {
-              case 0:
-                if (guardian.x == guardian.limitRight)
-                {
-                  guardian.direction = 1;
-                } else {
-                  guardian.x += 2;
-                  if (guardian.frame == 3) {
-                    guardian.frame = 0;
-                  } else {
-                    guardian.frame++;
-                  }
-                }
-                break;
-              case 1:
-                if (guardian.x == guardian.limitLeft)
-                {
-                  guardian.direction = 0;
-                } else {
-                  guardian.x -= 2;
-                  if (guardian.frame == 0) {
-                    guardian.frame = 3;
-                  } else {
-                    guardian.frame--;
-                  }
-                }
-                break;
-            }
-          }
-          break;
+    if (canMovingDirection == 1 && !controls.left) {
+      mustMovingDirection = 1;
+    }
+    if (canMovingDirection == -1 && !controls.right) {
+      mustMovingDirection = -1;
+    }
 
-        case 'vertical':
-          switch (guardian.direction) {
-            case 0:
-              if (guardian.y+guardian.speed > guardian.limitDown) {
-                guardian.direction = 1;
-              }
-              break;
-            case 1:
-              if (guardian.y-guardian.speed < guardian.limitUp) {
-                guardian.direction = 0;
-              }
-              break;
+    var newDirection = 0;
+    if ((controls.right && !controls.left && !jumpCounter && !fallingCounter && !mustMovingDirection && (!canMovingDirection || (canMovingDirection == -1 && previousDirection == 1))) ||
+        (jumpCounter && jumpDirection == 1) ||
+        (mustMovingDirection == 1)) {
+
+      newDirection = 1;
+      if (gameData.willy[0].direction == 1) {
+        gameData.willy[0].direction = 0;
+      } else {
+        jumpDirection = 1;
+        var moveY = rampMovement(2, gameData.willy[0].x, gameData.willy[0].y, 10, 16);
+        if (canMove(2, moveY)) {
+          gameData.willy[0].x += 2;
+          gameData.willy[0].y += moveY;
+          if (gameData.willy[0].frame == 3) {
+            gameData.willy[0].frame = 0;
+          } else {
+            gameData.willy[0].frame++;
           }
+        }
+      }
+    }
+
+    if ((controls.left && !controls.right && !jumpCounter && !fallingCounter && !mustMovingDirection && (!canMovingDirection || (canMovingDirection == 1 && previousDirection == -1))) ||
+        (jumpCounter && jumpDirection == -1) ||
+        (mustMovingDirection == -1)) {
+
+      newDirection = -1;
+      if (gameData.willy[0].direction == 0) {
+        gameData.willy[0].direction = 1;
+      } else {
+        jumpDirection = -1;
+        var moveY = rampMovement(-2, gameData.willy[0].x, gameData.willy[0].y, 10, 16);
+        if (canMove(-2, moveY)) {
+          gameData.willy[0].x -= 2;
+          gameData.willy[0].y += moveY;
+          if (gameData.willy[0].frame == 0) {
+            gameData.willy[0].frame = 3;
+          } else {
+            gameData.willy[0].frame--;
+          }
+        }
+      }
+    }
+
+    previousDirection = newDirection;
+
+    if (!jumpCounter && !fallingCounter && controls.jump) {
+      if (canMove(0, jumpMap[jumpCounter])) {
+        jumpCounter = 1;
+        gameData.willy[0].y += jumpMap[jumpCounter-1];
+        postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'jumpSound'});
+      }
+    }
+
+    if (!jumpCounter) {
+      jumpDirection = 0;
+    }
+  }
+} // willy
+
+function guardians() {
+  gameData.guardians.forEach((guardian) => {
+    switch (guardian.type) {
+      case 'horizontal':
+        var toMove = false;
+        switch (guardian.speed) {
+          case 0:
+            toMove = true;
+            break;
+          case 1:
+            if (!(this.counter%2)) {
+              toMove = true;
+            }
+            break;
+        }
+        if (toMove) {
           switch (guardian.direction) {
             case 0:
-              guardian.y += guardian.speed;
-              if (!(counter%[0,4,2,1,1,1,1,1,1][guardian.frames])) {
-                if (guardian.frame == guardian.frames-1) {
+              if (guardian.x == guardian.limitRight)
+              {
+                guardian.direction = 1;
+              } else {
+                guardian.x += 2;
+                if (guardian.frame == 3) {
                   guardian.frame = 0;
                 } else {
                   guardian.frame++;
@@ -307,97 +284,128 @@ function gameLoop() {
               }
               break;
             case 1:
-              guardian.y -= guardian.speed;
-              if (!(counter%[0,4,2,1,1,1,1,1,1][guardian.frames])) {
+              if (guardian.x == guardian.limitLeft)
+              {
+                guardian.direction = 0;
+              } else {
+                guardian.x -= 2;
                 if (guardian.frame == 0) {
-                  guardian.frame = guardian.frames-1;
+                  guardian.frame = 3;
                 } else {
                   guardian.frame--;
                 }
               }
               break;
           }
-          break;        
+        }
+        break;
 
-        case 'arrow':
-          switch (guardian.direction) {
-            case 0:
-              if (guardian.counter == guardian.maxCounter) {
-                guardian.counter = guardian.minCounter;
-              } else {
-                guardian.counter++;
-              }
-              break;
-            case 1:
-              if (guardian.counter == guardian.minCounter) {
-                guardian.counter = guardian.maxCounter;
-              } else {
-                guardian.counter--;
-              }
-              break;
-          }
-          var x = guardian.counter*guardian.speed;
-          if (x > 255) {
-            guardian.x = 0;
-            guardian.hide = true;
-          } else {
-            guardian.x = x;
-            guardian.hide = false;
-          }
-          break;
-
-        case 'maria':
-          guardian.direction = 0;
-          if (!(counter%[0,4,2,1,1,1,1,1,1][guardian.frames])) {
-            if (guardian.frame == guardian.frames-1) {
-              guardian.frame = 0;
-            } else {
-              guardian.frame++;
+      case 'vertical':
+        switch (guardian.direction) {
+          case 0:
+            if (guardian.y+guardian.speed > guardian.limitDown) {
+              guardian.direction = 1;
             }
+            break;
+          case 1:
+            if (guardian.y-guardian.speed < guardian.limitUp) {
+              guardian.direction = 0;
+            }
+            break;
+        }
+        switch (guardian.direction) {
+          case 0:
+            guardian.y += guardian.speed;
+            if (!(counter%[0,4,2,1,1,1,1,1,1][guardian.frames])) {
+              if (guardian.frame == guardian.frames-1) {
+                guardian.frame = 0;
+              } else {
+                guardian.frame++;
+              }
+            }
+            break;
+          case 1:
+            guardian.y -= guardian.speed;
+            if (!(counter%[0,4,2,1,1,1,1,1,1][guardian.frames])) {
+              if (guardian.frame == 0) {
+                guardian.frame = guardian.frames-1;
+              } else {
+                guardian.frame--;
+              }
+            }
+            break;
+        }
+        break;        
+
+      case 'arrow':
+        switch (guardian.direction) {
+          case 0:
+            if (guardian.counter == guardian.maxCounter) {
+              guardian.counter = guardian.minCounter;
+            } else {
+              guardian.counter++;
+            }
+            break;
+          case 1:
+            if (guardian.counter == guardian.minCounter) {
+              guardian.counter = guardian.maxCounter;
+            } else {
+              guardian.counter--;
+            }
+            break;
+        }
+        var x = guardian.counter*guardian.speed;
+        if (x > 255) {
+          guardian.x = 0;
+          guardian.hide = true;
+        } else {
+          guardian.x = x;
+          guardian.hide = false;
+        }
+        break;
+
+      case 'maria':
+        guardian.direction = 0;
+        if (!(counter%[0,4,2,1,1,1,1,1,1][guardian.frames])) {
+          if (guardian.frame == guardian.frames-1) {
+            guardian.frame = 0;
+          } else {
+            guardian.frame++;
           }
-          
-          guardian.direction = 0;
-          if (gameData.willy[0].y < 104) {
-            guardian.direction = 1;
-          }
-          if (gameData.willy[0].y < 96) {
-            guardian.direction = 2;
-          }
-          break;        
-      
-      }
-    });
+        }
+        
+        guardian.direction = 0;
+        if (gameData.willy[0].y < 104) {
+          guardian.direction = 1;
+        }
+        if (gameData.willy[0].y < 96) {
+          guardian.direction = 2;
+        }
+        break;        
+    
+    }
+  });
+} // guardians
 
-    // items
-    gameData.items.forEach((item) => {
-      if (item.frame == 3) {
-        item.frame = 0;
-      } else {
-        item.frame++;
-      }  
-    });
+function items() {
+  gameData.items.forEach((item) => {
+    if (item.frame == 3) {
+      item.frame = 0;
+    } else {
+      item.frame++;
+    }  
+  });
+} // items
 
-    // decorations
-    gameData.decorations.forEach((decoration) => {
-      if (decoration.frame == 1) {
-        decoration.frame = 0;
-      } else {
-        decoration.frame++;
-      }
-    });    
-
-    checkTouchItems();
-    checkCrash();
-
-    // game counters
-    gameData.info[0] = counter;
-    gameData.info[1] = counter2;
-    gameData.info[2] = counter4;
-    gameData.info[3] = counter6;
-  }
-
-  postMessage({'id': 'update', 'gameData': gameData});
-} // gameLoop
+function decorations() {
+  gameData.decorations.forEach((decoration) => {
+    if (decoration.frame == 1) {
+      decoration.frame = 0;
+    } else {
+      decoration.frame++;
+    }
+  });    
+} // decorations
 
 function checkTouchWithObjectsArray(x, y, width, height, objectsArray) {
   for (var a = 0; a < objectsArray.length; a++) {
