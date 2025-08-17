@@ -272,45 +272,57 @@ function willyWalking() {
 function willyOnRope() {
   var willy = gameData.willy[0];
   willy.frame = willy.direction;
-  if (controls.right && !controls.left) {
-    if (willy.direction == 1) {
-      willy.direction = 0;
-    } else {
-      switch (gameData.ropes[0].direction) {
-        case 0:
-          ropePosition++;
-          break;
-        case 1:
-          ropePosition--;
-          break;
-      }
-    }
-  }
-  if (controls.left && ! controls.right) {
-    if (willy.direction == 0) {
-      willy.direction = 1;
-    } else {
-      switch (gameData.ropes[0].direction) {
-        case 0:
-          ropePosition--;
-          break;
-        case 1:
-          ropePosition++;
-          break;
-      }
-    }
-  }
-  if (ropePosition < 3) {
-    ropePosition = 3;
-  }
-  if (ropePosition >= gameData.ropes[0].length) {
+  if (controls.jump) {
     operation = 0;
-    fallingCounter = 1;
-    willy.x = willy.x-willy.x%2;
-    willy.y = willy.y+willy.x%2;
+    jumpCounter = 1;
+    jumpDirection = 0;
+    if (controls.right && !controls.left) {
+      jumpDirection = 1;
+    }
+    if (controls.left && !controls.right) {
+      jumpDirection = -1;
+    }
   } else {
-    willy.x = gameData.ropes[ropePosition].x-4;
-    willy.y = gameData.ropes[ropePosition].y-8;
+    if (controls.right && !controls.left) {
+      if (willy.direction == 1) {
+        willy.direction = 0;
+      } else {
+        switch (gameData.ropes[0].direction) {
+          case 0:
+            ropePosition++;
+            break;
+          case 1:
+            ropePosition--;
+            break;
+        }
+      }
+    }
+    if (controls.left && ! controls.right) {
+      if (willy.direction == 0) {
+        willy.direction = 1;
+      } else {
+        switch (gameData.ropes[0].direction) {
+          case 0:
+            ropePosition--;
+            break;
+          case 1:
+            ropePosition++;
+            break;
+        }
+      }
+    }
+    if (ropePosition < 3) {
+      ropePosition = 3;
+    }
+    if (ropePosition >= gameData.ropes[0].length) {
+      operation = 0;
+      fallingCounter = 1;
+      willy.x = willy.x-willy.x%2;
+      willy.y = willy.y+willy.x%2;
+    } else {
+      willy.x = gameData.ropes[ropePosition].x-4;
+      willy.y = gameData.ropes[ropePosition].y-8;
+    }
   }
 } // willyOnRope
 
