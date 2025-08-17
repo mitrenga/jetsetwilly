@@ -44,8 +44,10 @@ function gameLoop() {
     guardians();
     items();
     decorations();
-    checkTouchItems();
-    checkCrash();
+    if (!gameData.info[4]) { // if not demo
+      checkTouchItems();
+      checkCrash();
+    }
     gameData.info[0] = counter;
     gameData.info[1] = counter2;
     gameData.info[2] = counter4;
