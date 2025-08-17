@@ -297,6 +297,7 @@ export class GameAreaEntity extends AbstractEntity {
           'y': y
         };
         if (r == 0) {
+          ropeInitData.length =  data.rope.length;
           ropeInitData.frame = data.rope.init.frame;
           ropeInitData.frames = data.rope.frames;       
           ropeInitData.direction = data.rope.init.direction;   

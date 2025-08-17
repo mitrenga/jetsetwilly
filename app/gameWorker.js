@@ -23,6 +23,8 @@ var fallingDirection = 0;
 var mustMovingDirection = 0;
 var canMovingDirection = 0;
 var previousDirection = 0;
+var ropePosition = 31;
+var operation = 1;
 
 function gameLoop() {
   setTimeout(gameLoop, 77);
@@ -111,6 +113,19 @@ function ropes() {
 } // ropes
 
 function willy() {
+  switch (operation) {
+    case 0:
+      willyWalking();
+      break;
+    case 1:
+      willyOnRope();
+      break;
+  }
+} // willy
+
+function willyWalking() {
+  var willy = gameData.willy[0];
+
   if (jumpCounter == jumpMap.length) {
     jumpCounter = 0;
     fallingDirection = jumpDirection;
@@ -120,8 +135,8 @@ function willy() {
 
   canMovingDirection = 0;
 
-  var standingOn = checkStandingWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]);
-  var standingOnRamps = checkStandingOnRamps(gameData.willy[0].x, gameData.willy[0].y, 10, 16);
+  var standingOn = checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]);
+  var standingOnRamps = checkStandingOnRamps(willy.x, willy.y, 10, 16);
   if (standingOnRamps.length) {
     standingOn = [...standingOn, ...gameData.ramps]; 
   }
@@ -152,7 +167,7 @@ function willy() {
       fallingDirection = 0;
       postMessage({'id': 'stopChannel', 'channel': 'sounds'});
     } else {
-      gameData.willy[0].y += 4;
+      willy.y += 4;
       fallingCounter++;
     }
   } else {
@@ -177,7 +192,7 @@ function willy() {
   if (jumpCounter > 0) {
     if (canMove(0, jumpMap[jumpCounter])) {
       jumpCounter++;
-      gameData.willy[0].y += jumpMap[jumpCounter-1]; 
+      willy.y += jumpMap[jumpCounter-1]; 
     } else {
       jumpCounter = 0;
       jumpDirection = 0;
@@ -200,18 +215,18 @@ function willy() {
       (mustMovingDirection == 1)) {
 
     newDirection = 1;
-    if (gameData.willy[0].direction == 1) {
-      gameData.willy[0].direction = 0;
+    if (willy.direction == 1) {
+      willy.direction = 0;
     } else {
       jumpDirection = 1;
-      var moveY = rampMovement(2, gameData.willy[0].x, gameData.willy[0].y, 10, 16);
+      var moveY = rampMovement(2, willy.x, willy.y, 10, 16);
       if (canMove(2, moveY)) {
-        gameData.willy[0].x += 2;
-        gameData.willy[0].y += moveY;
-        if (gameData.willy[0].frame == 3) {
-          gameData.willy[0].frame = 0;
+        willy.x += 2;
+        willy.y += moveY;
+        if (willy.frame == 3) {
+          willy.frame = 0;
         } else {
-          gameData.willy[0].frame++;
+          willy.frame++;
         }
       }
     }
@@ -222,18 +237,18 @@ function willy() {
       (mustMovingDirection == -1)) {
 
     newDirection = -1;
-    if (gameData.willy[0].direction == 0) {
-      gameData.willy[0].direction = 1;
+    if (willy.direction == 0) {
+      willy.direction = 1;
     } else {
       jumpDirection = -1;
-      var moveY = rampMovement(-2, gameData.willy[0].x, gameData.willy[0].y, 10, 16);
+      var moveY = rampMovement(-2, willy.x, willy.y, 10, 16);
       if (canMove(-2, moveY)) {
-        gameData.willy[0].x -= 2;
-        gameData.willy[0].y += moveY;
-        if (gameData.willy[0].frame == 0) {
-          gameData.willy[0].frame = 3;
+        willy.x -= 2;
+        willy.y += moveY;
+        if (willy.frame == 0) {
+          willy.frame = 3;
         } else {
-          gameData.willy[0].frame--;
+          willy.frame--;
         }
       }
     }
@@ -244,7 +259,7 @@ function willy() {
   if (!jumpCounter && !fallingCounter && controls.jump) {
     if (canMove(0, jumpMap[jumpCounter])) {
       jumpCounter = 1;
-      gameData.willy[0].y += jumpMap[jumpCounter-1];
+      willy.y += jumpMap[jumpCounter-1];
       postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'jumpSound'});
     }
   }
@@ -252,7 +267,52 @@ function willy() {
   if (!jumpCounter) {
     jumpDirection = 0;
   }
-} // willy
+} // willyWalking
+
+function willyOnRope() {
+  var willy = gameData.willy[0];
+  willy.frame = willy.direction;
+  if (controls.right && !controls.left) {
+    if (willy.direction == 1) {
+      willy.direction = 0;
+    } else {
+      switch (gameData.ropes[0].direction) {
+        case 0:
+          ropePosition++;
+          break;
+        case 1:
+          ropePosition--;
+          break;
+      }
+    }
+  }
+  if (controls.left && ! controls.right) {
+    if (willy.direction == 0) {
+      willy.direction = 1;
+    } else {
+      switch (gameData.ropes[0].direction) {
+        case 0:
+          ropePosition--;
+          break;
+        case 1:
+          ropePosition++;
+          break;
+      }
+    }
+  }
+  if (ropePosition < 3) {
+    ropePosition = 3;
+  }
+  if (ropePosition >= gameData.ropes[0].length) {
+    operation = 0;
+    fallingCounter = 1;
+    willy.x = willy.x-willy.x%2;
+    willy.y = willy.y+willy.x%2;
+  } else {
+    willy.x = gameData.ropes[ropePosition].x-4;
+    willy.y = gameData.ropes[ropePosition].y-8;
+  }
+} // willyOnRope
 
 function guardians() {
   gameData.guardians.forEach((guardian) => {
