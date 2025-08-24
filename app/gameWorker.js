@@ -449,11 +449,11 @@ function guardians() {
         
         guardian.direction = 0;
         if (gameData.willy.length) {
-        if (gameData.willy[0].y < 104) {
-          guardian.direction = 1;
-        }
-        if (gameData.willy[0].y < 96) {
-          guardian.direction = 2;
+          if (gameData.willy[0].y < 104) {
+            guardian.direction = 1;
+          }
+          if (gameData.willy[0].y < 96) {
+            guardian.direction = 2;
           }
         }
         break;        
