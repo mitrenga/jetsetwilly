@@ -20,7 +20,7 @@ export class MainModel extends AbstractModel {
     this.id = 'MainModel';
 
     this.mainImageEntity = null;
-    this.bannerTxt = '+++++ Press ENTER to Start +++++  JET-SET WILLY by Matthew Smith  © 1984 SOFTWARE PROJECTS Ltd . . . . .Guide Willy to collect all the items around the house before Midnight so Maria will let you get to your bed. . . . . . .+++++ Press ENTER to Start +++++';
+    this.bannerTxt = '+++++ Press ENTER to Start +++++  JET-SET WILLY by Matthew Smith  © 1984 SOFTWARE PROJECTS Ltd . . . . . Guide Willy to collect all the items around the house before Midnight so Maria will let you get to your bed . . . . . . .                                ';
     this.bannerEntity = null;
     this.screechDuration = 0;
 
@@ -89,7 +89,21 @@ export class MainModel extends AbstractModel {
         this.mainImageEntity.attrStep = 0;
         this.timer = false;
         this.sendEvent(0, {'id': 'setBorderAnimation', 'value': false});
-        this.sendEvent(0, {'id': 'playSound', 'channel': 'music', 'sound': 'titleScreenMelody', 'options': false});
+
+        this.app.demoRooms = [];
+        var rndRooms = [];
+        for (var r = 0; r < this.app.globalData.roomsCount; r++) {
+          if (r != this.app.globalData.initRoom && this.app.globalData.invalidRooms.indexOf(r) == -1) {
+            rndRooms.push(r);
+          }
+        }
+        while(rndRooms.length && this.app.demoRooms.length < 9) {
+          var r = Math.round(Math.random()*(rndRooms.length-1));
+          this.app.demoRooms.push(rndRooms[r]);
+          rndRooms.splice(r, 1);
+        }
+        this.sendEvent(1, {'id': 'newDemoRoom'});
+
         return true;
 
 
@@ -99,6 +113,7 @@ export class MainModel extends AbstractModel {
             case 'Enter':
               this.app.model.shutdown();
               this.app.roomNumber = this.app.globalData.initRoom;
+              this.app.demo = false;
               this.app.model = this.app.newModel('RoomModel');
               this.app.model.init();
               this.app.resizeApp();
@@ -113,6 +128,16 @@ export class MainModel extends AbstractModel {
       case 'mouseClick':
         this.app.model.shutdown();
         this.app.roomNumber = this.app.globalData.initRoom;
+        this.app.demo = false;
+        this.app.model = this.app.newModel('RoomModel');
+        this.app.model.init();
+        this.app.resizeApp();
+        return true;
+
+      case 'newDemoRoom':
+        this.app.model.shutdown();
+        this.app.roomNumber = this.app.globalData.initRoom;
+        this.app.demo = true;
         this.app.model = this.app.newModel('RoomModel');
         this.app.model.init();
         this.app.resizeApp();

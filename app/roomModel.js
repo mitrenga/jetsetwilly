@@ -17,7 +17,7 @@ import SpriteEntity from '././svision/js/platform/canvas2D/spriteEntity.js';
 
 export class RoomModel extends AbstractModel {
   
-  constructor(app, roomNumber) {
+  constructor(app, roomNumber, demo) {
     super(app);
     this.id = 'RoomModel';
 
@@ -29,19 +29,24 @@ export class RoomModel extends AbstractModel {
     this.liveColors = ['brightCyan', 'yellow', 'green', 'blue', 'cyan', 'brightMagenta', 'brightGreen'];
     this.timeEntity = null;
     this.adjoiningRoom = null;
+    this.demo = demo;
 
     this.initData = {'info': [
       0, // counter
       0, // counter2
       0, // counter4
       0, // counter6
-      false, // demo
+      demo,
       false, // crash
       0 // score
     ]};
 
     this.worker = new Worker(this.app.importPath+'/gameWorker.js?ver='+window.srcVersion);
     this.worker.onmessage = (event) => {
+
+      if (this.demo && event.data.gameData.info[0] == 80) {
+        this.sendEvent(1, {'id': 'newDemoRoom'});
+      }
 
       switch (event.data.id) {
         case 'update':
@@ -112,7 +117,7 @@ export class RoomModel extends AbstractModel {
     super.init();
 
     this.borderEntity.bkColor = this.app.platform.colorByName('black');
-    this.gameAreaEntity = new GameAreaEntity(this.desktopEntity, 0, 0, 32*8, 16*8, this.roomNumber, this.initData);
+    this.gameAreaEntity = new GameAreaEntity(this.desktopEntity, 0, 0, 32*8, 16*8, this.roomNumber, this.initData, this.demo);
     this.desktopEntity.addEntity(this.gameAreaEntity);
     this.roomNameEntity = new ZXTextEntity(this.desktopEntity, 0, 16*8, 32*8, 8, '', this.app.platform.colorByName('brightYellow'), this.app.platform.colorByName('brightBlack'), 0, true);
     this.roomNameEntity.justify = 2;
@@ -182,6 +187,13 @@ export class RoomModel extends AbstractModel {
         return true;
 
       case 'keyPress':
+        if (this.demo) {
+          this.app.model.shutdown();
+          this.app.model = this.app.newModel('MainModel');
+          this.app.model.init();
+          this.app.resizeApp();
+          return true;
+        }
         switch (event.key) {
           case 'Escape':
             this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.borderEntity.bkColor));
@@ -213,6 +225,32 @@ export class RoomModel extends AbstractModel {
             return true;
         }
         break;
+
+      case 'mouseClick':
+        if (this.demo) {
+          this.app.model.shutdown();
+          this.app.model = this.app.newModel('MainModel');
+          this.app.model.init();
+          this.app.resizeApp();
+          return true;
+        }
+        break;
+
+      case 'newDemoRoom':
+        this.app.model.shutdown();
+        if (this.app.demoRooms.length > 0) {
+          this.app.roomNumber = this.app.demoRooms[0];
+          this.app.demoRooms.splice(0, 1);
+          this.app.demo = true;
+          this.app.model = this.app.newModel('RoomModel');
+          this.app.model.init();
+          this.app.resizeApp();
+          return true;
+        }
+        this.app.model = this.app.newModel('MainModel');
+        this.app.model.init();
+        this.app.resizeApp();
+        return true;
 
       case 'gameOver':
         this.app.model.shutdown();

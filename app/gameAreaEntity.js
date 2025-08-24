@@ -11,12 +11,13 @@ import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
 
 export class GameAreaEntity extends AbstractEntity {
 
-  constructor(parentEntity, x, y, width, height, roomNumber, initData) {
+  constructor(parentEntity, x, y, width, height, roomNumber, initData, demo) {
     super(parentEntity, x, y, width, height);
     this.id = 'GameAreaEntity';
 
     this.roomNumber = roomNumber;
     this.initData = initData;
+    this.demo = demo;
     this.roomData = null;
 
     this.app.layout.newDrawingCache(this, 0); 
@@ -136,22 +137,24 @@ export class GameAreaEntity extends AbstractEntity {
 
     // Willy
     this.initData.willy = [];
-    var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(data.willy.attribute));
-    var entity = new SpriteEntity(this, data.willy.init.x, data.willy.init.y, penColor, false, data.willy.init.frame, data.willy.init.direction);
-    this.addEntity(entity);
-    entity.setGraphicsData(data.willy);
-    this.spriteEntities.willy.push(entity);
-    this.initData.willy.push({
-      'x': data.willy.init.x,
-      'y': data.willy.init.y,
-      'width': data.willy.width,
-      'height': data.willy.height,
-      'paintCorrectionsX': data.willy.paintCorrections.x,
-      'paintCorrectionsY': data.willy.paintCorrections.y,
-      'frame': data.willy.init.frame,
-      'frames': data.willy.init.frames,
-      'direction': data.willy.init.direction
-    });
+    if (!this.demo) {
+      var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(data.willy.attribute));
+      var entity = new SpriteEntity(this, data.willy.init.x, data.willy.init.y, penColor, false, data.willy.init.frame, data.willy.init.direction);
+      this.addEntity(entity);
+      entity.setGraphicsData(data.willy);
+      this.spriteEntities.willy.push(entity);
+      this.initData.willy.push({
+        'x': data.willy.init.x,
+        'y': data.willy.init.y,
+        'width': data.willy.width,
+        'height': data.willy.height,
+        'paintCorrectionsX': data.willy.paintCorrections.x,
+        'paintCorrectionsY': data.willy.paintCorrections.y,
+        'frame': data.willy.init.frame,
+        'frames': data.willy.init.frames,
+        'direction': data.willy.init.direction
+      });
+    }
 
     // prepare drawing caches for layout
     this.drawingCache[0].cleanCache();
