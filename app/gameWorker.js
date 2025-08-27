@@ -20,7 +20,6 @@ var jumpDirection = 0;
 var jumpMap = [-4, -4, -3, -3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4];
 var fallingCounter = 0;
 var fallingDirection = 0;
-var fallY = 0;
 var mustMovingDirection = 0;
 var canMovingDirection = 0;
 var previousDirection = 0;
@@ -137,21 +136,11 @@ function willyWalking() {
 
   canMovingDirection = 0;
 
-  var standingOn = [];
-  do {
-    if (fallY > 0) {
-      fallY--;
-      willy.y++;
-    }
-    standingOn = checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]);
-    var standingOnRamps = checkStandingOnRamps(willy.x, willy.y, 10, 16);
-    if (standingOnRamps.length) {
-      standingOn = [...standingOn, ...gameData.ramps];
-    }
-    if (standingOn.length) {
-      fallY = 0;
-    }
-  } while (fallY > 0)
+  var standingOn = checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]);
+  var standingOnRamps = checkStandingOnRamps(willy.x, willy.y, 10, 16);
+  if (standingOnRamps.length) {
+    standingOn = [...standingOn, ...gameData.ramps];
+  }
 
   standingOn.forEach((object) => {
     if ('moving' in object) {
@@ -182,7 +171,7 @@ function willyWalking() {
       fallingDirection = 0;
       postMessage({'id': 'stopChannel', 'channel': 'sounds'});
     } else {
-      fallY = 4;
+      willy.y += 4;
       fallingCounter++;
     }
   } else {
@@ -207,11 +196,7 @@ function willyWalking() {
   if (jumpCounter > 0) {
     if (canMove(0, jumpMap[jumpCounter])) {
       jumpCounter++;
-      if (jumpMap[jumpCounter-1] > 0) {
-        fallY = jumpMap[jumpCounter-1];
-      } else {
-        willy.y += jumpMap[jumpCounter-1];
-      }
+      willy.y += jumpMap[jumpCounter-1];
     } else {
       jumpCounter = 0;
       jumpDirection = 0;
