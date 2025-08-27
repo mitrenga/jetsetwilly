@@ -44,7 +44,7 @@ export class RoomModel extends AbstractModel {
     this.worker = new Worker(this.app.importPath+'/gameWorker.js?ver='+window.srcVersion);
     this.worker.onmessage = (event) => {
 
-      if (this.demo && event.data.gameData.info[0] == 80) {
+      if (this.demo && event.data.id == 'update' && event.data.gameData.info[0] == 80) {
         this.sendEvent(1, {'id': 'newDemoRoom'});
       }
 
