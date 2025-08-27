@@ -24,7 +24,7 @@ export class RoomModel extends AbstractModel {
     this.roomNumber = roomNumber;
     this.roomEntity = null;
     this.roomNameEntity = null;
-    this.scoreEntity = null;
+    this.itemsCollectedEntity = null;
     this.liveEntities = [];
     this.liveColors = ['brightCyan', 'yellow', 'green', 'blue', 'cyan', 'brightMagenta', 'brightGreen'];
     this.timeEntity = null;
@@ -38,7 +38,7 @@ export class RoomModel extends AbstractModel {
       0, // counter6
       demo,
       false, // crash
-      0 // score
+      this.app.itemsCollected
     ]};
 
     this.worker = new Worker(this.app.importPath+'/gameWorker.js?ver='+window.srcVersion);
@@ -76,6 +76,10 @@ export class RoomModel extends AbstractModel {
                   timeStr = timeStr+'am';
                 }
                 this.timeEntity.setText(timeStr);
+                if (this.app.itemsCollected != event.data.gameData.info[6]) {
+                  this.app.itemsCollected = event.data.gameData.info[6];
+                  this.itemsCollectedEntity.setText(this.app.itemsCollected.toString().padStart(3, '0'));
+                }
                 break;
                 
               case 'floors':
@@ -123,13 +127,14 @@ export class RoomModel extends AbstractModel {
     this.roomNameEntity.justify = 2;
     this.desktopEntity.addEntity(this.roomNameEntity);
     this.desktopEntity.addEntity(new AbstractEntity(this.desktopEntity, 0, 17*8, 32*8, 7*8, false, this.app.platform.colorByName('black')));
-    var itemsCollectedEntity = new ZXTextEntity(this.desktopEntity, 1*8, 18*8, 13*8, 8, 'Items collected', false, false, 0, true);
-    itemsCollectedEntity.penColorsMap = {};
+    var itemsCollectedLabelEntity = new ZXTextEntity(this.desktopEntity, 1*8, 18*8, 13*8, 8, 'Items collected', false, false, 0, true);
+    itemsCollectedLabelEntity.penColorsMap = {};
     for (var c = 0; c < 7; c++) {
-      itemsCollectedEntity.penColorsMap[c] = this.app.platform.color(c+1);
+      itemsCollectedLabelEntity.penColorsMap[c] = this.app.platform.color(c+1);
     }
-    this.desktopEntity.addEntity(itemsCollectedEntity);
-    this.desktopEntity.addEntity(new ZXTextEntity(this.desktopEntity, 15*8, 18*8, 3*8, 8, '000', this.app.platform.colorByName('white'), false, 0, true));
+    this.desktopEntity.addEntity(itemsCollectedLabelEntity);
+    this.itemsCollectedEntity = new ZXTextEntity(this.desktopEntity, 15*8, 18*8, 3*8, 8, this.app.itemsCollected.toString().padStart(3, '0'), this.app.platform.colorByName('white'), false, 0, true);
+    this.desktopEntity.addEntity(this.itemsCollectedEntity);
     this.desktopEntity.addEntity(new ZXTextEntity(this.desktopEntity, 20*8, 18*8, 4*8, 8, 'Time', this.app.platform.colorByName('white'), false, 0, true));
     this.timeEntity = new ZXTextEntity(this.desktopEntity, 25*8, 18*8, 6*8, 8, ' 7:00am', false, false, 0, true);
     this.timeEntity.justify = 1;

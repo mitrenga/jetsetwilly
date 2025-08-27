@@ -32,6 +32,7 @@ export class GameApp extends AbstractApp {
     this.demo = false;
     this.demoRooms = [];
     this.lives = 7;
+    this.itemsCollected = 0;
     this.globalData = false;
     this.items = [];
     this.model = this.newModel('ResetModel');

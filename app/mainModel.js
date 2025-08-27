@@ -112,6 +112,7 @@ export class MainModel extends AbstractModel {
           switch (event.key) {
             case 'Enter':
               this.app.model.shutdown();
+              this.app.itemsCollected = 0;
               this.app.roomNumber = this.app.globalData.initRoom;
               this.app.demo = false;
               this.app.model = this.app.newModel('RoomModel');
@@ -127,6 +128,7 @@ export class MainModel extends AbstractModel {
 
       case 'mouseClick':
         this.app.model.shutdown();
+        this.app.itemsCollected = 0;
         this.app.roomNumber = this.app.globalData.initRoom;
         this.app.demo = false;
         this.app.model = this.app.newModel('RoomModel');
