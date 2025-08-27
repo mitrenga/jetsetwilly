@@ -131,7 +131,7 @@ function willyWalking() {
     jumpCounter = 0;
     fallingDirection = jumpDirection;
     jumpDirection = 0;
-    fallingCounter = 1;
+    fallingCounter = 5;
   }      
 
   canMovingDirection = 0;
@@ -161,6 +161,9 @@ function willyWalking() {
 
   if (fallingCounter) {
     if (standingOn.length) {
+      if (fallingCounter > 9) {
+        gameData.info[5] = true;
+      }
       fallingCounter = 0;
       if (canMovingDirection == fallingDirection) {
         mustMovingDirection = canMovingDirection;
