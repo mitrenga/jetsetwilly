@@ -393,21 +393,6 @@ createAudioHandler(channel) {
     pulses = this.resizeArray(pulses, pulsesCounter);
     this.audioDataCache.extra.arrowSound = {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds};
     return this.audioDataCache.extra.arrowSound;
-
-
-      var b = 2;
-      var c = 128;
-      var a = 0;
-      do {
-        a = Math.abs(a-1);
-        do {
-          this.buffer[Math.round(this.frames*k)] = ((a == 0) ? 0.0 : 0.3);
-          this.frames++;
-          b--;
-        } while (b > 0);
-        b = c;
-        c--;
-      } while (c > 0);
   } // arrowSound
 
   tapePilotToneSound(sampleRate) {
