@@ -577,7 +577,7 @@ function checkStandingWithObjectsArray(x, y, width, height, objectsArray) {
 } // checkStandingWithObjectsArray
 
 function checkStandingOnRamps(result, x, y, width, height) {
-  if (!jumpCounter) {
+  if (!jumpCounter || !jumpDirection) {
     for (var o = 0; o < gameData.ramps.length; o++) {
       var obj = gameData.ramps[o];
       switch (obj.gradient) {
