@@ -253,14 +253,20 @@
       ]
    },
    "gameOver":{
+      "pillar":{
+         "width":9,
+         "height":1,
+         "attribute":"47",
+         "sprite":[
+            [
+               "---#----#"
+            ]
+         ]
+      },
       "foot":{
          "width":16,
          "height":16,
          "attribute":"47",
-         "paintCorrections":{
-            "x":0,
-            "y":0
-         },
          "frames":1,
          "directions":1,
          "sprite":[
@@ -288,10 +294,6 @@
          "width":11,
          "height":16,
          "attribute":"47",
-         "paintCorrections":{
-            "x":-1,
-            "y":0
-         },
          "frames":1,
          "directions":1,
          "sprite":[
@@ -319,10 +321,6 @@
          "width":16,
          "height":16,
          "attribute":"42",
-         "paintCorrections":{
-            "x":0,
-            "y":0
-         },
          "frames":1,
          "directions":1,
          "sprite":[
