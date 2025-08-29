@@ -1,17 +1,13 @@
 /**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
-const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
-const { ZXTextEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js?ver='+window.srcVersion);
 const { GameAreaEntity } = await import('./gameAreaEntity.js?ver='+window.srcVersion);
+const { GameInfoEntity } = await import('./gameInfoEntity.js?ver='+window.srcVersion);
 const { PauseGameEntity } = await import('./pauseGameEntity.js?ver='+window.srcVersion);
-const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
-import AbstractEntity from './svision/js/abstractEntity.js';
-import ZXTextEntity from '././svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js';
 import GameAreaEntity from './gameAreaEntity.js';
+import GameInfoEntity from './gameInfoEntity.js';
 import PauseGameEntity from './pauseGameEntity.js';
-import SpriteEntity from '././svision/js/platform/canvas2D/spriteEntity.js';
 /**/
 // begin code
 
@@ -22,12 +18,6 @@ export class RoomModel extends AbstractModel {
     this.id = 'RoomModel';
 
     this.roomNumber = roomNumber;
-    this.roomEntity = null;
-    this.roomNameEntity = null;
-    this.itemsCollectedEntity = null;
-    this.liveEntities = [];
-    this.liveColors = ['brightCyan', 'yellow', 'green', 'blue', 'cyan', 'brightMagenta', 'brightGreen'];
-    this.timeEntity = null;
     this.adjoiningRoom = null;
     this.demo = demo;
 
@@ -54,8 +44,8 @@ export class RoomModel extends AbstractModel {
             switch (objectsType) {
               case 'info':
                 for (var l = 0; l < this.app.lives; l++) {
-                  this.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
-                  this.liveEntities[l].frame = event.data.gameData.info[3]%4;
+                  this.gameInfoEntity.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
+                  this.gameInfoEntity.liveEntities[l].frame = event.data.gameData.info[3]%4;
                 }
                 var hour = 7+Math.floor(event.data.gameData.info[0]/15360);
                 if (hour > 23) {
@@ -69,16 +59,16 @@ export class RoomModel extends AbstractModel {
                 if (hour12 == 0) {
                   hour12 = 12;
                 }
-                var timeStr = hour12.toString().padStart(2, ' ')+':'+minute.toString().padStart(2, '0');
+                this.app.timeStr = hour12.toString().padStart(2, ' ')+':'+minute.toString().padStart(2, '0');
                 if (hour > 11) {
-                  timeStr = timeStr+'pm';
+                  this.app.timeStr = this.app.timeStr+'pm';
                 } else {
-                  timeStr = timeStr+'am';
+                  this.app.timeStr = this.app.timeStr+'am';
                 }
-                this.timeEntity.setText(timeStr);
+                this.gameInfoEntity.timeEntity.setText(this.app.timeStr);
                 if (this.app.itemsCollected != event.data.gameData.info[6]) {
                   this.app.itemsCollected = event.data.gameData.info[6];
-                  this.itemsCollectedEntity.setText(this.app.itemsCollected.toString().padStart(3, '0'));
+                  this.gameInfoEntity.itemsCollectedEntity.setText(this.app.itemsCollected.toString().padStart(3, '0'));
                 }
                 break;
                 
@@ -123,31 +113,8 @@ export class RoomModel extends AbstractModel {
     this.borderEntity.bkColor = this.app.platform.colorByName('black');
     this.gameAreaEntity = new GameAreaEntity(this.desktopEntity, 0, 0, 32*8, 16*8, this.roomNumber, this.initData, this.demo);
     this.desktopEntity.addEntity(this.gameAreaEntity);
-    this.roomNameEntity = new ZXTextEntity(this.desktopEntity, 0, 16*8, 32*8, 8, '', this.app.platform.colorByName('brightYellow'), this.app.platform.colorByName('brightBlack'), 0, true);
-    this.roomNameEntity.justify = 2;
-    this.desktopEntity.addEntity(this.roomNameEntity);
-    this.desktopEntity.addEntity(new AbstractEntity(this.desktopEntity, 0, 17*8, 32*8, 7*8, false, this.app.platform.colorByName('black')));
-    var itemsCollectedLabelEntity = new ZXTextEntity(this.desktopEntity, 1*8, 18*8, 13*8, 8, 'Items collected', false, false, 0, true);
-    itemsCollectedLabelEntity.penColorsMap = {};
-    for (var c = 0; c < 7; c++) {
-      itemsCollectedLabelEntity.penColorsMap[c] = this.app.platform.color(c+1);
-    }
-    this.desktopEntity.addEntity(itemsCollectedLabelEntity);
-    this.itemsCollectedEntity = new ZXTextEntity(this.desktopEntity, 15*8, 18*8, 3*8, 8, this.app.itemsCollected.toString().padStart(3, '0'), this.app.platform.colorByName('white'), false, 0, true);
-    this.desktopEntity.addEntity(this.itemsCollectedEntity);
-    this.desktopEntity.addEntity(new ZXTextEntity(this.desktopEntity, 20*8, 18*8, 4*8, 8, 'Time', this.app.platform.colorByName('white'), false, 0, true));
-    this.timeEntity = new ZXTextEntity(this.desktopEntity, 25*8, 18*8, 6*8, 8, ' 7:00am', false, false, 0, true);
-    this.timeEntity.justify = 1;
-    this.timeEntity.penColorsMap = {};
-    for (var c = 0; c < 7; c++) {
-      this.timeEntity.penColorsMap[c] = this.app.platform.color(7-c);
-    }
-    this.desktopEntity.addEntity(this.timeEntity);
-    for (var l = 0; l < this.app.lives; l++) {
-      this.liveEntities[l] = new SpriteEntity(this.desktopEntity, l*16, 21*8, this.app.platform.colorByName(this.liveColors[l]), false, 0, 0);
-      this.desktopEntity.addEntity(this.liveEntities[l]);
-    }
-
+    this.gameInfoEntity = new GameInfoEntity(this.desktopEntity, 0, 16*8, 32*8, 8*8);
+    this.desktopEntity.addEntity(this.gameInfoEntity);
 
     this.sendEvent(330, {'id': 'changeFlashState'});
 
@@ -168,10 +135,11 @@ export class RoomModel extends AbstractModel {
   } // shutdown
 
   setData(data) {
-    this.roomNameEntity.setText(data.name);
+    this.gameInfoEntity.roomNameEntity.setText(data.name);
+    this.app.roomName = data.name;
     this.borderEntity.bkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(data.borderColor), 7, 1);
     for (var l = 0; l < this.app.lives; l++) {
-      this.liveEntities[l].setGraphicsData(data.willy);
+      this.gameInfoEntity.liveEntities[l].setGraphicsData(data.willy);
     }
     super.setData(data);
     this.worker.postMessage({'id': 'init', 'initData': this.initData});
@@ -259,7 +227,7 @@ export class RoomModel extends AbstractModel {
 
       case 'gameOver':
         this.app.model.shutdown();
-        this.app.model = this.app.newModel('MainModel');
+        this.app.model = this.app.newModel('GameOverModel');
         this.app.model.init();
         this.app.resizeApp();
         return true;

@@ -29,6 +29,8 @@ export class GameApp extends AbstractApp {
     this.audioManager = new AudioManager(this);
     
     this.roomNumber = false;
+    this.roomName = '';
+    this.timeStr = '';
     this.demo = false;
     this.demoRooms = [];
     this.lives = 7;
