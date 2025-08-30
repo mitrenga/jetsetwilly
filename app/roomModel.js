@@ -118,14 +118,10 @@ export class RoomModel extends AbstractModel {
 
     this.sendEvent(330, {'id': 'changeFlashState'});
 
-    if (this.app.audioManager.music > 0) {
-      this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'music'});
-      this.sendEvent(500, {'id': 'playSound', 'channel': 'music', 'sound': 'inGameMelody', 'options': {'repeat': true, 'lives': 7}});
-    }
-    if (this.app.audioManager.sounds > 0) {
-      this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'sounds'});
-      this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'extra'});
-    }
+    this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'music'});
+    this.sendEvent(500, {'id': 'playSound', 'channel': 'music', 'sound': 'inGameMelody', 'options': {'repeat': true, 'lives': 7}});
+    this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'sounds'});
+    this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'extra'});
   } // init
 
   shutdown() {
