@@ -73,6 +73,7 @@ createAudioHandler(channel) {
       case 'fallingSound': return this.fallingSound(sampleRate);
       case 'itemSound': return this.itemSound(sampleRate);
       case 'arrowSound': return this.arrowSound(sampleRate);
+      case 'gameOverSound': return this.gameOverSound(sampleRate);
       case 'tapePilotToneSound': return this.tapePilotToneSound(sampleRate);
       case 'tapeRndDataSound': return this.tapeRndDataSound(sampleRate);
       case 'basicBeepsSound': return this.basicBeepsSound(sampleRate);
@@ -96,7 +97,7 @@ createAudioHandler(channel) {
   addPulse(frame, k, lastPos, fKeys, fragments, pulses, pulsesCounter) {
     var newPos = Math.round(frame*k);
     var pulse = newPos-lastPos;
-    if (!(pulse in (fKeys))) {
+    if (!(pulse in fKeys)) {
       fKeys[pulse] = fragments.length;
       fragments.push(pulse);
     }
@@ -394,6 +395,39 @@ createAudioHandler(channel) {
     this.audioDataCache.extra.arrowSound = {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds};
     return this.audioDataCache.extra.arrowSound;
   } // arrowSound
+
+  gameOverSound(sampleRate) {
+    var fragments = [];
+    var fKeys = {};
+    var pulses = new Uint8Array((255-59)/4*64);
+    var pulsesCounter = 0;
+    
+    var k = Math.round(sampleRate/2800)/100;
+    fragments.push(Math.round(sampleRate/212));
+
+    for (var x = 255; x > 59; x=x-4) {
+      for (var o = 0; o < 63; o++) {
+        var d = Math.round(x*k);
+        if (!(d in fKeys)) {
+          fragments.push(d);
+          fKeys[d] = fragments.length-1;
+        }
+        if (pulsesCounter == pulses.length) {
+          pulses = this.extendArray(pulses, 100);
+        }
+        pulses[pulsesCounter] = fKeys[d];
+        pulsesCounter++;
+      }
+      if (pulsesCounter == pulses.length) {
+        pulses = this.extendArray(pulses, 100);
+      }
+      pulses[pulsesCounter] = 0;
+      pulsesCounter++;
+    }
+
+    pulses = this.resizeArray(pulses, pulsesCounter);
+    return {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds};
+  } // gameOverSound
 
   tapePilotToneSound(sampleRate) {
     // T-state is 1/3500000 = 0.0000002867 sec. 

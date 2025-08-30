@@ -79,6 +79,9 @@ export class GameOverModel extends AbstractModel {
     this.timerEntity.hide = true;
     this.timerEntity.justify = 2;
     this.desktopEntity.addEntity(this.timerEntity);
+
+    this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'sounds'});
+    this.sendEvent(500, {'id': 'playSound', 'channel': 'sounds', 'sound': 'gameOverSound', 'options': false});
   } // init
 
   handleEvent(event) {
