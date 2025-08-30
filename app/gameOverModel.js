@@ -132,7 +132,7 @@ export class GameOverModel extends AbstractModel {
       if (this.colorTimer === false) {
         this.colorTimer = timestamp;
       }
-      if (timestamp-this.colorTimer > 30) {
+      if (timestamp-this.colorTimer > 50) {
         this.colorTimer = timestamp;
         for (var ch = 0; ch < 4; ch++) {
           this.gameEntity.penColorsMap[ch] = this.app.platform.penColorByAttr(this.colorCounter);
