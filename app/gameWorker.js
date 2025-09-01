@@ -57,8 +57,9 @@ function gameLoop() {
     gameData.info[1] = counter2;
     gameData.info[2] = counter4;
     gameData.info[3] = counter6;
+  
+    postMessage({'id': 'update', 'gameData': gameData});
   }
-  postMessage({'id': 'update', 'gameData': gameData});
 } // gameLoop
 
 function conveyors() {
