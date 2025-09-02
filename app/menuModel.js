@@ -211,7 +211,7 @@ export class MenuModel extends AbstractModel {
 
       case 'setMusic':
         if (this.app.audioManager.music == 0) {
-          this.app.audioManager.music = 0.07;
+          this.app.audioManager.music = 0.1;
         } else {
           this.app.audioManager.music = 0;
         }
