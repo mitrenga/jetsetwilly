@@ -111,14 +111,7 @@ export class MainModel extends AbstractModel {
         if (this.desktopEntity.modalEntity == null) {
           switch (event.key) {
             case 'Enter':
-              this.app.model.shutdown();
-              this.app.itemsCollected = 0;
-              this.app.timeStr = ' 7:00am';
-              this.app.roomNumber = this.app.globalData.initRoom;
-              this.app.demo = false;
-              this.app.model = this.app.newModel('RoomModel');
-              this.app.model.init();
-              this.app.resizeApp();
+              this.app.startRoom(false, true, true);
               return true;
             case 'Escape':
               this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.app.platform.colorByName('blue')));
@@ -128,25 +121,11 @@ export class MainModel extends AbstractModel {
         break;
 
       case 'mouseClick':
-        this.app.model.shutdown();
-        this.app.itemsCollected = 0;
-        this.app.timeStr = ' 7:00am';
-        this.app.roomNumber = this.app.globalData.initRoom;
-        this.app.demo = false;
-        this.app.model = this.app.newModel('RoomModel');
-        this.app.model.init();
-        this.app.resizeApp();
+        this.app.startRoom(false, true, true);
         return true;
 
       case 'newDemoRoom':
-        this.app.model.shutdown();
-        this.app.itemsCollected = 0;
-        this.app.timeStr = ' 7:00am';
-        this.app.roomNumber = this.app.globalData.initRoom;
-        this.app.demo = true;
-        this.app.model = this.app.newModel('RoomModel');
-        this.app.model.init();
-        this.app.resizeApp();
+        this.app.startRoom(true, true, true);
         return true;
     }
     return false;

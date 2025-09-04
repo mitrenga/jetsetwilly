@@ -159,19 +159,13 @@ export class TapeLoadingModel extends AbstractModel {
         return true;
 
       case 'setMenuModel':
-        this.app.model.shutdown();
-        this.app.model = this.app.newModel('MenuModel');
-        this.app.model.init();
-        this.app.resizeApp();
+        this.app.setModel('MenuModel');
         return true;
         
       case 'keyPress':
         switch (event.key) {
           case 'Escape':
-            this.app.model.shutdown();
-            this.app.model = this.app.newModel('MenuModel');
-            this.app.model.init();
-            this.app.resizeApp();
+            this.app.setModel('MenuModel');
             return true;
         }
         break;

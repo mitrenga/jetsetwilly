@@ -37,21 +37,53 @@ export class GameApp extends AbstractApp {
     this.itemsCollected = 0;
     this.globalData = false;
     this.items = [];
-    this.model = this.newModel('ResetModel');
-    this.model.init();
+    this.setModel('ResetModel');
   } // constructor
 
-  newModel(model) {
+  setModel(model) {
+    var needResizeApp = false;
+    if (this.model) {
+      this.model.shutdown();
+      needResizeApp = true;
+    }
     switch (model) {
-      case 'ResetModel': return new ResetModel(this);
-      case 'MenuModel': return new MenuModel(this);
-      case 'MainModel': return new MainModel(this);
-      case 'RoomModel': return new RoomModel(this, this.roomNumber, this.demo);
-      case 'GameOverModel': return new GameOverModel(this);
-      case 'TapeLoadingModel': return new TapeLoadingModel(this);
+      case 'ResetModel':
+        this.model = new ResetModel(this);
+        break;
+      case 'MenuModel':
+        this.model = new MenuModel(this);
+        break;
+      case 'MainModel':
+        this.model = new MainModel(this);
+        break;
+      case 'RoomModel':
+        this.model = new RoomModel(this, this.roomNumber, this.demo);
+        break;
+      case 'GameOverModel':
+        this.model = new GameOverModel(this);
+        break;
+      case 'TapeLoadingModel':
+        this.model = new TapeLoadingModel(this);
+        break;
     } // switch
-    return null;
-  } // newModel
+    this.model.init();
+    if (needResizeApp) {
+      this.resizeApp();
+    }
+  } // setModel
+  
+  startRoom(demo, newGame, setInitRoom) {
+    if (newGame) {
+      this.itemsCollected = 0;
+      this.timeStr = ' 7:00am';
+      this.lives = 7;
+      if (setInitRoom) {
+        this.roomNumber = this.globalData.initRoom;
+      }
+    }
+    this.demo = demo;
+    this.setModel('RoomModel');
+  } // startRoom
   
   setGlobalData(data) {
     this.globalData = data;

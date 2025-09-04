@@ -157,10 +157,7 @@ export class RoomModel extends AbstractModel {
 
       case 'keyPress':
         if (this.demo) {
-          this.app.model.shutdown();
-          this.app.model = this.app.newModel('MainModel');
-          this.app.model.init();
-          this.app.resizeApp();
+          this.app.setModel('MainModel');
           return true;
         }
         switch (event.key) {
@@ -197,35 +194,24 @@ export class RoomModel extends AbstractModel {
 
       case 'mouseClick':
         if (this.demo) {
-          this.app.model.shutdown();
-          this.app.model = this.app.newModel('MainModel');
-          this.app.model.init();
-          this.app.resizeApp();
+          this.app.setModel('MainModel');
           return true;
         }
         break;
 
       case 'newDemoRoom':
-        this.app.model.shutdown();
         if (this.app.demoRooms.length > 0) {
           this.app.roomNumber = this.app.demoRooms[0];
           this.app.demoRooms.splice(0, 1);
           this.app.demo = true;
-          this.app.model = this.app.newModel('RoomModel');
-          this.app.model.init();
-          this.app.resizeApp();
+          this.app.startRoom(true, false, false);
           return true;
         }
-        this.app.model = this.app.newModel('MainModel');
-        this.app.model.init();
-        this.app.resizeApp();
+        this.app.setModel('MainModel');
         return true;
 
       case 'gameOver':
-        this.app.model.shutdown();
-        this.app.model = this.app.newModel('GameOverModel');
-        this.app.model.init();
-        this.app.resizeApp();
+        this.app.setModel('GameOverModel');
         return true;
 
       case 'changeFlashState':

@@ -186,17 +186,11 @@ export class MenuModel extends AbstractModel {
     switch (event.id) {
 
       case 'startGame': 
-        this.app.model.shutdown();
-        this.app.model = this.app.newModel('MainModel');
-        this.app.model.init();
-        this.app.resizeApp();
+        this.app.setModel('MainModel');
         return true;
       
       case 'startTapeLoading': 
-        this.app.model.shutdown();
-        this.app.model = this.app.newModel('TapeLoadingModel');
-        this.app.model.init();
-        this.app.resizeApp();
+        this.app.setModel('TapeLoadingModel');
         return true;
 
       case 'setSounds':

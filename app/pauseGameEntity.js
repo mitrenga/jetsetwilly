@@ -81,10 +81,7 @@ export class PauseGameEntity extends AbstractEntity {
         return true;
 
       case 'exitGame':
-        this.app.model.shutdown();
-        this.app.model = this.app.newModel('MenuModel');
-        this.app.model.init();
-        this.app.resizeApp();
+        this.app.setModel('MenuModel');
         return true;
     }
 

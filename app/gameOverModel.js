@@ -94,34 +94,21 @@ export class GameOverModel extends AbstractModel {
       case 'keyPress':
         switch (event.key) {
           case 'Enter':
-            console.log (this.app.globalData);
             if (this.app.roomNumber != this.app.globalData.initRoom && this.fallTimer == 2000) {
-              this.app.model.shutdown();
-              this.app.itemsCollected = 0;
-              this.app.timeStr = ' 7:00am';
-              this.app.demo = false;
-              this.app.model = this.app.newModel('RoomModel');
-              this.app.model.init();
-              this.app.resizeApp();
+              this.app.startRoom(false, true, false);
               return true;
             }
             break;
           case 'Escape':
             if (this.app.roomNumber != this.app.globalData.initRoom && this.fallTimer == 2000) {
-              this.app.model.shutdown();
-              this.app.model = this.app.newModel('MainModel');
-              this.app.model.init();
-              this.app.resizeApp();
+              this.app.setModel('MainModel');
               return true;
             }
             break;
         }
         break;
       case 'MainModel':
-        this.app.model.shutdown();
-        this.app.model = this.app.newModel('MainModel');
-        this.app.model.init();
-        this.app.resizeApp();
+        this.app.setModel('MainModel');
         return true;
     }
     return false;
