@@ -8,7 +8,6 @@
 var counter = 0;
 var counter2 = 0;
 var counter4 = 0;
-var counter6 = 0;
 var gameData = null;
 var ropeRelativeCoordinates = [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1,1,2,1,1,2,2,3,2,3,2,3,3,3,3,3,3],
@@ -38,9 +37,6 @@ function gameLoop() {
     if (!(counter%4)) {
       counter4++;
     }
-    if (!(counter%6)) {
-      counter6++;
-    }
     conveyors();
     ropes();
     if (!gameData.info[4]) { // if not demo
@@ -56,7 +52,6 @@ function gameLoop() {
     gameData.info[0] = counter;
     gameData.info[1] = counter2;
     gameData.info[2] = counter4;
-    gameData.info[3] = counter6;
   
     postMessage({'id': 'update', 'gameData': gameData});
   }
