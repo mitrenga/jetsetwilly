@@ -71,6 +71,7 @@ createAudioHandler(channel) {
       case 'inGameMelody': return this.inGameMelody(sampleRate, options.lives);
       case 'jumpSound': return this.jumpSound(sampleRate);
       case 'fallingSound': return this.fallingSound(sampleRate);
+      case 'crashSound': return this.crashSound(sampleRate);
       case 'itemSound': return this.itemSound(sampleRate);
       case 'arrowSound': return this.arrowSound(sampleRate);
       case 'gameOverSound': return this.gameOverSound(sampleRate);
@@ -344,6 +345,49 @@ createAudioHandler(channel) {
     this.audioDataCache.sounds.fallingSound = {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds};
     return this.audioDataCache.sounds.fallingSound;
   } // fallingSound
+
+  crashSound(sampleRate) {
+    var fragments = [];
+    var fKeys = {};
+    var pulses = new Uint8Array(8*(116+4+1));
+    var pulsesCounter = 0;
+    
+    var k = Math.round(sampleRate/2600)/100;
+    fragments.push(Math.round(sampleRate/220));
+
+    var value1 = 116;
+    var value2 = 8;
+    var frames = 0;
+    for (var x = 0; x < 8; x++) {
+      for (var o = 0; o < value1; o++) {
+        for (var y = 0; y < 2; y++) {
+          var d = Math.round((frames+value2)*k)-Math.round(frames*k);
+          frames += value2;
+          if (!(d in fKeys)) {
+            fragments.push(d);
+            fKeys[d] = fragments.length-1;
+          }
+          if (pulsesCounter == pulses.length) {
+            pulses = this.extendArray(pulses, 100);
+          }
+          pulses[pulsesCounter] = fKeys[d];
+          pulsesCounter++;
+        }
+      }
+
+      if (pulsesCounter == pulses.length) {
+        pulses = this.extendArray(pulses, 100);
+      }
+      pulses[pulsesCounter] = 0;
+      pulsesCounter++;
+
+      value1 -= 16;
+      value2 += 8;
+    }
+
+    pulses = this.resizeArray(pulses, pulsesCounter);
+    return {'fragments': fragments, 'pulses': pulses, 'volume': this.sounds*1.5};
+  } // crashSound
 
   itemSound(sampleRate) {
     var fragments = [];
