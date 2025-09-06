@@ -20,12 +20,14 @@ export class RoomModel extends AbstractModel {
     this.roomNumber = roomNumber;
     this.adjoiningRoom = null;
     this.demo = demo;
+    this.bkAnimation = false;
+    this.crashTime = false;
 
     this.initData = {'info': [
       0, // counter
       0, // counter2
       0, // counter4
-      0, // unused
+      0, // counter6
       demo,
       false, // crash
       this.app.itemsCollected
@@ -40,6 +42,18 @@ export class RoomModel extends AbstractModel {
 
       switch (event.data.id) {
         case 'update':
+          if (this.bkAnimation !== false) {
+            this.gameAreaEntity.bkColor = this.app.platform.color(this.bkAnimation);
+            if (this.bkAnimation >= 0) {
+              this.bkAnimation--;
+            } else {
+              this.bkAnimation = false;
+            }
+            if (this.bkAnimation < 0) {
+              this.gameAreaEntity.restoreBkColor();
+              this.bkAnimation = false;
+            }
+          }
           Object.keys(event.data.gameData).forEach((objectsType) => {
             switch (objectsType) {
               case 'info':
@@ -48,12 +62,6 @@ export class RoomModel extends AbstractModel {
                   this.gameInfoEntity.liveEntities[l].frame = event.data.gameData.info[3]%4;
                 }
                 var hour = 7+Math.floor(event.data.gameData.info[0]/15360);
-                if (hour > 23) {
-                  this.sendEvent(0, {'id': 'gameOver'});
-                }
-                if (event.data.gameData.info[5]) {
-                  this.sendEvent(0, {'id': 'gameOver'});
-                }
                 var minute = Math.floor(event.data.gameData.info[0]%15360/256);
                 var hour12 = hour%12;
                 if (hour12 == 0) {
@@ -66,6 +74,12 @@ export class RoomModel extends AbstractModel {
                   this.app.timeStr = this.app.timeStr+'am';
                 }
                 this.gameInfoEntity.timeEntity.setText(this.app.timeStr);
+                if (hour > 23) {
+                  this.sendEvent(0, {'id': 'gameOver'});
+                }
+                if (event.data.gameData.info[5]) {
+                  this.sendEvent(0, {'id': 'crash'});
+                }
                 if (this.app.itemsCollected != event.data.gameData.info[6]) {
                   this.app.itemsCollected = event.data.gameData.info[6];
                   this.gameInfoEntity.itemsCollectedEntity.setText(this.app.itemsCollected.toString().padStart(3, '0'));
@@ -88,8 +102,8 @@ export class RoomModel extends AbstractModel {
           this.sendEvent(0, {'id': 'playSound', 'channel': event.data.channel, 'sound': event.data.sound, 'options': false});
           break;
 
-        case 'stopChannel':
-          this.sendEvent(0, {'id': 'stopChannel', 'channel': event.data.channel});
+        case 'stopAudioChannel':
+          this.sendEvent(0, {'id': 'stopAudioChannel', 'channel': event.data.channel});
           break;
       }
     } // onmessage
@@ -107,6 +121,12 @@ export class RoomModel extends AbstractModel {
     }
   } // constructor
 
+  postWorkerMessage(message) {
+    if (this.worker) {
+      this.worker.postMessage(message);
+    }
+  } // postWorkerMessage
+
   init() {
     super.init();
 
@@ -119,15 +139,17 @@ export class RoomModel extends AbstractModel {
     this.sendEvent(330, {'id': 'changeFlashState'});
 
     this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'music'});
-    this.sendEvent(500, {'id': 'playSound', 'channel': 'music', 'sound': 'inGameMelody', 'options': {'repeat': true, 'lives': 7}});
+    this.sendEvent(500, {'id': 'playSound', 'channel': 'music', 'sound': 'inGameMelody', 'options': {'repeat': true, 'lives': this.app.lives}});
     this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'sounds'});
     this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'extra'});
   } // init
 
   shutdown() {
     super.shutdown();
-    this.worker.terminate();
-    this.worker = null;
+    if (this.worker) {
+      this.worker.terminate();
+      this.worker = null;
+    }
   } // shutdown
 
   setData(data) {
@@ -138,7 +160,7 @@ export class RoomModel extends AbstractModel {
       this.gameInfoEntity.liveEntities[l].setGraphicsData(data.willy);
     }
     super.setData(data);
-    this.worker.postMessage({'id': 'init', 'initData': this.initData});
+    this.postWorkerMessage({'id': 'init', 'initData': this.initData});
   } // setData
 
   handleEvent(event) {
@@ -165,14 +187,14 @@ export class RoomModel extends AbstractModel {
             this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.borderEntity.bkColor));
             return true;
           case 'ArrowRight':
-            this.worker.postMessage({'id': 'controls', 'action': 'right', 'value': true});
+            this.postWorkerMessage({'id': 'controls', 'action': 'right', 'value': true});
             return true;
           case 'ArrowLeft':
-            this.worker.postMessage({'id': 'controls', 'action': 'left', 'value': true});
+            this.postWorkerMessage({'id': 'controls', 'action': 'left', 'value': true});
             return true;
           case 'ArrowUp':
           case ' ':
-            this.worker.postMessage({'id': 'controls', 'action': 'jump', 'value': true});
+            this.postWorkerMessage({'id': 'controls', 'action': 'jump', 'value': true});
             return true;
         }
         break;
@@ -180,14 +202,14 @@ export class RoomModel extends AbstractModel {
       case 'keyRelease':
         switch (event.key) {
           case 'ArrowRight':
-            this.worker.postMessage({'id': 'controls', 'action': 'right', 'value': false});
+            this.postWorkerMessage({'id': 'controls', 'action': 'right', 'value': false});
             return true;
           case 'ArrowLeft':
-            this.worker.postMessage({'id': 'controls', 'action': 'left', 'value': false});
+            this.postWorkerMessage({'id': 'controls', 'action': 'left', 'value': false});
             return true;
           case 'ArrowUp':
           case ' ':
-            this.worker.postMessage({'id': 'controls', 'action': 'jump', 'value': false});
+            this.postWorkerMessage({'id': 'controls', 'action': 'jump', 'value': false});
             return true;
         }
         break;
@@ -209,6 +231,19 @@ export class RoomModel extends AbstractModel {
         }
         this.app.setModel('MainModel');
         return true;
+        
+      case 'crash':
+        if (this.worker) {
+          this.worker.terminate();
+          this.worker = null;
+        }
+        this.gameAreaEntity.spriteEntities.willy[0].hide = true;
+        this.sendEvent(0, {'id': 'stopAllAudioChannels'});
+        this.borderEntity.bkColor = this.app.platform.color(0);
+        this.gameAreaEntity.setMonochromeColors(this.app.platform.color(15), this.app.platform.color(0));
+        this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'crashSound', 'options': false});
+        this.crashTime = this.timer;
+        return true;
 
       case 'gameOver':
         this.app.setModel('GameOverModel');
@@ -226,6 +261,26 @@ export class RoomModel extends AbstractModel {
 
   loopModel(timestamp) {
     super.loopModel(timestamp);
+
+    this.timer = timestamp;
+
+    if (this.crashTime != false) {
+      var animateTime = timestamp-this.crashTime;
+      var monochromeColor = Math.round(15-animateTime/30);
+      if (monochromeColor < 8) {
+        monochromeColor = 0;
+      }
+      this.gameAreaEntity.setMonochromeColors(this.app.platform.color(monochromeColor), this.app.platform.color(0));
+      if (animateTime > 240) {
+        if (this.app.lives > 0) {
+          this.app.lives--;
+          this.app.startRoom(false, false, false);
+        } else {
+          this.app.setModel('GameOverModel');
+        }
+      }
+    }
+
     this.drawModel();
   } // loopModel
 

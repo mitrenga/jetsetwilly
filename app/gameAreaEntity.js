@@ -12,13 +12,15 @@ import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
 export class GameAreaEntity extends AbstractEntity {
 
   constructor(parentEntity, x, y, width, height, roomNumber, initData, demo) {
-    super(parentEntity, x, y, width, height);
+    super(parentEntity, x, y, width, height, false, false);
     this.id = 'GameAreaEntity';
 
     this.roomNumber = roomNumber;
     this.initData = initData;
     this.demo = demo;
     this.roomData = null;
+    this.bkColorForRestore = false;
+    this.monochromeColor = false;
 
     this.app.layout.newDrawingCache(this, 0); 
     this.app.layout.newDrawingCache(this, 1); 
@@ -46,11 +48,11 @@ export class GameAreaEntity extends AbstractEntity {
               var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
               var idItem = layoutObjects[item];
               if (idItem !== false) {
-                var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
+                var attr = this.roomData.graphicData[idItem].substring(0, 2);
                 if (this.staticKinds.includes(idItem)) {
                   if (this.graphicCache[idItem].needToRefresh(this, 8, 8)) {
-                    var penColor = this.app.platform.penColorByAttr(attr);
-                    var bkColor = this.app.platform.bkColorByAttr(attr);
+                    var penColor = this.penColorByAttr(this.app.hexToInt(attr));
+                    var bkColor = this.bkColorByAttr(this.app.hexToInt(attr));
                     if (f == 1) {
                       var tmpColor = penColor;
                       penColor = bkColor;
@@ -134,6 +136,7 @@ export class GameAreaEntity extends AbstractEntity {
     this.roomData = data;
 
     this.bkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(this.roomData.bkColor), 56, 8);
+    this.bkColorForRestore = this.bkColor;
 
     // Willy
     this.initData.willy = [];
@@ -447,6 +450,46 @@ export class GameAreaEntity extends AbstractEntity {
       }
     });
   } // updateData
+
+
+  cleanCache() {
+    this.drawingCache[0].cleanCache();
+    Object.keys(this.graphicCache).forEach((attr) => {
+      this.graphicCache[attr].cleanCache();
+    });
+  } // cleanCache
+
+  penColorByAttr(attr) {
+    if (this.monochromeColor) {
+      return this.monochromeColor;
+    }
+    return this.app.platform.penColorByAttr(attr);
+  } // penColorByAttr
+
+  bkColorByAttr(attr) {
+    if (this.monochromeColor) {
+      return false;
+    }
+    return this.app.platform.bkColorByAttr(attr);
+  } // bkColorByAttr
+
+  restoreBkColor() {
+    if (this.restoreBkColor !== false) {
+      this.bkColor = this.bkColorForRestore;
+    }
+  } // restoreBkColor
+
+  setMonochromeColors(monochromeColor, bkColor) {
+    this.monochromeColor = monochromeColor;
+    this.setBkColor(bkColor);
+
+    Object.keys(this.spriteEntities).forEach((objectsType) => {
+      this.spriteEntities[objectsType].forEach((object) => {
+        object.bkColor = false;
+        object.setPenColor(monochromeColor);
+      });
+    });
+  } // setMonochromeColors
 
 } // class GameAreaEntity
 
