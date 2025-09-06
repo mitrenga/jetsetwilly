@@ -61,8 +61,8 @@ export class RoomModel extends AbstractModel {
                   this.gameInfoEntity.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
                   this.gameInfoEntity.liveEntities[l].frame = event.data.gameData.info[3]%4;
                 }
-                var hour = 7+Math.floor(event.data.gameData.info[0]/15360);
-                var minute = Math.floor(event.data.gameData.info[0]%15360/256);
+                var hour = 7+Math.floor((this.app.timeCounter+event.data.gameData.info[0])/15360);
+                var minute = Math.floor((this.app.timeCounter+event.data.gameData.info[0])%15360/256);
                 var hour12 = hour%12;
                 if (hour12 == 0) {
                   hour12 = 12;
@@ -78,6 +78,7 @@ export class RoomModel extends AbstractModel {
                   this.sendEvent(0, {'id': 'gameOver'});
                 }
                 if (event.data.gameData.info[5]) {
+                  this.app.timeCounter += event.data.gameData.info[0]; 
                   this.sendEvent(0, {'id': 'crash'});
                 }
                 if (this.app.itemsCollected != event.data.gameData.info[6]) {

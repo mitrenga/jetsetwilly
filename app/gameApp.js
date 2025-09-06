@@ -30,6 +30,7 @@ export class GameApp extends AbstractApp {
     
     this.roomNumber = false;
     this.roomName = '';
+    this.timeCounter = 0;
     this.timeStr = '';
     this.demo = false;
     this.demoRooms = [];
@@ -75,6 +76,7 @@ export class GameApp extends AbstractApp {
   startRoom(demo, newGame, setInitRoom) {
     if (newGame) {
       this.itemsCollected = 0;
+      this.timeCounter = 0;
       this.timeStr = ' 7:00am';
       this.lives = 7;
       if (setInitRoom) {
