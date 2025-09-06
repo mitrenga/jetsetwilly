@@ -34,7 +34,7 @@ export class GameInfoEntity extends AbstractEntity {
       itemsCollectedLabelEntity.penColorsMap[c] = this.app.platform.color(c+1);
     }
     this.addEntity(itemsCollectedLabelEntity);
-    this.itemsCollectedEntity = new ZXTextEntity(this, 15*8, 2*8, 3*8, 8, this.app.itemsCollected.toString().padStart(3, '0'), this.app.platform.colorByName('white'), false, 0, true);
+    this.itemsCollectedEntity = new ZXTextEntity(this, 15*8, 2*8, 3*8, 8, Object.keys(this.app.itemsCollected).length.toString().padStart(3, '0'), this.app.platform.colorByName('white'), false, 0, true);
     this.addEntity(this.itemsCollectedEntity);
     this.addEntity(new ZXTextEntity(this, 20*8, 2*8, 4*8, 8, 'Time', this.app.platform.colorByName('white'), false, 0, true));
     this.timeEntity = new ZXTextEntity(this, 25*8, 2*8, 6*8, 8, this.app.timeStr, false, false, 0, true);

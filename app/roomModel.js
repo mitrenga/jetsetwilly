@@ -83,7 +83,7 @@ export class RoomModel extends AbstractModel {
                 }
                 if (this.app.itemsCollected != event.data.gameData.info[6]) {
                   this.app.itemsCollected = event.data.gameData.info[6];
-                  this.gameInfoEntity.itemsCollectedEntity.setText(this.app.itemsCollected.toString().padStart(3, '0'));
+                  this.gameInfoEntity.itemsCollectedEntity.setText(Object.keys(this.app.itemsCollected).length.toString().padStart(3, '0'));
                 }
                 break;
                 

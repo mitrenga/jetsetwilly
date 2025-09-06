@@ -35,9 +35,10 @@ export class GameApp extends AbstractApp {
     this.demo = false;
     this.demoRooms = [];
     this.lives = 7;
-    this.itemsCollected = 0;
     this.globalData = false;
     this.items = [];
+    this.totalItems = 0;
+    this.itemsCollected = {};
     this.setModel('ResetModel');
   } // constructor
 
@@ -75,7 +76,7 @@ export class GameApp extends AbstractApp {
   
   startRoom(demo, newGame, setInitRoom) {
     if (newGame) {
-      this.itemsCollected = 0;
+      this.itemsCollected = {};
       this.timeCounter = 0;
       this.timeStr = ' 7:00am';
       this.lives = 7;
@@ -91,6 +92,7 @@ export class GameApp extends AbstractApp {
     this.globalData = data;
 
     this.items = [];
+    var id = 0;
     for (var r = 0; r < this.globalData.roomsCount; r++) {
       this.items.push([]);
     }
@@ -106,8 +108,10 @@ export class GameApp extends AbstractApp {
       var x = this.binToInt(binaryItem.substring(11, 16));
       var y = this.binToInt(binaryItem.substring(0, 1)+binaryItem.substring(8, 11));
       var room = this.binToInt(binaryItem.substring(2, 8));
-      this.items[room].push({'x': x, 'y': y});
+      this.items[room].push({'x': x, 'y': y, 'id': id});
+      id++;
     });
+    this.totalItems = id;
   } // setGlobalData
 
 } // class GameApp

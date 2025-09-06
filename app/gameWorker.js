@@ -612,7 +612,7 @@ function checkTouchItems() {
   var touchId = checkTouchWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.items]);
   if (touchId) {
     gameData.items[touchId-1].hide = true;
-    gameData.info[6]++;
+    gameData.info[6][gameData.items[touchId-1].id] = true;
     postMessage({'id': 'playSound', 'channel': 'extra', 'sound': 'itemSound'});
   }
 } // checkTouchItems

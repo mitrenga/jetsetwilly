@@ -23,18 +23,6 @@ export class MainModel extends AbstractModel {
     this.bannerTxt = '+++++ Press ENTER to Start +++++  JET-SET WILLY by Matthew Smith  © 1984 SOFTWARE PROJECTS Ltd . . . . . Guide Willy to collect all the items around the house before Midnight so Maria will let you get to your bed . . . . . . .                                ';
     this.bannerEntity = null;
     this.screechDuration = 0;
-
-    const http = new XMLHttpRequest();
-    http.responser = this;
-    http.open('GET', 'global.data');
-    http.send();
-
-    http.onreadystatechange = function () {
-      if (this.readyState == 4 && this.status == 200) {
-        var data = JSON.parse(http.responseText);
-        this.responser.sendEvent(1, {'id': 'setGlobalData', 'data': data});
-      }
-    }
   } // constructor
 
   newBorderEntity() {
@@ -62,10 +50,6 @@ export class MainModel extends AbstractModel {
     }
 
     switch (event.id) {
-      case 'setGlobalData':
-        this.app.setGlobalData(event.data);
-        return true;
-
       case 'changeFlashState':
         this.app.stack.flashState = !this.app.stack.flashState;
         this.sendEvent(330, {'id': 'changeFlashState'});
