@@ -32,15 +32,19 @@ function gameLoop() {
 
   if (gameData != null) {
     counter++;
+    gameData.info[0] = counter;
     if (!(counter%2)) {
       counter2++;
     }
+    gameData.info[1] = counter2;
     if (!(counter%4)) {
       counter4++;
     }
+    gameData.info[2] = counter4;
     if (!(counter%6)) {
       counter6++;
     }
+    gameData.info[3] = counter6;
     conveyors();
     ropes();
     if (!gameData.info[4]) { // if not demo
@@ -53,10 +57,6 @@ function gameLoop() {
       checkTouchItems();
       checkCrash();
     }
-    gameData.info[0] = counter;
-    gameData.info[1] = counter2;
-    gameData.info[2] = counter4;
-    gameData.info[3] = counter6;
   
     postMessage({'id': 'update', 'gameData': gameData});
   }
