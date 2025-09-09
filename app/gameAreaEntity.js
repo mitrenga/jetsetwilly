@@ -146,17 +146,7 @@ export class GameAreaEntity extends AbstractEntity {
       this.addEntity(entity);
       entity.setGraphicsData(data.willy);
       this.spriteEntities.willy.push(entity);
-      this.initData.willy.push({
-        'x': data.willy.init.x,
-        'y': data.willy.init.y,
-        'width': data.willy.width,
-        'height': data.willy.height,
-        'paintCorrectionsX': data.willy.paintCorrections.x,
-        'paintCorrectionsY': data.willy.paintCorrections.y,
-        'frame': data.willy.init.frame,
-        'frames': data.willy.init.frames,
-        'direction': data.willy.init.direction
-      });
+      this.initData.willy.push(this.app.willyRoomsCache);
     }
 
     // prepare drawing caches for layout

@@ -30,7 +30,9 @@ export class RoomModel extends AbstractModel {
       0, // counter6
       demo,
       false, // crash
-      this.app.itemsCollected
+      this.app.itemsCollected,
+      false, // adjoining room
+      false // Willy data
     ]};
 
     this.worker = new Worker(this.app.importPath+'/gameWorker.js?ver='+window.srcVersion);
@@ -57,6 +59,10 @@ export class RoomModel extends AbstractModel {
           Object.keys(event.data.gameData).forEach((objectsType) => {
             switch (objectsType) {
               case 'info':
+                if (event.data.gameData.info[7] !== false) {
+                  this.app.timeCounter += event.data.gameData.info[0]; 
+                  this.sendEvent(0, {'id': 'changeRoom', 'adjoiningRoom': this.app.hexToInt(this.adjoiningRoom[event.data.gameData.info[7]]), 'willyData': event.data.gameData.info[8]});
+                }
                 for (var l = 0; l < this.app.lives; l++) {
                   this.gameInfoEntity.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
                   this.gameInfoEntity.liveEntities[l].frame = event.data.gameData.info[3]%4;
@@ -233,7 +239,13 @@ export class RoomModel extends AbstractModel {
         }
         this.app.setModel('MainModel');
         return true;
-        
+
+      case 'changeRoom':
+        this.app.roomNumber = event.adjoiningRoom;
+        this.app.willyRoomsCache = event.willyData;
+        this.app.startRoom(false, false, false);
+        break;
+
       case 'crash':
         if (this.worker) {
           this.worker.terminate();

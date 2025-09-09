@@ -39,6 +39,9 @@ export class GameApp extends AbstractApp {
     this.items = [];
     this.totalItems = 0;
     this.itemsCollected = {};
+    this.willyRoomsCache = {
+      'willy': false
+    };
     this.setModel('ResetModel');
   } // constructor
 
@@ -81,6 +84,17 @@ export class GameApp extends AbstractApp {
       this.timeStr = ' 7:00am';
       this.lives = 7;
       if (setInitRoom) {
+        this.willyRoomsCache = {
+          'x': this.globalData.willy.init.x,
+          'y': this.globalData.willy.init.y,
+          'width': this.globalData.willy.width,
+          'height': this.globalData.willy.height,
+          'paintCorrectionsX': this.globalData.willy.paintCorrections.x,
+          'paintCorrectionsY': this.globalData.willy.paintCorrections.y,
+          'frame': this.globalData.willy.init.frame,
+          'frames': this.globalData.willy.init.frames,
+          'direction': this.globalData.willy.init.direction
+        };
         this.roomNumber = this.globalData.initRoom;
       }
     }
