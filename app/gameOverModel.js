@@ -149,7 +149,7 @@ export class GameOverModel extends AbstractModel {
       }
       var countdown = countdownLength-Math.floor((timestamp-this.timer-2000)/1000);
       if (countdown < 0) {
-        this.sendEvent(0, {'id': 'MainModel'});
+        this.sendEvent(1, {'id': 'MainModel'});
       } else {
         this.timerEntity.setText(countdown.toString());
       }

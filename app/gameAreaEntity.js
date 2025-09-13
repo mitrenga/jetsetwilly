@@ -2,10 +2,12 @@
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { DrawingCache } = await import('./svision/js/platform/canvas2D/drawingCache.js?ver='+window.srcVersion);
 const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
+const { RopeEntity } = await import('./ropeEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractEntity from './svision/js/abstractEntity.js';
 import DrawingCache from './svision/js/platform/canvas2D/drawingCache.js';
 import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
+import RopeEntity from './ropeEntity.js';
 /**/
 // begin code
 
@@ -27,7 +29,7 @@ export class GameAreaEntity extends AbstractEntity {
     this.graphicCache = {};
     this.staticKinds = ['floor', 'wall', 'nasty'];
 
-    this.spriteEntities = {'conveyors': [], 'ropes': [], 'guardians': [], 'items': [], 'decorations': [], 'willy': []};
+    this.spriteEntities = {'conveyors': [], 'ropes': [], 'guardians': [], 'items': [], 'decorations': [], 'willy': [], 'ramps': []};
     this.ropeRelativeCoordinates = [
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1,1,2,1,1,2,2,3,2,3,2,3,3,3,3,3,3],
       [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,2,3,2,3,2,3,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
@@ -90,6 +92,9 @@ export class GameAreaEntity extends AbstractEntity {
           if (this.graphicCache['ramp'].needToRefresh(this, 8, 8)) {
             var attr = rampData.data.substring(0, 2);
             var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(attr));
+            if (this.monochromeColor !== false) {
+              penColor = this.monochromeColor;
+            }
             var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(attr)&63);
             if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor))) {
               bkColor = false;
@@ -191,10 +196,6 @@ export class GameAreaEntity extends AbstractEntity {
     this.initData.ramps = [];
     if ('ramp' in data.graphicData) {
       var rampData = data.graphicData.ramp;
-      var gradient = 1;
-      if (rampData.gradient == 'left') {
-          gradient = -1;
-      }
       var rampLength = this.app.hexToInt(rampData.length);
       var rampInitData = {
         'gradient': rampData.gradient,
@@ -285,7 +286,7 @@ export class GameAreaEntity extends AbstractEntity {
       var y = data.rope.init.y;
       var ptr = data.rope.init.frame;
       for (var r = 0; r <= data.rope.length; r++) {
-        var entity = new AbstractEntity(this, x, y, 1, 1, false, color);
+        var entity = new RopeEntity(this, x, y, 1, 1, color);
         this.addEntity(entity);
         this.spriteEntities.ropes.push(entity);
         var ropeInitData = {

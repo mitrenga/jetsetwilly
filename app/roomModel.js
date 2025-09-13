@@ -21,7 +21,8 @@ export class RoomModel extends AbstractModel {
     this.adjoiningRoom = null;
     this.demo = demo;
     this.bkAnimation = false;
-    this.crashTime = false;
+    this.animationTime = false;
+    this.animationType = false;
 
     this.initData = {'info': [
       0, // counter
@@ -39,7 +40,8 @@ export class RoomModel extends AbstractModel {
     this.worker.onmessage = (event) => {
 
       if (this.demo && event.data.id == 'update' && event.data.gameData.info[0] == 80) {
-        this.sendEvent(1, {'id': 'newDemoRoom'});
+        this.sendEvent(1, {'id': 'animationDemoRoomDone'});
+        return;
       }
 
       switch (event.data.id) {
@@ -61,7 +63,7 @@ export class RoomModel extends AbstractModel {
               case 'info':
                 if (event.data.gameData.info[7] !== false) {
                   this.app.timeCounter += event.data.gameData.info[0]; 
-                  this.sendEvent(0, {'id': 'changeRoom', 'adjoiningRoom': this.app.hexToInt(this.adjoiningRoom[event.data.gameData.info[7]]), 'willyData': event.data.gameData.info[8]});
+                  this.sendEvent(1, {'id': 'changeRoom', 'adjoiningRoom': this.app.hexToInt(this.adjoiningRoom[event.data.gameData.info[7]]), 'willyData': event.data.gameData.info[8]});
                 }
                 for (var l = 0; l < this.app.lives; l++) {
                   this.gameInfoEntity.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
@@ -81,11 +83,11 @@ export class RoomModel extends AbstractModel {
                 }
                 this.gameInfoEntity.timeEntity.setText(this.app.timeStr);
                 if (hour > 23) {
-                  this.sendEvent(0, {'id': 'gameOver'});
+                  this.sendEvent(1, {'id': 'gameOver'});
                 }
                 if (event.data.gameData.info[5]) {
                   this.app.timeCounter += event.data.gameData.info[0]; 
-                  this.sendEvent(0, {'id': 'crash'});
+                  this.sendEvent(1, {'id': 'crash'});
                 }
                 if (this.app.itemsCollected != event.data.gameData.info[6]) {
                   this.app.itemsCollected = event.data.gameData.info[6];
@@ -229,6 +231,16 @@ export class RoomModel extends AbstractModel {
         }
         break;
 
+      case 'animationDemoRoomDone':
+        if (this.worker) {
+          this.worker.terminate();
+          this.worker = null;
+        }
+        this.gameAreaEntity.setMonochromeColors(this.app.platform.color(3), this.app.platform.color(7));
+        this.animationTime = this.timer;
+        this.animationType = 'demoRoomDone';
+        break;
+
       case 'newDemoRoom':
         if (this.app.demoRooms.length > 0) {
           this.app.roomNumber = this.app.demoRooms[0];
@@ -256,7 +268,8 @@ export class RoomModel extends AbstractModel {
         this.borderEntity.bkColor = this.app.platform.color(0);
         this.gameAreaEntity.setMonochromeColors(this.app.platform.color(15), this.app.platform.color(0));
         this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'crashSound', 'options': false});
-        this.crashTime = this.timer;
+        this.animationTime = this.timer;
+        this.animationType = 'crash';
         return true;
 
       case 'gameOver':
@@ -265,7 +278,11 @@ export class RoomModel extends AbstractModel {
 
       case 'changeFlashState':
         this.app.stack.flashState = !this.app.stack.flashState;
-        this.sendEvent(330, {'id': 'changeFlashState'});
+        if (this.animationTime === false) {
+          this.sendEvent(330, {'id': 'changeFlashState'});
+        } else {
+          this.app.stack.flashState = false;
+        }
         return true;
 
     }
@@ -278,20 +295,45 @@ export class RoomModel extends AbstractModel {
 
     this.timer = timestamp;
 
-    if (this.crashTime != false) {
-      var animateTime = timestamp-this.crashTime;
-      var monochromeColor = Math.round(15-animateTime/30);
-      if (monochromeColor < 8) {
-        monochromeColor = 0;
-      }
-      this.gameAreaEntity.setMonochromeColors(this.app.platform.color(monochromeColor), this.app.platform.color(0));
-      if (animateTime > 240) {
-        if (this.app.lives > 0) {
-          this.app.lives--;
-          this.app.startRoom(false, false, false);
-        } else {
-          this.app.setModel('GameOverModel');
-        }
+    if (this.animationTime != false) {
+      var animTime = timestamp-this.animationTime;
+      switch (this.animationType) {
+        case 'crash':
+          var monochromeColor = Math.round(15-animTime/30);
+          if (monochromeColor < 8) {
+            monochromeColor = 0;
+          }
+          this.gameAreaEntity.setMonochromeColors(this.app.platform.color(monochromeColor), this.app.platform.colorByName('black'));
+          if (animTime > 240) {
+            this.animationTime = false;
+            this.animationType = false;
+            if (this.app.lives > 0) {
+              this.app.lives--;
+              this.app.startRoom(false, false, false);
+            } else {
+              this.app.setModel('GameOverModel');
+            }
+          }
+          break;
+
+        case 'demoRoomDone':
+          var monochromeAttr = Math.round(59-animTime/8.62);
+          if (monochromeAttr < 1) {
+            monochromeAttr = 1;
+          }
+          var penColor = this.app.platform.penColorByAttr(monochromeAttr);
+          var bkColor = this.app.platform.bkColorByAttr(monochromeAttr);
+          this.gameAreaEntity.setMonochromeColors(penColor, bkColor);
+          this.gameInfoEntity.roomNameEntity.bkColor = bkColor;
+          this.gameInfoEntity.roomNameEntity.setPenColor(penColor);
+          if (animTime > 500) {
+            this.borderEntity.bkColor = this.app.platform.colorByName('black');
+            this.sendEvent(1, {'id': 'newDemoRoom'});
+            this.animationTime = false;
+            this.animationType = false;
+          }
+          break;
+
       }
     }
 
