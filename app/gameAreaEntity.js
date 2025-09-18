@@ -47,7 +47,7 @@ export class GameAreaEntity extends AbstractEntity {
 
       for (var f = 0; f < 2; f++) {
         if (this.drawingCache[f].needToRefresh(this, this.width, this.height)) {
-          // layout
+          // layout - bkColor
           this.roomData.layout.forEach((row, r) => {
             for (var column = 0; column < 32; column++) {
               var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
@@ -86,7 +86,7 @@ export class GameAreaEntity extends AbstractEntity {
 
       for (var f = 2; f < 4; f++) {
         if (this.drawingCache[f].needToRefresh(this, this.width, this.height)) {
-          // layout
+          // layout - penColor
           this.roomData.layout.forEach((row, r) => {
             for (var column = 0; column < 32; column++) {
               var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
@@ -171,6 +171,31 @@ export class GameAreaEntity extends AbstractEntity {
           this.app.layout.paintCache(this, 3);
           break;
       }
+    }
+
+    // draw attribute efects on Willy due bkColor on conveyors
+    var c = 0;
+    while (c < this.spriteEntities.conveyors.length && !this.spriteEntities.conveyors[c].hide) {
+      var conveyor = this.spriteEntities.conveyors[c];
+      if (conveyor.bkColor !== false) {
+        var obj = this.spriteEntities.willy[0];
+        if (!(obj.x+obj.width <= conveyor.x || obj.y+obj.height <= conveyor.y || obj.x >= conveyor.x+conveyor.width || obj.y >= conveyor.y+conveyor.height)) {
+          var x = Math.max(obj.x, conveyor.x);
+          var y = Math.max(obj.y, conveyor.y);
+          var w = Math.min(obj.x+obj.width, conveyor.x+conveyor.width)-x;
+          var h = Math.min(obj.y+obj.height, conveyor.y+conveyor.height)-y;
+          var d = obj.direction;
+          if (obj.directions == 1) {
+            d = 0;
+          }
+          obj.spriteData[obj.frame+d*obj.frames].forEach((pixel) => {
+            if (pixel.x >= x-obj.x && pixel.y >= y-obj.y && pixel.x < x-obj.x+w && pixel.y < y-obj.y+h) {
+              this.app.layout.paintRect(this.app.stack.ctx, obj.parentX+obj.x+pixel.x, obj.parentY+obj.y+pixel.y, 1, 1, conveyor.penColor);
+            }
+          });
+        }
+      }
+      c++;
     }
   } // drawEntity
 
