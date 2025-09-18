@@ -26,6 +26,8 @@ export class GameAreaEntity extends AbstractEntity {
 
     this.app.layout.newDrawingCache(this, 0); 
     this.app.layout.newDrawingCache(this, 1); 
+    this.app.layout.newDrawingCache(this, 2); 
+    this.app.layout.newDrawingCache(this, 3); 
     this.graphicCache = {};
     this.staticKinds = ['floor', 'wall', 'nasty'];
 
@@ -37,12 +39,52 @@ export class GameAreaEntity extends AbstractEntity {
   } // constructor
 
   drawEntity() {
-    super.drawEntity();
-
     if (this.roomData) {
+
+      this.app.layout.paint(this, 0, 0, this.width, this.height, this.bkColor);
+
       var layoutObjects = [false, 'floor', 'wall', 'nasty'];
 
       for (var f = 0; f < 2; f++) {
+        if (this.drawingCache[f].needToRefresh(this, this.width, this.height)) {
+          // layout
+          this.roomData.layout.forEach((row, r) => {
+            for (var column = 0; column < 32; column++) {
+              var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
+              var idItem = layoutObjects[item];
+              if (idItem !== false) {
+                var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
+                if (this.staticKinds.includes(idItem)) {
+                  var penColor = this.penColorByAttr(attr);
+                  var bkColor = this.bkColorByAttr(attr);
+                  if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor))) {
+                    bkColor = false;
+                  }
+                  if (f == 1 && (attr&128) == 128) {
+                    bkColor = penColor;
+                  }
+                  if (bkColor != false) {
+                    this.app.layout.paintRect(this.drawingCache[f].ctx, column*8, r*8, 8, 8, bkColor);
+                  }
+                }
+              }
+            }
+          });
+        }
+      }
+
+      switch (this.app.stack.flashState) {
+        case false:
+          this.app.layout.paintCache(this, 0);
+          break;
+        case true:
+          this.app.layout.paintCache(this, 1);
+          break;
+      }
+
+      super.drawSubEntities();
+
+      for (var f = 2; f < 4; f++) {
         if (this.drawingCache[f].needToRefresh(this, this.width, this.height)) {
           // layout
           this.roomData.layout.forEach((row, r) => {
@@ -55,16 +97,11 @@ export class GameAreaEntity extends AbstractEntity {
                   if (this.graphicCache[idItem].needToRefresh(this, 8, 8)) {
                     var penColor = this.penColorByAttr(this.app.hexToInt(attr));
                     var bkColor = this.bkColorByAttr(this.app.hexToInt(attr));
-                    if (f == 1) {
-                      var tmpColor = penColor;
-                      penColor = bkColor;
-                      bkColor = tmpColor;
-                    }
                     if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor))) {
                       bkColor = false;
                     }
-                    if (bkColor != false) {
-                      this.app.layout.paintRect(this.graphicCache[idItem].ctx, 0, 0, 8, 8, bkColor);
+                    if (f == 3) {
+                      penColor = bkColor;
                     }
                     for (var y = 0; y < 8; y++) {
                       var spriteLine = this.app.hexToBin(this.roomData.graphicData[idItem].substring((y+1)*2, (y+1)*2+2));
@@ -128,10 +165,10 @@ export class GameAreaEntity extends AbstractEntity {
 
       switch (this.app.stack.flashState) {
         case false:
-          this.app.layout.paintCache(this, 0);
+          this.app.layout.paintCache(this, 2);
           break;
         case true:
-          this.app.layout.paintCache(this, 1);
+          this.app.layout.paintCache(this, 3);
           break;
       }
     }
@@ -156,6 +193,9 @@ export class GameAreaEntity extends AbstractEntity {
 
     // prepare drawing caches for layout
     this.drawingCache[0].cleanCache();
+    this.drawingCache[1].cleanCache();
+    this.drawingCache[2].cleanCache();
+    this.drawingCache[3].cleanCache();
     this.graphicCache = {};
     Object.keys(data.graphicData).forEach((key) => {
       if (this.staticKinds.includes(key)) {
@@ -447,6 +487,9 @@ export class GameAreaEntity extends AbstractEntity {
 
   cleanCache() {
     this.drawingCache[0].cleanCache();
+    this.drawingCache[1].cleanCache();
+    this.drawingCache[2].cleanCache();
+    this.drawingCache[3].cleanCache();
     Object.keys(this.graphicCache).forEach((attr) => {
       this.graphicCache[attr].cleanCache();
     });
