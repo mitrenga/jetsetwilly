@@ -15,9 +15,12 @@ import MiniButtonEntity from './svision/js/platform/canvas2D/miniButtonEntity.js
 
 export class PlayerNameEntity extends AbstractEntity {
 
-  constructor(parentEntity, x, y, width, height) {
+  constructor(parentEntity, x, y, width, height, autoStartGame) {
     super(parentEntity, x, y, width, height, false, false);
     this.id = 'PlayerNameEntity';    
+
+    this.inputLineEntity = null;
+    this.autoStartGame = autoStartGame;
   } // constructor
 
   init() {
@@ -45,8 +48,12 @@ export class PlayerNameEntity extends AbstractEntity {
         if (this.inputLineEntity.value.length > 0) {
           this.app.playerName = this.inputLineEntity.value;
           this.app.setCookie('playerName', this.app.playerName);
-          this.sendEvent(0, 0, {'id': 'refreshMenu'});
-          this.destroy();
+          if (this.autoStartGame) {
+            this.app.setModel('MainModel');
+          } else {
+            this.sendEvent(0, 0, {'id': 'refreshMenu'});
+            this.destroy();
+          }
         }
         return true;
     }

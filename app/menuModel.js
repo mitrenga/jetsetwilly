@@ -191,7 +191,11 @@ export class MenuModel extends AbstractModel {
       
 
       case 'startGame': 
-        this.app.setModel('MainModel');
+        if (!this.app.playerName.length) {
+          this.desktopEntity.addModalEntity(new PlayerNameEntity(this.desktopEntity, 27, 24, 202, 134, true));
+        } else {
+          this.app.setModel('MainModel');
+        }
         return true;
       
       case 'startTapeLoading': 
@@ -219,7 +223,7 @@ export class MenuModel extends AbstractModel {
         return true;
     
       case 'setPlayerName':
-        this.desktopEntity.addModalEntity(new PlayerNameEntity(this.desktopEntity, 28, 26, 200, 132));
+        this.desktopEntity.addModalEntity(new PlayerNameEntity(this.desktopEntity, 28, 26, 200, 132, false));
       return true;
 
       case 'showHallOfFame':
