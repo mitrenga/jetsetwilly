@@ -35,6 +35,7 @@ export class GameApp extends AbstractApp {
     this.demo = false;
     this.demoRooms = [];
     this.lives = 7;
+    this.playerName = this.getCookie('playerName', '');
     this.globalData = false;
     this.items = [];
     this.totalItems = 0;

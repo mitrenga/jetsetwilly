@@ -130,7 +130,7 @@ export class MenuModel extends AbstractModel {
   menuParamValue(event) {
     switch (event) {
       case 'setPlayerName':
-        return 'libmit';
+        return this.app.playerName;
       case 'setSounds':
         if (this.app.audioManager.sounds == 0) {
           return 'OFF';
@@ -184,6 +184,11 @@ export class MenuModel extends AbstractModel {
     }
 
     switch (event.id) {
+
+      case 'refreshMenu': 
+        this.refreshMenu();
+        return true;
+      
 
       case 'startGame': 
         this.app.setModel('MainModel');
