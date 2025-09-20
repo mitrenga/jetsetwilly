@@ -214,7 +214,7 @@ export class MenuModel extends AbstractModel {
         return true;
     
       case 'setPlayerName':
-        this.desktopEntity.addModalEntity(new PlayerNameEntity(this.desktopEntity, 28, 42, 200, 100));
+        this.desktopEntity.addModalEntity(new PlayerNameEntity(this.desktopEntity, 28, 26, 200, 132));
       return true;
 
       case 'showHallOfFame':
