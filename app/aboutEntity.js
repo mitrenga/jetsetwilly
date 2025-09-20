@@ -39,7 +39,7 @@ export class AboutEntity extends AbstractEntity {
     this.addEntity(new MiniTextEntity(this, 1, 102, this.width-2, 7, 'NIGHTS`` WERE`` SPENT`` WITH` FRIENDS`` TRYING', this.app.platform.colorByName('black'), false, 1, 1));
     this.addEntity(new MiniTextEntity(this, 1, 109, this.width-2, 7, 'TO` GET` THROUGH` ROOMS` LIKE` THE` BANYAN', this.app.platform.colorByName('black'), false, 1, 1));
     this.addEntity(new MiniTextEntity(this, 1, 116, this.width-2, 7, 'TREE OR CONSERVATORY ROOF.', this.app.platform.colorByName('black'), false, 1, 1));
-    this.addEntity(new MiniButtonEntity(this, this.width-38, this.height-15, 36, 13, 'CLOSE', 'closeAbout', ['Enter', 'Escape', ' '], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightGreen'), 1, 4));
+    this.addEntity(new MiniButtonEntity(this, this.width-38, this.height-15, 36, 13, 'CLOSE', 'closeAbout', ['Enter', 'Escape', ' '], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'), 1, 4));
     // JET SET WILLY je remake původní hry z roku 1984 od Matthew Smith. Vtipné je, že při tvorbě této hry jsem při studiu původního kódu narazil na chyby, které neumožňovaly úspěšně dokončit hru. Při hledání informací jsem zjistil, že tyto chyby byly v 80. letech minulého století publikované včetně návodu na opravu. A já to zjistil až po 40 letech :-) Kolik měsíců a bezesených nocí jsme s kamarády strávili při pokusech v místnostech "The Banyan Tree" nebo "Conservatory Roof".
   } // init
 
