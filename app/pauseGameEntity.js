@@ -36,13 +36,13 @@ export class PauseGameEntity extends AbstractEntity {
     this.addEntity(new AbstractEntity(this, 0, 6, 1, this.height-6, false, this.app.platform.colorByName('brightWhite')));
     this.addEntity(new AbstractEntity(this, 0, this.height-1, this.width, 1, false, this.app.platform.colorByName('brightWhite')));
     this.addEntity(new AbstractEntity(this, this.width-1, 6, 1, this.height-6, false, this.app.platform.colorByName('brightWhite')));
-    this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, this.width, 9, 'PAUSE', this.app.platform.colorByName('brightBlack'), this.app.platform.colorByName('brightWhite'), {justify: 'center', margin: 2}));
+    this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, this.width, 9, 'PAUSE', this.app.platform.colorByName('brightBlack'), this.app.platform.colorByName('brightWhite'), {align: 'center', margin: 2}));
     for (var b = 0; b < this.buttons.length; b++) {
       var bkColor = this.app.platform.colorByName('white');
       if (b == this.selectedButton) {
         bkColor = this.selectedButtonColor;
       }
-      this.buttonsEntities[b] = new ButtonEntity(this, this.app.fonts.zxFonts8x8, 10, 19+b*24, this.width-20, 14, this.buttons[b].label, this.buttons[b].eventID, this.buttons[b].hotKeys, this.app.platform.colorByName('black'), bkColor, {justify: 'center', margin: 3});
+      this.buttonsEntities[b] = new ButtonEntity(this, this.app.fonts.zxFonts8x8, 10, 19+b*24, this.width-20, 14, this.buttons[b].label, this.buttons[b].eventID, this.buttons[b].hotKeys, this.app.platform.colorByName('black'), bkColor, {align: 'center', margin: 3});
       this.addEntity(this.buttonsEntities[b]);
     }
   } // init

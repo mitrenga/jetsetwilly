@@ -109,7 +109,7 @@ export class MenuModel extends AbstractModel {
       this.menuEntities[y] = [];
       this.menuEntities[y][0] = new TextEntity(this.bkEntity, this.app.fonts.zxFonts8x8, 10, 10+y*16, 138, 12, this.menuItems[y].label, color, false, {margin: 2});
       this.bkEntity.addEntity(this.menuEntities[y][0]);
-      this.menuEntities[y][1] = new TextEntity(this.bkEntity, this.app.fonts.zxFonts8x8, 120, 10+y*16, 100, 12, this.menuParamValue(this.menuItems[y].event), color, false, {margin: 2, justify: 'right'});
+      this.menuEntities[y][1] = new TextEntity(this.bkEntity, this.app.fonts.zxFonts8x8, 120, 10+y*16, 100, 12, this.menuParamValue(this.menuItems[y].event), color, false, {margin: 2, align: 'right'});
       this.bkEntity.addEntity(this.menuEntities[y][1]);
     }
 
@@ -117,7 +117,7 @@ export class MenuModel extends AbstractModel {
     this.sighboardEntity = new TextEntity(this.desktopEntity, signboardFonts, 144, 6, 93, 10, 'JET SET WILlY', 'rgb(91, 91, 91)', false, {scale: 2, animationMode: 'flashPenColor', flashColor: 'rgb(155, 155, 155)'});
     this.desktopEntity.addEntity(this.sighboardEntity);
 
-    this.copyrightEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, {justify: 'center'});
+    this.copyrightEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, {align: 'center'});
     this.desktopEntity.addEntity(this.copyrightEntity);
 
     this.app.stack.flashState = false;

@@ -24,7 +24,7 @@ export class GameInfoEntity extends AbstractEntity {
   init() {
     super.init();
 
-    this.roomNameEntity = new TextEntity(this, this.app.fonts.zxFonts8x8, 0, 0, 32*8, 8, '', this.app.platform.colorByName('brightYellow'), this.app.platform.colorByName('brightBlack'), {justify: 'center'});
+    this.roomNameEntity = new TextEntity(this, this.app.fonts.zxFonts8x8, 0, 0, 32*8, 8, '', this.app.platform.colorByName('brightYellow'), this.app.platform.colorByName('brightBlack'), {align: 'center'});
     this.addEntity(this.roomNameEntity);
     this.addEntity(new AbstractEntity(this, 0, 8, 32*8, 7*8, false, this.app.platform.colorByName('black')));
     var colorsMap = {};
@@ -39,7 +39,7 @@ export class GameInfoEntity extends AbstractEntity {
     for (var c = 0; c < 7; c++) {
       colorsMap[c] = this.app.platform.color(7-c);
     }
-    this.timeEntity = new TextEntity(this, this.app.fonts.zxFonts8x8, 25*8, 2*8, 6*8, 8, this.app.timeStr, false, false, {justify: 'right', penColorsMap: colorsMap});
+    this.timeEntity = new TextEntity(this, this.app.fonts.zxFonts8x8, 25*8, 2*8, 6*8, 8, this.app.timeStr, false, false, {align: 'right', penColorsMap: colorsMap});
     this.addEntity(this.timeEntity);
     for (var l = 0; l < this.app.lives; l++) {
       this.liveEntities[l] = new SpriteEntity(this, l*16, 5*8, this.app.platform.colorByName(this.liveColors[l]), false, 0, 0);

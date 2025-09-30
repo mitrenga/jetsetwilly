@@ -51,7 +51,7 @@ export class TapeLoadingModel extends AbstractModel {
   init() {
     super.init();
 
-    this.inputLineEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, {justify: 'center'});
+    this.inputLineEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, {align: 'center'});
     this.desktopEntity.addEntity(this.inputLineEntity);
 
     this.programNameEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 1*8, 32*8, 8, 'Program: JETSET', this.app.platform.colorByName('black'), false, {});
@@ -64,7 +64,7 @@ export class TapeLoadingModel extends AbstractModel {
     this.copyrightLine2 = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 5*8, 11*8, 8, 8, '', this.app.platform.colorByName('white'), this.app.platform.colorByName('yellow'), {});
     this.copyrightLine2.hide = true;
     this.desktopEntity.addEntity(this.copyrightLine2);
-    this.copyrightLine3 = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8Mono, 6*8, 11*8, 20*8, 8, 'JetSet Willy Loading', this.app.platform.colorByName('white'), this.app.platform.colorByName('red'), {justify: 'center', animationMode: 'flashReverseColors'});
+    this.copyrightLine3 = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8Mono, 6*8, 11*8, 20*8, 8, 'JetSet Willy Loading', this.app.platform.colorByName('white'), this.app.platform.colorByName('red'), {align: 'center', animationMode: 'flashReverseColors'});
     this.copyrightLine3.hide = true;
     this.desktopEntity.addEntity(this.copyrightLine3);
     this.copyrightLine4 = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 26*8, 11*8, 8, 8, '', this.app.platform.colorByName('white'), this.app.platform.colorByName('yellow'), {});
@@ -93,7 +93,7 @@ export class TapeLoadingModel extends AbstractModel {
         return true;
 
       case 'updateCommand':
-        this.inputLineEntity.options.justify = 'left';
+        this.inputLineEntity.options.align = 'left';
         this.inputLineEntity.fonts = this.app.fonts.zxFonts8x8Mono;
         this.inputLineEntity.options.animationMode = 'flashReverseColors';
         this.inputLineEntity.setText(this.command[this.phase]);

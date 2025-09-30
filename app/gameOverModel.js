@@ -72,10 +72,10 @@ export class GameOverModel extends AbstractModel {
     this.overEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 18*8, 6*8, 4*8, 8, 'Over', this.app.platform.colorByName('brightWhite'), false, {penColorsMap: colorsMap}, true);
     this.overEntity.hide = true;
     this.desktopEntity.addEntity(this.overEntity);
-    this.contiueEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 21*8, 32*8, 8, 'Press ENTER to continue', this.app.platform.colorByName('brightWhite'), false, {justify: 'center'});
+    this.contiueEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 21*8, 32*8, 8, 'Press ENTER to continue', this.app.platform.colorByName('brightWhite'), false, {align: 'center'});
     this.contiueEntity.hide = true;
     this.desktopEntity.addEntity(this.contiueEntity);
-    this.timerEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, '10', this.app.platform.colorByName('brightWhite'), false, {justify: 'center'});
+    this.timerEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, '10', this.app.platform.colorByName('brightWhite'), false, {align: 'center'});
     this.timerEntity.hide = true;
     this.desktopEntity.addEntity(this.timerEntity);
 

@@ -39,7 +39,7 @@ export class AboutEntity extends AbstractEntity {
     this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 2, 103, this.width-4, 7, 'NIGHTS`` WERE`` SPENT`` WITH` FRIENDS`` TRYING', this.app.platform.colorByName('black'), false, {}));
     this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 2, 110, this.width-4, 7, 'TO` GET` THROUGH` ROOMS` LIKE` THE` BANYAN', this.app.platform.colorByName('black'), false, {}));
     this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 2, 117, this.width-4, 7, 'TREE OR CONSERVATORY ROOF.', this.app.platform.colorByName('black'), false, {}));
-    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-38, this.height-15, 36, 13, 'CLOSE', 'closeAbout', ['Enter', 'Escape', ' '], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'), {justify: 'center', margin: 4}));
+    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-38, this.height-15, 36, 13, 'CLOSE', 'closeAbout', ['Enter', 'Escape', ' '], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'), {align: 'center', margin: 4}));
   } // init
 
   handleEvent(event) {

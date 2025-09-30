@@ -25,7 +25,7 @@ export class SignboardFonts extends AbstractFonts {
     }
   } // constructor
 
-  getCharData(char, bitMask, justify, scale) {
+  getCharData(char, bitMask, align, scale) {
     var charObject = {};
     charObject.width = this.fontsData[char].width*scale;
 

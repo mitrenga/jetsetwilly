@@ -38,11 +38,11 @@ export class HallOfFameEntity extends AbstractEntity {
     this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, 64, 7, 'HALL OF FAME', this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlack'), {margin: 1}));
     for (var i = 0; i < 10; i++) {
       var y = 12+i*10;
-      this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 2, y, 18, 8, (i+1)+'.', this.app.platform.colorByName('black'), false, {justify: 'right'}));
+      this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 2, y, 18, 8, (i+1)+'.', this.app.platform.colorByName('black'), false, {align: 'right'}));
       this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 22, y, 100, 8, this.tableHallOfFame[i].name, this.app.platform.colorByName('black'), false, {}));
-      this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8Mono, this.width-78, y, 68, 8, this.tableHallOfFame[i].score, this.app.platform.colorByName('black'), false, {justify: 'right'}));
+      this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8Mono, this.width-78, y, 68, 8, this.tableHallOfFame[i].score, this.app.platform.colorByName('black'), false, {align: 'right'}));
     }
-    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-38, this.height-15, 36, 13, 'CLOSE', 'closeAbout', ['Enter', 'Escape', ' '], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'), {justify: 'center', margin: 4}));
+    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-38, this.height-15, 36, 13, 'CLOSE', 'closeAbout', ['Enter', 'Escape', ' '], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'), {align: 'center', margin: 4}));
   } // init
 
   handleEvent(event) {
