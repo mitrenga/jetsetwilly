@@ -1,13 +1,11 @@
 /**/
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
-const { MiniTextEntity } = await import('./svision/js/platform/canvas2D/miniTextEntity.js?ver='+window.srcVersion);
-const { MiniButtonEntity } = await import('./svision/js/platform/canvas2D/miniButtonEntity.js?ver='+window.srcVersion);
-const { ZXTextEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js?ver='+window.srcVersion);
+const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
+const { ButtonEntity } = await import('./svision/js/platform/canvas2D/buttonEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractEntity from './svision/js//abstractEntity.js';
-import MiniTextEntity from './svision/js/platform/canvas2D/miniTextEntity.js';
-import MiniButtonEntity from './svision/js/platform/canvas2D/miniButtonEntity.js';
-import ZXTextEntity from './svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js';
+import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
+import ButtonEntity from './svision/js/platform/canvas2D/buttonEntity.js';
 /**/
 // begin code
 
@@ -37,21 +35,14 @@ export class HallOfFameEntity extends AbstractEntity {
     this.addEntity(new AbstractEntity(this, 0, 6, 1, this.height-6, false, this.app.platform.colorByName('brightBlack')));
     this.addEntity(new AbstractEntity(this, 0, this.height-1, this.width, 1, false, this.app.platform.colorByName('brightBlack')));
     this.addEntity(new AbstractEntity(this, this.width-1, 6, 1, this.height-6, false, this.app.platform.colorByName('brightBlack')));
-    this.addEntity(new MiniTextEntity(this, 0, 0, 64, 7, 'HALL OF FAME', this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlack'), 1, 1));
+    this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, 64, 7, 'HALL OF FAME', this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlack'), {margin: 1}));
     for (var i = 0; i < 10; i++) {
       var y = 12+i*10;
-      var entity = new ZXTextEntity(this, 2, y, 18, 8, (i+1)+'.', this.app.platform.colorByName('black'), false, 0, 1);
-      entity.justify = 1;
-      this.addEntity(entity);
-
-      entity = new ZXTextEntity(this, 22, y, 100, 8, this.tableHallOfFame[i].name, this.app.platform.colorByName('black'), false, 0, 1);
-      this.addEntity(entity);
-
-      entity = new ZXTextEntity(this, this.width-78, y, 68, 8, this.tableHallOfFame[i].score, this.app.platform.colorByName('black'), false, 0, 0);
-      entity.justify = 1;
-      this.addEntity(entity);
+      this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 2, y, 18, 8, (i+1)+'.', this.app.platform.colorByName('black'), false, {justify: 'right'}));
+      this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 22, y, 100, 8, this.tableHallOfFame[i].name, this.app.platform.colorByName('black'), false, {}));
+      this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8Mono, this.width-78, y, 68, 8, this.tableHallOfFame[i].score, this.app.platform.colorByName('black'), false, {justify: 'right'}));
     }
-    this.addEntity(new MiniButtonEntity(this, this.width-38, this.height-15, 36, 13, 'CLOSE', 'closeAbout', ['Enter', 'Escape', ' '], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'), 1, 4));
+    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-38, this.height-15, 36, 13, 'CLOSE', 'closeAbout', ['Enter', 'Escape', ' '], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'), {justify: 'center', margin: 4}));
   } // init
 
   handleEvent(event) {

@@ -1,11 +1,11 @@
 /**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
 const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion);
-const { ZXTextEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js?ver='+window.srcVersion);
+const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import BorderEntity from './borderEntity.js';
-import ZXTextEntity from './svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js';
+import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
 /**/
 // begin code
 
@@ -51,29 +51,26 @@ export class TapeLoadingModel extends AbstractModel {
   init() {
     super.init();
 
-    this.inputLineEntity = new ZXTextEntity(this.desktopEntity, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, 0, true);
-    this.inputLineEntity.justify = 2;
+    this.inputLineEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, {justify: 'center'});
     this.desktopEntity.addEntity(this.inputLineEntity);
 
-    this.programNameEntity = new ZXTextEntity(this.desktopEntity, 0, 1*8, 32*8, 8, 'Program: JETSET', this.app.platform.colorByName('black'), false, 0, true);
+    this.programNameEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 1*8, 32*8, 8, 'Program: JETSET', this.app.platform.colorByName('black'), false, {});
     this.programNameEntity.hide = true;
     this.desktopEntity.addEntity(this.programNameEntity);
 
-    this.copyrightLine1 = new ZXTextEntity(this.desktopEntity, 5*8, 10*8, 22*8, 8, '', this.app.platform.colorByName('white'), this.app.platform.colorByName('yellow'), 0, true);
+    this.copyrightLine1 = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 5*8, 10*8, 22*8, 8, '', this.app.platform.colorByName('white'), this.app.platform.colorByName('yellow'), {});
     this.copyrightLine1.hide = true;
     this.desktopEntity.addEntity(this.copyrightLine1);
-    this.copyrightLine2 = new ZXTextEntity(this.desktopEntity, 5*8, 11*8, 8, 8, '', this.app.platform.colorByName('white'), this.app.platform.colorByName('yellow'), 0, true);
+    this.copyrightLine2 = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 5*8, 11*8, 8, 8, '', this.app.platform.colorByName('white'), this.app.platform.colorByName('yellow'), {});
     this.copyrightLine2.hide = true;
     this.desktopEntity.addEntity(this.copyrightLine2);
-    this.copyrightLine3 = new ZXTextEntity(this.desktopEntity, 6*8, 11*8, 20*8, 8, 'JetSet Willy Loading', this.app.platform.colorByName('white'), this.app.platform.colorByName('red'), 0, false);
-    this.copyrightLine3.flashMask = '####################';
-    this.copyrightLine3.justify = 2;
+    this.copyrightLine3 = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8Mono, 6*8, 11*8, 20*8, 8, 'JetSet Willy Loading', this.app.platform.colorByName('white'), this.app.platform.colorByName('red'), {justify: 'center', animationMode: 'flashReverseColors'});
     this.copyrightLine3.hide = true;
     this.desktopEntity.addEntity(this.copyrightLine3);
-    this.copyrightLine4 = new ZXTextEntity(this.desktopEntity, 26*8, 11*8, 8, 8, '', this.app.platform.colorByName('white'), this.app.platform.colorByName('yellow'), 0, true);
+    this.copyrightLine4 = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 26*8, 11*8, 8, 8, '', this.app.platform.colorByName('white'), this.app.platform.colorByName('yellow'), {});
     this.copyrightLine4.hide = true;
     this.desktopEntity.addEntity(this.copyrightLine4);
-    this.copyrightLine5 = new ZXTextEntity(this.desktopEntity, 5*8, 12*8, 22*8, 8, '', this.app.platform.colorByName('white'), this.app.platform.colorByName('yellow'), 0, true);
+    this.copyrightLine5 = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 5*8, 12*8, 22*8, 8, '', this.app.platform.colorByName('white'), this.app.platform.colorByName('yellow'), {});
     this.copyrightLine5.hide = true;
     this.desktopEntity.addEntity(this.copyrightLine5);
 
@@ -96,12 +93,13 @@ export class TapeLoadingModel extends AbstractModel {
         return true;
 
       case 'updateCommand':
-        this.inputLineEntity.justify = 0;
-        this.inputLineEntity.proportional = false;
+        this.inputLineEntity.options.justify = 'left';
+        this.inputLineEntity.fonts = this.app.fonts.zxFonts8x8Mono;
+        this.inputLineEntity.options.animationMode = 'flashReverseColors';
         this.inputLineEntity.setText(this.command[this.phase]);
-        this.inputLineEntity.flashMask = '';
+        this.inputLineEntity.options.flashMask = '';
         if (this.command[this.phase].length > 0) {
-          this.inputLineEntity.flashMask = this.inputLineEntity.flashMask.padStart (this.command[this.phase].length-1, ' ')+'#';
+          this.inputLineEntity.options.flashMask = this.inputLineEntity.options.flashMask.padStart (this.command[this.phase].length-1, ' ')+'#';
         }
         this.phase++;
         this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'keyboardSound', 'options': false});

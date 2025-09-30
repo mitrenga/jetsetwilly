@@ -1,11 +1,11 @@
 /**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
 const { ResetEntity } = await import('./resetEntity.js?ver='+window.srcVersion);
-const { ZXTextEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js?ver='+window.srcVersion);
+const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import ResetEntity from './resetEntity.js';
-import ZXTextEntity from './svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js';
+import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
 /**/
 // begin code
 
@@ -36,8 +36,7 @@ export class ResetModel extends AbstractModel {
     this.resetEntity = new ResetEntity(this.desktopEntity, 0, 0, 32*8, 24*8);
     this.resetEntity.hide = true;
     this.desktopEntity.addEntity(this.resetEntity);
-    this.inputLineEntity = new ZXTextEntity(this.desktopEntity, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, 0, true);
-    this.inputLineEntity.justify = 2;
+    this.inputLineEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, {justify: 'center'});
     this.inputLineEntity.hide = true;
     this.desktopEntity.addEntity(this.inputLineEntity);
     this.sendEvent(500, {'id': 'showReset'});

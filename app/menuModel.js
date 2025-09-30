@@ -1,8 +1,8 @@
 /**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
-const { ZXTextEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js?ver='+window.srcVersion);
-const { LogoEntity } = await import('./logoEntity.js?ver='+window.srcVersion);
+const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
+const { SignboardFonts } = await import('./signboardFonts.js?ver='+window.srcVersion);
 const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
 const { PlayerNameEntity } = await import('./playerNameEntity.js?ver='+window.srcVersion);
 const { HallOfFameEntity } = await import('./hallOfFameEntity.js?ver='+window.srcVersion);
@@ -10,8 +10,8 @@ const { AboutEntity } = await import('./aboutEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import AbstractEntity from './svision/js/abstractEntity.js';
-import ZXTextEntity from './svision/js/platform/canvas2D/zxSpectrum/zxTextEntity.js';
-import LogoEntity from './logoEntity.js';
+import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
+import SignboardFonts from './signboardFonts.js';
 import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
 import PlayerNameEntity from './playerNameEntity.js';
 import HallOfFameEntity from './hallOfFameEntity.js';
@@ -64,7 +64,7 @@ export class MenuModel extends AbstractModel {
       {'label': 'SHOW TAPE LOADING', 'event': 'startTapeLoading'},
       {'label': 'ABOUT GAME', 'event': 'showAbout'}
     ];
-    this.logoEntity = null;
+    this.sighboardEntity = null;
     this.copyrightEntity = null;
 
     const http = new XMLHttpRequest();
@@ -107,20 +107,17 @@ export class MenuModel extends AbstractModel {
         color = this.penSelectedMenuItemColor;
       }
       this.menuEntities[y] = [];
-      this.menuEntities[y][0] = new ZXTextEntity(this.bkEntity, 10, 10+y*16, 138, 12, this.menuItems[y].label, color, false, 0, true);
-      this.menuEntities[y][0].margin = 2;
+      this.menuEntities[y][0] = new TextEntity(this.bkEntity, this.app.fonts.zxFonts8x8, 10, 10+y*16, 138, 12, this.menuItems[y].label, color, false, {margin: 2});
       this.bkEntity.addEntity(this.menuEntities[y][0]);
-      this.menuEntities[y][1] = new ZXTextEntity(this.bkEntity, 120, 10+y*16, 100, 12, this.menuParamValue(this.menuItems[y].event), color, false, 0, true);
-      this.menuEntities[y][1].margin = 2;
-      this.menuEntities[y][1].justify = 1;
+      this.menuEntities[y][1] = new TextEntity(this.bkEntity, this.app.fonts.zxFonts8x8, 120, 10+y*16, 100, 12, this.menuParamValue(this.menuItems[y].event), color, false, {margin: 2, justify: 'right'});
       this.bkEntity.addEntity(this.menuEntities[y][1]);
     }
 
-    this.logoEntity = new LogoEntity(this.desktopEntity, 144, 6, 93, 10, 'rgb(91, 91, 91)', 'rgb(155, 155, 155)', false, 2);
-    this.desktopEntity.addEntity(this.logoEntity);
+    var signboardFonts = new SignboardFonts(this.app);
+    this.sighboardEntity = new TextEntity(this.desktopEntity, signboardFonts, 144, 6, 93, 10, 'JET SET WILlY', 'rgb(91, 91, 91)', false, {scale: 2, animationMode: 'flashPenColor', flashColor: 'rgb(155, 155, 155)'});
+    this.desktopEntity.addEntity(this.sighboardEntity);
 
-    this.copyrightEntity = new ZXTextEntity(this.desktopEntity, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, 0, true);
-    this.copyrightEntity.justify = 2;
+    this.copyrightEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, {justify: 'center'});
     this.desktopEntity.addEntity(this.copyrightEntity);
 
     this.app.stack.flashState = false;

@@ -1,6 +1,8 @@
 /**/
 const { AbstractApp } = await import('./svision/js/abstractApp.js?ver='+window.srcVersion);
 const { AudioManager } = await import('./audioManager.js?ver='+window.srcVersion);
+const { ZXFonts8x8 } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxFonts8x8.js?ver='+window.srcVersion);
+const { Fonts5x5 } = await import('./svision/js/platform/canvas2D/fonts5x5.js?ver='+window.srcVersion);
 const { ResetModel } = await import('./resetModel.js?ver='+window.srcVersion);
 const { MenuModel } = await import('./menuModel.js?ver='+window.srcVersion);
 const { MainModel } = await import('./mainModel.js?ver='+window.srcVersion);
@@ -11,6 +13,8 @@ const { AudioWorkletHandler } = await import('./svision/js/audioWorkletHandler.j
 /*/
 import AbstractApp from './svision/js/abstractApp.js';
 import AudioManager from './audioManager.js';
+import ZXFonts8x8 from './svision/js/platform/canvas2D/zxSpectrum/zxFonts8x8.js';
+import Fonts5x5 from './svision/js/platform/canvas2D/fonts5x5.js';
 import ResetModel from './resetModel.js';
 import MenuModel from './menuModel.js';
 import MainModel from './mainModel.js';
@@ -27,6 +31,11 @@ export class GameApp extends AbstractApp {
     super(platform, 'bodyApp',  importPath, wsURL);
 
     this.audioManager = new AudioManager(this);
+
+    this.fonts = {};
+    this.fonts.zxFonts8x8Mono = new ZXFonts8x8(this, false);
+    this.fonts.zxFonts8x8 = new ZXFonts8x8(this, true);
+    this.fonts.fonts5x5 = new Fonts5x5(this);
     
     this.roomNumber = false;
     this.roomName = '';
