@@ -29,8 +29,8 @@ window.ontouchcancel = function(event) {gameApp.inputEventsManager.eventTouchCan
 window.ontouchmove = function(event) {gameApp.inputEventsManager.eventTouchMove(event); }
 window.ongamepadconnected = function(event) { gameApp.inputEventsManager.eventGamePadConnected(event); }
 window.ongamepaddisconnected = function(event) { gameApp.inputEventsManager.eventGamePadDisconnected(event); }
-window.onblur = function(event) { gameApp.eventBlurWindow(event); }
-window.onfocus = function(event) { gameApp.eventFocusWindow(event); }
+window.onblur = function(event) { gameApp.inputEventsManager.eventBlurWindow(event); }
+window.onfocus = function(event) { gameApp.inputEventsManager.eventFocusWindow(event); }
 window.onresize = function(event) { gameApp.eventResizeWindow(event); }
 
 // start game

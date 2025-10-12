@@ -27,11 +27,11 @@ export class BannerTextEntity extends AbstractEntity {
       }
       this.cursorX = 1;
       for (var ch = 0; ch < this.text.length; ch++) {
-        var charData = this.fonts.getCharData(this.text[ch], '1', 'left', 1);
+        var charData = this.fonts.getCharData(this.text[ch], '1', 1);
         for (var x = 0; x < charData.data.length; x++) {
           this.app.layout.paintRect(this.drawingCache[0].ctx, this.cursorX+charData.data[x][0], charData.data[x][1], charData.data[x][2], charData.data[x][3], this.penColor);
         }
-        this.cursorX += charData.width;
+        this.cursorX += charData.width+this.fonts.charsSpacing;
       }
     }
     this.app.layout.paintCropCache(this, 0, this.bannerPosition, 0, 0, 0);
