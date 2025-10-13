@@ -54,7 +54,7 @@ export class TapeLoadingModel extends AbstractModel {
     this.inputLineEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, {align: 'center'});
     this.desktopEntity.addEntity(this.inputLineEntity);
 
-    this.programNameEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 1*8, 32*8, 8, 'Program: JETSET', this.app.platform.colorByName('black'), false, {});
+    this.programNameEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 1*8, 32*8, 8, 'Program: JETSET', this.app.platform.colorByName('black'), false, {leftMargin: 1});
     this.programNameEntity.hide = true;
     this.desktopEntity.addEntity(this.programNameEntity);
 
