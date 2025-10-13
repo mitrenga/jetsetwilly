@@ -220,15 +220,15 @@ export class MenuModel extends AbstractModel {
         return true;
     
       case 'setPlayerName':
-        this.desktopEntity.addModalEntity(new PlayerNameEntity(this.desktopEntity, 28, 25, 200, 138, false));
+        this.desktopEntity.addModalEntity(new PlayerNameEntity(this.desktopEntity, 27, 25, 202, 138, false));
       return true;
 
       case 'showHallOfFame':
-        this.desktopEntity.addModalEntity(new HallOfFameEntity(this.desktopEntity, 28, 25, 200, 138));
+        this.desktopEntity.addModalEntity(new HallOfFameEntity(this.desktopEntity, 27, 25, 202, 138));
       return true;
 
       case 'showAbout':
-        this.desktopEntity.addModalEntity(new AboutEntity(this.desktopEntity, 28, 25, 200, 138));
+        this.desktopEntity.addModalEntity(new AboutEntity(this.desktopEntity, 27, 25, 202, 138));
       return true;
 
       case 'changeFlashState':

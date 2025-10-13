@@ -19,18 +19,47 @@ export class PlayerNameEntity extends AbstractEntity {
     super(parentEntity, x, y, width, height, false, false);
     this.id = 'PlayerNameEntity';    
 
+    this.maxNameChars = 15;
     this.inputEntity = null;
+    this.charsCounter = null;
     this.autoStartGame = autoStartGame;
 
     this.keyboardLayout = {
       options: {
-        buttons: {
-          default: {width: 16, height: 16, space: 1, penColor: this.app.platform.colorByName('black'), bkColor: this.app.platform.colorByName('white'), margin: 4},
-          '⏎': {width: 21}, '⇧': {width: 23}, '⌥': {penColor: this.app.platform.colorByName('brightRed')}, ' ': {width: 26}
+        fnKeys: {
+          '∅': false,
+          '⏎': 'Enter',
+          '⌫': 'Backspace',
+          '←': 'ArrowLeft',
+          '↓': 'ArrowDown',
+          '↑': 'ArrowUp',
+          '➔': 'ArrowRight'
         },
-        rows: [{shift: 0}, {shift: 6}, {shift: 12}, {shift: 0}]
+        shiftKeys: {
+          '⇧': {activeBkColor: this.app.platform.colorByName('yellow')},
+          '⌥': {activeBkColor: this.app.platform.colorByName('yellow')}
+        },
+        buttons: {
+          default: {
+            width: 16, height: 16, keySpacing: 1, align: 'center', topMargin: 4,
+            fonts: this.app.fonts.zxFonts8x8Keys,
+            penColor: this.app.platform.colorByName('black'),
+            bkColor: this.app.platform.colorByName('white')
+          },
+
+          '←': {fonts: this.app.fonts.fonts5x5, topMargin: 6},
+          '↓': {fonts: this.app.fonts.fonts5x5, topMargin: 6},
+          '↑': {fonts: this.app.fonts.fonts5x5, topMargin: 6},
+          '➔': {fonts: this.app.fonts.fonts5x5, topMargin: 6},
+          '⌫': {label: 'DELETE', width: 25, fonts: this.app.fonts.fonts3x3, topMargin: 7},
+          '⏎': {label: 'ENTER', width: 23, fonts: this.app.fonts.fonts3x3, topMargin: 7},
+          '⇧': {label: 'CAPS\nSHIFT', width: 23, fonts: this.app.fonts.fonts3x3},
+          '⌥': {label: 'SYMBOL\nSHIFT', width: 25, penColor: this.app.platform.colorByName('brightRed'), fonts: this.app.fonts.fonts3x3},
+          ' ': {label: 'SPACE', width: 25, fonts: this.app.fonts.fonts3x3, topMargin: 7},
+        },
+        rows: [{shiftX: 0}, {shiftX: 9}, {shiftX: 18}, {shiftX: 0}]
       },
-      keys: {
+      keymap: {
         ' ': [
           ['1','2','3','4','5','6','7','8','9','0'],
           ['q','w','e','r','t','y','u','i','o','p'],
@@ -60,15 +89,16 @@ export class PlayerNameEntity extends AbstractEntity {
     this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, 63, 7, 'PLAYER NAME', this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('black'), {topMargin: 1, leftMargin: 2}));
     this.addEntity(new AbstractEntity(this, 1, 7, this.width-2, this.height-8, false, this.app.platform.colorByName('brightWhite')));
 
-    this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, 63, 7, 'PLAYER NAME', this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlack'), {topMargin: 1, leftMargin: 2}));
-    this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 8, 18, this.width-16, 8, 'Enter your player name:', this.app.platform.colorByName('black'), false, {}));
-    this.inputEntity = new InputEntity(this, this.app.fonts.zxFonts8x8, 8, 28, this.width-16, 8, this.app.playerName, this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('magenta'), 15, {});
+    this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 4, 18, this.width-8, 8, 'Enter your player name:', this.app.platform.colorByName('black'), false, {}));
+    this.inputEntity = new InputEntity(this.app, this.app.fonts.zxFonts8x8, 4, 28, this.width-38, 8, 'playerName', this.app.playerName, this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('magenta'), this.maxNameChars, {leftMargin: 1});
     this.addEntity(this.inputEntity);
+    this.charsCounter = new TextEntity(this, this.app.fonts.fonts5x5, this.width-34, 28, 30, 8, this.inputEntity.value.length+'/'+this.maxNameChars, this.app.platform.colorByName('white'), this.app.platform.colorByName('magenta'), {align: 'right', rightMargin: 1, topMargin: 2});
+    this.addEntity(this.charsCounter);
 
-    this.addEntity(new KeyboardEntity(this, this.app.fonts.zxFonts8x8, 8, 45, 186, 67, this.keyboardLayout, false));
+    this.addEntity(new KeyboardEntity(this, 4, 42, 194, 67, this.keyboardLayout, false));
 
-    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-100, this.height-15, 46, 13, 'CANCEL', 'cancel', ['Escape'], this.app.platform.colorByName('white'), this.app.platform.colorByName('red'), {align: 'center', margin: 4}));
-    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-48, this.height-15, 46, 13, 'OK', 'ok', ['Enter'], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('green'), {align: 'center', margin: 4}));
+    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-98, this.height-16, 46, 13, 'CANCEL', 'cancel', ['Escape'], this.app.platform.colorByName('white'), this.app.platform.colorByName('red'), {align: 'center', margin: 4}));
+    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-50, this.height-16, 46, 13, 'OK', 'ok', ['Enter'], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('green'), {align: 'center', margin: 4}));
   } // init
 
   handleEvent(event) {
@@ -76,6 +106,13 @@ export class PlayerNameEntity extends AbstractEntity {
       case 'cancel':
         this.destroy();
         return true;
+
+      case 'changeInputValue':
+        if (event.inputId == 'playerName') {
+          this.charsCounter.setText(this.inputEntity.value.length+'/'+this.maxNameChars);
+          return true;
+        }
+        break;
 
       case 'ok':
         if (this.inputEntity.value.length > 0) {
