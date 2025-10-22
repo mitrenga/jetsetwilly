@@ -115,6 +115,7 @@ export class MainModel extends AbstractModel {
         this.app.startRoom(true, true, true);
         return true;
     }
+    
     return false;
   } // handleEvent
 

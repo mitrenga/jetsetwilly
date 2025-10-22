@@ -42,17 +42,19 @@ export class HallOfFameEntity extends AbstractEntity {
       this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8Mono, this.width-71, y, 68, 8, this.tableHallOfFame[i].score, this.app.platform.colorByName('black'), false, {align: 'right'}));
     }
 
-    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', 'closeAbout', ['Enter', 'Escape', ' '], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'), {align: 'center', margin: 4}));
+    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', 'closeHallOfFame', ['Enter', 'Escape', ' '], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'), {align: 'center', margin: 4}));
   } // init
 
   handleEvent(event) {
+    if (super.handleEvent(event)) {
+      return true;
+    }
     switch (event.id) {
-      case 'closeAbout':
+      case 'closeHallOfFame':
         this.destroy();
         return true;
     }
-
-    return super.handleEvent(event);
+    return false;
   } // handleEvent
 
 } // HallOfFameEntity

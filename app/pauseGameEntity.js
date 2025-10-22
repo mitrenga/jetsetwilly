@@ -48,6 +48,10 @@ export class PauseGameEntity extends AbstractEntity {
   } // init
 
   handleEvent(event) {
+    if (super.handleEvent(event)) {
+      return true;
+    }
+
     switch (event.id) {
 
       case 'keyPress':
@@ -81,7 +85,7 @@ export class PauseGameEntity extends AbstractEntity {
         return true;
     }
 
-    return super.handleEvent(event);
+    return false;
   } // handleEvent
 
 } // PauseGameEntity

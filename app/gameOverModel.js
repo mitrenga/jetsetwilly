@@ -109,7 +109,7 @@ export class GameOverModel extends AbstractModel {
         this.app.setModel('MainModel');
         return true;
     }
-    return false;
+     false;
   } // handleEvent
 
   loopModel(timestamp) {

@@ -70,6 +70,10 @@ export class BorderEntity  extends AbstractEntity {
   } // drawEntity
 
   handleEvent(event) {
+    if (super.handleEvent(event)) {
+      return true;
+    }
+
     switch (event.id) {
       case 'setBorderAnimation':
         this.animation = event.value;
@@ -90,7 +94,7 @@ export class BorderEntity  extends AbstractEntity {
         return true;
     }
 
-    return super.handleEvent(event);
+    return false;
   } // handleEvent
 
 } // BorderEntity
