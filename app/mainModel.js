@@ -2,13 +2,13 @@
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
 const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion);
 const { MainImageEntity } = await import('./mainImageEntity.js?ver='+window.srcVersion);
-const { BannerTextEntity } = await import('./bannerTextEntity.js?ver='+window.srcVersion);
+const { SlidingTextEntity } = await import('./svision/js/platform/canvas2D/slidingTextEntity.js?ver='+window.srcVersion);
 const { PauseGameEntity } = await import('./pauseGameEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import BorderEntity from './borderEntity.js';
 import MainImageEntity from './mainImageEntity.js';
-import BannerTextEntity from './bannerTextEntity.js';
+import SlidingTextEntity from './svision/js/platform/canvas2D/slidingTextEntity.js';
 import PauseGameEntity from './pauseGameEntity.js';
 /**/
 // begin code
@@ -20,8 +20,16 @@ export class MainModel extends AbstractModel {
     this.id = 'MainModel';
 
     this.mainImageEntity = null;
-    this.bannerTxt = '+++++ Press ENTER to Start +++++  JET-SET WILLY by Matthew Smith  © 1984 SOFTWARE PROJECTS Ltd . . . . . Guide Willy to collect all the items around the house before Midnight so Maria will let you get to your bed . . . . . . .                                ';
-    this.bannerEntity = null;
+    this.slidingText = 
+      '+++++ Press ENTER to Start +++++' +
+      '  ' +
+      'JET-SET WILLY by Matthew Smith' +
+      '  ' +
+      '© 1984 SOFTWARE PROJECTS Ltd' +
+      ' . . . . . . ' +
+      'Guide Willy to collect all the items around the house before Midnight so Maria will let you get to your bed' +
+      ' . . . . . . ';
+    this.slidingTextEntity = null;
     this.screechDuration = 0;
   } // constructor
 
@@ -35,13 +43,14 @@ export class MainModel extends AbstractModel {
     this.borderEntity.bkColor = this.app.platform.colorByName('black');
     this.mainImageEntity = new MainImageEntity(this.desktopEntity, 0, 0, 32*8, 24*8, this.flashState);
     this.desktopEntity.addEntity(this.mainImageEntity);
-    this.bannerEntity = new BannerTextEntity(this.mainImageEntity, this.app.fonts.zxFonts8x8Mono, 0, 18*8, 32*8, 1*8, this.bannerTxt, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), this.bannerTxt.length*8);
-    this.mainImageEntity.addEntity(this.bannerEntity);
-    this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'music'});
-    this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'sounds'});
-    this.sendEvent(500, {'id': 'playSound', 'channel': 'music', 'sound': 'titleScreenMelody', 'options': false});
+    this.slidingTextEntity = new SlidingTextEntity(this.mainImageEntity, this.app.fonts.zxFonts8x8Mono, 0, 18*8, 32*8, 1*8, this.slidingText, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), {animation: 'custom', rightMargin: 256});
+    this.mainImageEntity.addEntity(this.slidingTextEntity);
+    this.sendEvent(250, {id: 'openAudioChannel', channel: 'music'});
+    this.sendEvent(250, {id: 'openAudioChannel', channel: 'sounds'});
+    this.sendEvent(500, {id: 'playSound', channel: 'music', sound: 'titleScreenMelody', options: false});
+
     this.app.stack.flashState = false;
-    this.sendEvent(330, {'id': 'changeFlashState'});
+    this.sendEvent(330, {id: 'changeFlashState'});
   } // init
 
   handleEvent(event) {
@@ -52,28 +61,22 @@ export class MainModel extends AbstractModel {
     switch (event.id) {
       case 'changeFlashState':
         this.app.stack.flashState = !this.app.stack.flashState;
-        this.sendEvent(330, {'id': 'changeFlashState'});
+        this.sendEvent(330, {id: 'changeFlashState'});
         return true;
 
       case 'melodyEnd':
-        this.sendEvent(0, {'id': 'playSound', 'channel': 'music', 'sound': 'screechSound', 'options': false});
+        this.sendEvent(0, {id: 'playSound', channel: 'music', sound: 'screechSound', options: false});
         return true;
 
       case 'screechBegin':
-        this.bannerEntity.setPenColor(this.app.platform.colorByName('brightWhite'));
-        this.bannerEntity.setBkColor(this.app.platform.colorByName('brightBlue'));
+        this.slidingTextEntity.setPenColor(this.app.platform.colorByName('brightWhite'));
+        this.slidingTextEntity.setBkColor(this.app.platform.colorByName('brightBlue'));
         this.screechDuration = event.data.duration;
         this.timer = this.app.now;
-        this.sendEvent(0, {'id': 'setBorderAnimation', 'value': 'screech'});
+        this.sendEvent(0, {id: 'setBorderAnimation', value: 'screech'});
         return true;
 
       case 'screechEnd':
-        this.bannerEntity.setPenColor(this.app.platform.colorByName('yellow'));
-        this.bannerEntity.setBkColor(this.app.platform.colorByName('black'));
-        this.mainImageEntity.attrStep = 0;
-        this.timer = false;
-        this.sendEvent(0, {'id': 'setBorderAnimation', 'value': false});
-
         this.app.demoRooms = [];
         var rndRooms = [];
         for (var r = 0; r < this.app.globalData.roomsCount; r++) {
@@ -86,7 +89,7 @@ export class MainModel extends AbstractModel {
           this.app.demoRooms.push(rndRooms[r]);
           rndRooms.splice(r, 1);
         }
-        this.sendEvent(1, {'id': 'newDemoRoom'});
+        this.sendEvent(1, {id: 'newDemoRoom'});
 
         return true;
 
@@ -120,7 +123,7 @@ export class MainModel extends AbstractModel {
 
     if (this.timer != false) {
       if (timestamp-this.timer < this.screechDuration) {
-        this.bannerEntity.bannerPosition = Math.round((this.bannerTxt.length-32)*8*(timestamp-this.timer)/this.screechDuration);
+        this.slidingTextEntity.animationPosition = Math.round((this.slidingTextEntity.animationWidth-this.slidingTextEntity.width)*(timestamp-this.timer)/this.screechDuration);
         this.mainImageEntity.attrStep = Math.floor(((timestamp-this.timer)/77)%8)*3;
       }
     }
@@ -128,6 +131,6 @@ export class MainModel extends AbstractModel {
     this.drawModel();
   } // loopModel
 
-} // class MainModel
+} // MainModel
 
 export default MainModel;
