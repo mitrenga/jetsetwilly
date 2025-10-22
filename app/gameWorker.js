@@ -14,7 +14,7 @@ var ropeRelativeCoordinates = [
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1,1,2,1,1,2,2,3,2,3,2,3,3,3,3,3,3],
   [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,2,3,2,3,2,3,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
 ];
-var controls = {'left': false, 'right': false, 'jump': false};
+var controls = {left: false, right: false, jump: false};
 var jumpCounter = 0;
 var jumpDirection = 0;
 var jumpMap = [-4, -4, -3, -3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4];
@@ -58,7 +58,7 @@ function gameLoop() {
       checkCrash();
     }
   
-    postMessage({'id': 'update', 'gameData': gameData});
+    postMessage({id: 'update', gameData: gameData});
   }
 } // gameLoop
 
@@ -166,7 +166,7 @@ function willyWalking() {
         mustMovingDirection = canMovingDirection;
       }
       fallingDirection = 0;
-      postMessage({'id': 'stopAudioChannel', 'channel': 'sounds'});
+      postMessage({id: 'stopAudioChannel', channel: 'sounds'});
     } else {
       var fall = 4;
       do {
@@ -189,7 +189,7 @@ function willyWalking() {
     if (!jumpCounter && !standingOn.length) {
       fallingCounter = 1;
       fallingDirection = 0;
-      postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'fallingSound'});
+      postMessage({id: 'playSound', channel: 'sounds', sound: 'fallingSound'});
     }
   }
 
@@ -200,7 +200,7 @@ function willyWalking() {
         mustMovingDirection = canMovingDirection;
       }
       jumpDirection = 0;
-      postMessage({'id': 'stopAudioChannel', 'channel': 'sounds'});
+      postMessage({id: 'stopAudioChannel', channel: 'sounds'});
     }
   }
 
@@ -230,7 +230,7 @@ function willyWalking() {
       jumpDirection = 0;
       fallingCounter = 1;
       fallingDirection = 0;
-      postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'fallingSound'});
+      postMessage({id: 'playSound', channel: 'sounds', sound: 'fallingSound'});
     }
   }
 
@@ -321,7 +321,7 @@ function willyWalking() {
       } else {
         jumpCounter = 1;
         willy.y += jumpMap[jumpCounter-1];
-        postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'jumpSound'});
+        postMessage({id: 'playSound', channel: 'sounds', sound: 'jumpSound'});
       }
     }
   }
@@ -339,7 +339,7 @@ function willyWalking() {
         ropePosition = r;
         jumpCounter = 0;
         fallingCounter = 0;
-        postMessage({'id': 'stopAudioChannel', 'channel': 'sounds'});
+        postMessage({id: 'stopAudioChannel', channel: 'sounds'});
       }
       r--;
     }
@@ -366,7 +366,7 @@ function willyOnRope() {
     willy.x = willy.x-willy.x%2+4*jumpDirection;
     willy.y = willy.y+willy.x%2-2;
     willy.frame = Math.floor(willy.x%8/2);
-    postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'jumpSound'});
+    postMessage({id: 'playSound', channel: 'sounds', sound: 'jumpSound'});
   } else {
     if (controls.right && !controls.left) {
       if (willy.direction == 1) {
@@ -404,7 +404,7 @@ function willyOnRope() {
       fallingCounter = 1;
       willy.x = willy.x-willy.x%2;
       willy.y = willy.y+willy.x%2;
-      postMessage({'id': 'playSound', 'channel': 'sounds', 'sound': 'fallingSound'});
+      postMessage({id: 'playSound', channel: 'sounds', sound: 'fallingSound'});
     } else {
       willy.x = gameData.ropes[ropePosition].x-4;
       willy.y = gameData.ropes[ropePosition].y-6;
@@ -515,7 +515,7 @@ function guardians() {
             break;
         }
         if (guardian.counter == guardian.soundWhenCounter) {
-          postMessage({'id': 'playSound', 'channel': 'extra', 'sound': 'arrowSound'});
+          postMessage({id: 'playSound', channel: 'extra', sound: 'arrowSound'});
         }
         var x = guardian.counter*guardian.speed;
         if (x > 255) {
@@ -659,7 +659,7 @@ function checkTouchItems() {
   if (touchId) {
     gameData.items[touchId-1].hide = true;
     gameData.info[6][gameData.items[touchId-1].id] = true;
-    postMessage({'id': 'playSound', 'channel': 'extra', 'sound': 'itemSound'});
+    postMessage({id: 'playSound', channel: 'extra', sound: 'itemSound'});
   }
 } // checkTouchItems
 

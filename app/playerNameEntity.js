@@ -121,7 +121,7 @@ export class PlayerNameEntity extends AbstractEntity {
           if (this.autoStartGame) {
             this.app.setModel('MainModel');
           } else {
-            this.sendEvent(0, 0, {'id': 'refreshMenu'});
+            this.sendEvent(0, 0, {id: 'refreshMenu'});
             this.destroy();
           }
         }
@@ -131,6 +131,6 @@ export class PlayerNameEntity extends AbstractEntity {
     return super.handleEvent(event);
   } // handleEvent
 
-} // class PlayerNameEntity
+} // PlayerNameEntity
 
 export default PlayerNameEntity;

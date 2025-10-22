@@ -103,6 +103,6 @@ export class MainImageEntity extends AbstractEntity {
     super.drawSubEntities();
   } // drawEntity
 
-} // class MainImageEntity
+} // MainImageEntity
 
 export default MainImageEntity;

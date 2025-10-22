@@ -37,6 +37,6 @@ export class SignboardFonts extends AbstractFonts {
     return charObject;
   } // getCharData
 
-} // class SignboardFonts
+} // SignboardFonts
 
 export default SignboardFonts;

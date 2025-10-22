@@ -46,6 +46,6 @@ export class AboutEntity extends AbstractEntity {
     return super.handleEvent(event);
   } // handleEvent
 
-} // class AboutEntity
+} // AboutEntity
 
 export default AboutEntity;

@@ -47,6 +47,6 @@ export class GameInfoEntity extends AbstractEntity {
     }
   } // init
 
-} // class GameInfoEntity
+} // GameInfoEntity
 
 export default GameInfoEntity;

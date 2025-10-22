@@ -55,6 +55,6 @@ export class HallOfFameEntity extends AbstractEntity {
     return super.handleEvent(event);
   } // handleEvent
 
-} // class HallOfFameEntity
+} // HallOfFameEntity
 
 export default HallOfFameEntity;

@@ -79,8 +79,8 @@ export class GameOverModel extends AbstractModel {
     this.timerEntity.hide = true;
     this.desktopEntity.addEntity(this.timerEntity);
 
-    this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'sounds'});
-    this.sendEvent(500, {'id': 'playSound', 'channel': 'sounds', 'sound': 'gameOverSound', 'options': false});
+    this.sendEvent(250, {id: 'openAudioChannel', channel: 'sounds'});
+    this.sendEvent(500, {id: 'playSound', channel: 'sounds', sound: 'gameOverSound', options: false});
   } // init
 
   handleEvent(event) {
@@ -147,7 +147,7 @@ export class GameOverModel extends AbstractModel {
       }
       var countdown = countdownLength-Math.floor((timestamp-this.timer-2000)/1000);
       if (countdown < 0) {
-        this.sendEvent(1, {'id': 'MainModel'});
+        this.sendEvent(1, {id: 'MainModel'});
       } else {
         this.timerEntity.setText(countdown.toString());
       }
@@ -161,6 +161,6 @@ export class GameOverModel extends AbstractModel {
     this.drawModel();
   } // loopModel
 
-} // class GameOverModel
+} // GameOverModel
 
 export default GameOverModel;

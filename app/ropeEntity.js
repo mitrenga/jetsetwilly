@@ -16,6 +16,6 @@ export class RopeEntity extends AbstractEntity {
     this.app.layout.paint(this, 0, 0, this.width, this.height, this.penColor);
   } // drawEntity
 
-} // class RopeEntity
+} // RopeEntity
 
 export default RopeEntity;

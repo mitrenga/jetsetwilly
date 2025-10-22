@@ -28,11 +28,11 @@ export class MenuModel extends AbstractModel {
     this.prevCounter = 0;
     this.gameFrame = 0;
     this.bodyObjects = [
-      {'id': 'body', 'trackX': 0,  'trackY': 26, 'color': 'rgb(217, 41, 188)'},
-      {'id': 'body', 'trackX': 8, 'trackY': 29, 'color': 'rgb(230, 241, 13)'},
-      {'id': 'body', 'trackX': 16, 'trackY': 32, 'color': 'rgb(90, 72, 209)'},
-      {'id': 'body', 'trackX': 24, 'trackY': 35, 'color': 'rgb(42, 165, 63)'},
-      {'id': 'body', 'trackX': 32, 'trackY': 38, 'color': 'rgb(192, 81, 81)'}
+      {id: 'body', trackX: 0, trackY: 26, color: 'rgb(217, 41, 188)'},
+      {id: 'body', trackX: 8, trackY: 29, color: 'rgb(230, 241, 13)'},
+      {id: 'body', trackX: 16, trackY: 32, color: 'rgb(90, 72, 209)'},
+      {id: 'body', trackX: 24, trackY: 35, color: 'rgb(42, 165, 63)'},
+      {id: 'body', trackX: 32, trackY: 38, color: 'rgb(192, 81, 81)'}
     ];
     this.dataLoaded = false;
     this.bodyEntities = [];
@@ -43,7 +43,7 @@ export class MenuModel extends AbstractModel {
     this.headDirectionY = 0;
     this.track = [];
     for (var t = 0; t < 40; t++) {
-      this.track[t] = {'x': this.headX, 'y': this.headY, 'direction': 0};
+      this.track[t] = {x: this.headX, y: this.headY, direction: 0};
     }
     this.wave = [0, 2, 4, 5, 6, 7, 7, 7, 6, 5, 4, 2, 0, -2, -4, -5, -6, -7, -7, -7, -6, -5, -4, -2];
     this.waveCounter = 0;
@@ -55,14 +55,14 @@ export class MenuModel extends AbstractModel {
     this.penSelectedMenuItemColor = 'rgb(0, 0, 0)';
     this.menuEntities = [];
     this.menuItems = [
-      {'label': 'START GAME', 'event': 'startGame'},
-      {'label': 'PLAYER NAME', 'event': 'setPlayerName'},
-      {'label': 'HALL OF FAME', 'event': 'showHallOfFame'},
-      {'label': 'SOUNDS', 'event': 'setSounds'},
-      {'label': 'MUSIC', 'event': 'setMusic'},
-      {'label': 'CONTROLS', 'event': 'showControls'},
-      {'label': 'SHOW TAPE LOADING', 'event': 'startTapeLoading'},
-      {'label': 'ABOUT GAME', 'event': 'showAbout'}
+      {label: 'START GAME', event: 'startGame'},
+      {label: 'PLAYER NAME', event: 'setPlayerName'},
+      {label: 'HALL OF FAME', event: 'showHallOfFame'},
+      {label: 'SOUNDS', event: 'setSounds'},
+      {label: 'MUSIC', event: 'setMusic'},
+      {label: 'CONTROLS', event: 'showControls'},
+      {label: 'SHOW TAPE LOADING', event: 'startTapeLoading'},
+      {label: 'ABOUT GAME', event: 'showAbout'}
     ];
     this.sighboardEntity = null;
     this.copyrightEntity = null;
@@ -75,7 +75,7 @@ export class MenuModel extends AbstractModel {
     http.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 200) {
         var data = JSON.parse(http.responseText);
-        this.responser.sendEvent(1, {'id': 'setMenuData', 'data': data});
+        this.responser.sendEvent(1, {id: 'setMenuData', data: data});
       }
     }
   } // constructor
@@ -121,7 +121,7 @@ export class MenuModel extends AbstractModel {
     this.desktopEntity.addEntity(this.copyrightEntity);
 
     this.app.stack.flashState = false;
-    this.sendEvent(330, {'id': 'changeFlashState'});
+    this.sendEvent(330, {id: 'changeFlashState'});
   } // init
 
   menuParamValue(event) {
@@ -233,14 +233,14 @@ export class MenuModel extends AbstractModel {
 
       case 'changeFlashState':
         this.app.stack.flashState = !this.app.stack.flashState;
-        this.sendEvent(330, {'id': 'changeFlashState'});
+        this.sendEvent(330, {id: 'changeFlashState'});
         return true;
 
       case 'keyPress':
         switch (event.key) {
           case 'Enter':
           case ' ':
-              this.sendEvent(0, {'id': this.menuItems[this.selectedItem].event});
+              this.sendEvent(0, {id: this.menuItems[this.selectedItem].event});
             return true;
           case 'ArrowDown':
             this.changeMenuItem(this.selectedItem+1);
@@ -256,7 +256,7 @@ export class MenuModel extends AbstractModel {
           for (var i = 0; i < this.menuItems.length; i++) {
             if ((this.menuEntities[i][0].pointOnEntity(event)) || (this.menuEntities[i][1].pointOnEntity(event))) {
               this.changeMenuItem(i);
-              this.sendEvent(0, {'id': this.menuItems[this.selectedItem].event});
+              this.sendEvent(0, {id: this.menuItems[this.selectedItem].event});
               return true;
             }
           }
@@ -351,7 +351,7 @@ export class MenuModel extends AbstractModel {
             }
           });
           this.track.shift();
-          this.track.push({'x': this.headEntity.x, 'y': this.headEntity.y, 'direction': this.headEntity.direction});
+          this.track.push({x: this.headEntity.x, y: this.headEntity.y, direction: this.headEntity.direction});
         }
       }
     }
@@ -359,6 +359,6 @@ export class MenuModel extends AbstractModel {
     this.drawModel();
   } // loopModel
 
-} // class MenuModel
+} // MenuModel
 
 export default MenuModel;

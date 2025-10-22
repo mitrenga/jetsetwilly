@@ -15,9 +15,9 @@ export class BorderEntity  extends AbstractEntity {
     this.animation = false;
     this.stripes = [];
     this.style = {
-      'pilotTone': {'colors': ['cyan', 'red'], 'stripeHeight': 10},
-      'dataTone': {'colors': ['blue', 'yellow'], 'stripeHeight': 3},
-      'screech': {'colors': ['white', 'yellow', 'cyan', 'green', 'magenta', 'red', 'blue', 'black'], 'stripeHeight': 1}
+      pilotTone: {colors: ['cyan', 'red'], stripeHeight: 10},
+      dataTone: {colors: ['blue', 'yellow'], stripeHeight: 3},
+      screech: {colors: ['white', 'yellow', 'cyan', 'green', 'magenta', 'red', 'blue', 'black'], stripeHeight: 1}
     };
 
   } // constructor
@@ -54,7 +54,7 @@ export class BorderEntity  extends AbstractEntity {
         if (y+stripeHeight+extraStripe > this.height) {
           stripeHeight = this.height-y-extraStripe;
         }
-        this.stripes.push({'y': y, 'height': stripeHeight+extraStripe, 'color': this.app.platform.colorByName(this.style[this.animation].colors[color])});
+        this.stripes.push({y: y, height: stripeHeight+extraStripe, color: this.app.platform.colorByName(this.style[this.animation].colors[color])});
         y += stripeHeight+extraStripe;
         if (this.animation == 'screech') {
           color = Math.floor(Math.random()*this.style[this.animation].colors.length);
@@ -74,7 +74,7 @@ export class BorderEntity  extends AbstractEntity {
       case 'setBorderAnimation':
         this.animation = event.value;
         if (this.animation === 'pilotTone' || this.animation === 'screech') {
-          this.sendEvent(0, 50, {'id': 'moveStripes'});
+          this.sendEvent(0, 50, {id: 'moveStripes'});
         }
         return true;
       case 'moveStripes':
@@ -85,7 +85,7 @@ export class BorderEntity  extends AbstractEntity {
           } else {
             this.diff = this.app.rotateInc(this.diff, 0, this.style[this.animation].colors.length*10-1);
           }
-          this.sendEvent(0, 50, {'id': 'moveStripes'});
+          this.sendEvent(0, 50, {id: 'moveStripes'});
         }
         return true;
     }
@@ -93,6 +93,6 @@ export class BorderEntity  extends AbstractEntity {
     return super.handleEvent(event);
   } // handleEvent
 
-} // class BorderEntity
+} // BorderEntity
 
 export default BorderEntity;

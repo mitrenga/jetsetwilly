@@ -25,23 +25,25 @@ export class RoomModel extends AbstractModel {
     this.animationType = false;
     this.autorepeatKeys = false;
 
-    this.initData = {'info': [
-      0, // counter
-      0, // counter2
-      0, // counter4
-      0, // counter6
-      demo,
-      false, // crash
-      this.app.itemsCollected,
-      false, // adjoining room
-      false // Willy data
-    ]};
+    this.initData = {
+      info: [
+        0, // counter
+        0, // counter2
+        0, // counter4
+        0, // counter6
+        demo,
+        false, // crash
+        this.app.itemsCollected,
+        false, // adjoining room
+        false // Willy data
+      ]
+    };
 
     this.worker = new Worker(this.app.importPath+'/gameWorker.js?ver='+window.srcVersion);
     this.worker.onmessage = (event) => {
 
       if (this.demo && event.data.id == 'update' && event.data.gameData.info[0] == 80) {
-        this.sendEvent(1, {'id': 'animationDemoRoomDone'});
+        this.sendEvent(1, {id: 'animationDemoRoomDone'});
         return;
       }
 
@@ -64,7 +66,7 @@ export class RoomModel extends AbstractModel {
               case 'info':
                 if (event.data.gameData.info[7] !== false) {
                   this.app.timeCounter += event.data.gameData.info[0]; 
-                  this.sendEvent(1, {'id': 'changeRoom', 'adjoiningRoom': this.app.hexToInt(this.adjoiningRoom[event.data.gameData.info[7]]), 'willyData': event.data.gameData.info[8]});
+                  this.sendEvent(1, {id: 'changeRoom', adjoiningRoom: this.app.hexToInt(this.adjoiningRoom[event.data.gameData.info[7]]), willyData: event.data.gameData.info[8]});
                 }
                 for (var l = 0; l < this.app.lives; l++) {
                   this.gameInfoEntity.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
@@ -84,11 +86,11 @@ export class RoomModel extends AbstractModel {
                 }
                 this.gameInfoEntity.timeEntity.setText(this.app.timeStr);
                 if (hour > 23) {
-                  this.sendEvent(1, {'id': 'gameOver'});
+                  this.sendEvent(1, {id: 'gameOver'});
                 }
                 if (event.data.gameData.info[5]) {
                   this.app.timeCounter += event.data.gameData.info[0]; 
-                  this.sendEvent(1, {'id': 'crash'});
+                  this.sendEvent(1, {id: 'crash'});
                 }
                 if (this.app.itemsCollected != event.data.gameData.info[6]) {
                   this.app.itemsCollected = event.data.gameData.info[6];
@@ -109,11 +111,11 @@ export class RoomModel extends AbstractModel {
           break;
 
         case 'playSound':
-          this.sendEvent(0, {'id': 'playSound', 'channel': event.data.channel, 'sound': event.data.sound, 'options': false});
+          this.sendEvent(0, {id: 'playSound', channel: event.data.channel, sound: event.data.sound, options: false});
           break;
 
         case 'stopAudioChannel':
-          this.sendEvent(0, {'id': 'stopAudioChannel', 'channel': event.data.channel});
+          this.sendEvent(0, {id: 'stopAudioChannel', channel: event.data.channel});
           break;
       }
     } // onmessage
@@ -126,7 +128,7 @@ export class RoomModel extends AbstractModel {
     http.onreadystatechange = function () {
       if (this.readyState == 4 && this.status == 200) {
         var data = JSON.parse(http.responseText);
-        this.responser.sendEvent(1, {'id': 'setRoomData', 'data': data});
+        this.responser.sendEvent(1, {id: 'setRoomData', data: data});
       }
     }
   } // constructor
@@ -147,12 +149,13 @@ export class RoomModel extends AbstractModel {
     this.gameInfoEntity = new GameInfoEntity(this.desktopEntity, 0, 16*8, 32*8, 8*8);
     this.desktopEntity.addEntity(this.gameInfoEntity);
 
-    this.sendEvent(330, {'id': 'changeFlashState'});
+    this.app.stack.flashState = false;
+    this.sendEvent(330, {id: 'changeFlashState'});
 
-    this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'music'});
-    this.sendEvent(500, {'id': 'playSound', 'channel': 'music', 'sound': 'inGameMelody', 'options': {'repeat': true, 'lives': this.app.lives}});
-    this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'sounds'});
-    this.sendEvent(250, {'id': 'openAudioChannel', 'channel': 'extra'});
+    this.sendEvent(250, {id: 'openAudioChannel', channel: 'music'});
+    this.sendEvent(500, {id: 'playSound', channel: 'music', sound: 'inGameMelody', options: {repeat: true, lives: this.app.lives}});
+    this.sendEvent(250, {id: 'openAudioChannel', channel: 'sounds'});
+    this.sendEvent(250, {id: 'openAudioChannel', channel: 'extra'});
   } // init
 
   shutdown() {
@@ -171,7 +174,7 @@ export class RoomModel extends AbstractModel {
       this.gameInfoEntity.liveEntities[l].setGraphicsData(data.willy);
     }
     super.setData(data);
-    this.postWorkerMessage({'id': 'init', 'initData': this.initData});
+    this.postWorkerMessage({id: 'init', initData: this.initData});
     this.app.inputEventsManager.sendEventsActiveKeys('press');
   } // setData
 
@@ -207,20 +210,20 @@ export class RoomModel extends AbstractModel {
           case 'p':
           case 'P':
           case 'MouseButton2':
-            this.postWorkerMessage({'id': 'controls', 'action': 'right', 'value': true});
+            this.postWorkerMessage({id: 'controls', action: 'right', value: true});
             return true;
 
           case 'ArrowLeft':
           case 'o':
           case 'O':
           case 'MouseButton1':
-            this.postWorkerMessage({'id': 'controls', 'action': 'left', 'value': true});
+            this.postWorkerMessage({id: 'controls', action: 'left', value: true});
             return true;
 
           case 'ArrowUp':
           case ' ':
           case 'MouseButton4':
-            this.postWorkerMessage({'id': 'controls', 'action': 'jump', 'value': true});
+            this.postWorkerMessage({id: 'controls', action: 'jump', value: true});
             return true;
         }
         break;
@@ -231,20 +234,20 @@ export class RoomModel extends AbstractModel {
           case 'p':
           case 'P':
           case 'MouseButton2':
-            this.postWorkerMessage({'id': 'controls', 'action': 'right', 'value': false});
+            this.postWorkerMessage({id: 'controls', action: 'right', value: false});
             return true;
 
           case 'ArrowLeft':
           case 'o':
           case 'O':
           case 'MouseButton1':
-            this.postWorkerMessage({'id': 'controls', 'action': 'left', 'value': false});
+            this.postWorkerMessage({id: 'controls', action: 'left', value: false});
             return true;
 
           case 'ArrowUp':
           case ' ':
           case 'MouseButton4':
-            this.postWorkerMessage({'id': 'controls', 'action': 'jump', 'value': false});
+            this.postWorkerMessage({id: 'controls', action: 'jump', value: false});
             return true;
         }
         break;
@@ -289,10 +292,10 @@ export class RoomModel extends AbstractModel {
           this.worker = null;
         }
         this.gameAreaEntity.spriteEntities.willy[0].hide = true;
-        this.sendEvent(0, {'id': 'stopAllAudioChannels'});
+        this.sendEvent(0, {id: 'stopAllAudioChannels'});
         this.borderEntity.bkColor = this.app.platform.color(0);
         this.gameAreaEntity.setMonochromeColors(this.app.platform.color(15), this.app.platform.color(0));
-        this.sendEvent(0, {'id': 'playSound', 'channel': 'sounds', 'sound': 'crashSound', 'options': false});
+        this.sendEvent(0, {id: 'playSound', channel: 'sounds', sound: 'crashSound', options: false});
         this.animationTime = this.timer;
         this.animationType = 'crash';
         return true;
@@ -304,7 +307,7 @@ export class RoomModel extends AbstractModel {
       case 'changeFlashState':
         this.app.stack.flashState = !this.app.stack.flashState;
         if (this.animationTime === false) {
-          this.sendEvent(330, {'id': 'changeFlashState'});
+          this.sendEvent(330, {id: 'changeFlashState'});
         } else {
           this.app.stack.flashState = false;
         }
@@ -353,7 +356,7 @@ export class RoomModel extends AbstractModel {
           this.gameInfoEntity.roomNameEntity.setPenColor(penColor);
           if (animTime > 500) {
             this.borderEntity.bkColor = this.app.platform.colorByName('black');
-            this.sendEvent(1, {'id': 'newDemoRoom'});
+            this.sendEvent(1, {id: 'newDemoRoom'});
             this.animationTime = false;
             this.animationType = false;
           }
@@ -365,6 +368,6 @@ export class RoomModel extends AbstractModel {
     this.drawModel();
   } // loopModel
 
-} // class RoomModel
+} // RoomModel
 
 export default RoomModel;

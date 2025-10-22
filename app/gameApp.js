@@ -4,7 +4,7 @@ const { AudioManager } = await import('./audioManager.js?ver='+window.srcVersion
 const { ZXFonts8x8 } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxFonts8x8.js?ver='+window.srcVersion);
 const { Fonts5x5 } = await import('./svision/js/platform/canvas2D/fonts5x5.js?ver='+window.srcVersion);
 const { Fonts3x3 } = await import('./svision/js/platform/canvas2D/fonts3x3.js?ver='+window.srcVersion);
-const { ResetModel } = await import('./resetModel.js?ver='+window.srcVersion);
+const { ZXResetModel } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxResetModel.js?ver='+window.srcVersion);
 const { MenuModel } = await import('./menuModel.js?ver='+window.srcVersion);
 const { MainModel } = await import('./mainModel.js?ver='+window.srcVersion);
 const { RoomModel } = await import('./roomModel.js?ver='+window.srcVersion);
@@ -16,7 +16,7 @@ import AudioManager from './audioManager.js';
 import ZXFonts8x8 from './svision/js/platform/canvas2D/zxSpectrum/zxFonts8x8.js';
 import Fonts5x5 from './svision/js/platform/canvas2D/fonts5x5.js';
 import Fonts3x3 from './svision/js/platform/canvas2D/fonts3x3.js';
-import ResetModel from './resetModel.js';
+import ZXResetModel from './svision/js/platform/canvas2D/zxSpectrum/zxResetModel.js';
 import MenuModel from './menuModel.js';
 import MainModel from './mainModel.js';
 import RoomModel from './roomModel.js';
@@ -52,10 +52,8 @@ export class GameApp extends AbstractApp {
     this.items = [];
     this.totalItems = 0;
     this.itemsCollected = {};
-    this.willyRoomsCache = {
-      'willy': false
-    };
-    this.setModel('ResetModel');
+    this.willyRoomsCache = {willy: false};
+    this.setModel('LoadingModel');
   } // constructor
 
   setModel(model) {
@@ -65,8 +63,8 @@ export class GameApp extends AbstractApp {
       needResizeApp = true;
     }
     switch (model) {
-      case 'ResetModel':
-        this.model = new ResetModel(this);
+      case 'LoadingModel':
+        this.model = new ZXResetModel(this);
         break;
       case 'MenuModel':
         this.model = new MenuModel(this);
@@ -98,15 +96,15 @@ export class GameApp extends AbstractApp {
       this.lives = 7;
       if (setInitRoom) {
         this.willyRoomsCache = {
-          'x': this.globalData.willy.init.x,
-          'y': this.globalData.willy.init.y,
-          'width': this.globalData.willy.width,
-          'height': this.globalData.willy.height,
-          'paintCorrectionsX': this.globalData.willy.paintCorrections.x,
-          'paintCorrectionsY': this.globalData.willy.paintCorrections.y,
-          'frame': this.globalData.willy.init.frame,
-          'frames': this.globalData.willy.init.frames,
-          'direction': this.globalData.willy.init.direction
+          x: this.globalData.willy.init.x,
+          y: this.globalData.willy.init.y,
+          width: this.globalData.willy.width,
+          height: this.globalData.willy.height,
+          paintCorrectionsX: this.globalData.willy.paintCorrections.x,
+          paintCorrectionsY: this.globalData.willy.paintCorrections.y,
+          frame: this.globalData.willy.init.frame,
+          frames: this.globalData.willy.init.frames,
+          direction: this.globalData.willy.init.direction
         };
         this.roomNumber = this.globalData.initRoom;
       }
@@ -135,12 +133,12 @@ export class GameApp extends AbstractApp {
       var x = this.binToInt(binaryItem.substring(11, 16));
       var y = this.binToInt(binaryItem.substring(0, 1)+binaryItem.substring(8, 11));
       var room = this.binToInt(binaryItem.substring(2, 8));
-      this.items[room].push({'x': x, 'y': y, 'id': id});
+      this.items[room].push({x: x, y: y, id: id});
       id++;
     });
     this.totalItems = id;
   } // setGlobalData
 
-} // class GameApp
+} // GameApp
 
 export default GameApp;

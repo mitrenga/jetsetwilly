@@ -38,6 +38,6 @@ export class PillarEntity extends AbstractEntity {
     }
   } // drawEntity
 
-} // class PillarEntity
+} // PillarEntity
 
 export default PillarEntity;

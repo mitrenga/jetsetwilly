@@ -31,7 +31,7 @@ export class GameAreaEntity extends AbstractEntity {
     this.graphicCache = {};
     this.staticKinds = ['floor', 'wall', 'nasty'];
 
-    this.spriteEntities = {'conveyors': [], 'ropes': [], 'guardians': [], 'items': [], 'decorations': [], 'willy': [], 'ramps': []};
+    this.spriteEntities = {conveyors: [], ropes: [], guardians: [], items: [], decorations: [], willy: [], ramps: []};
     this.ropeRelativeCoordinates = [
       [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1,1,2,1,1,2,2,3,2,3,2,3,3,3,3,3,3],
       [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,2,3,2,3,2,3,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
@@ -243,7 +243,7 @@ export class GameAreaEntity extends AbstractEntity {
         var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
         var idItem = [false, 'floor', 'wall', 'nasty'][item];
         if (idItem !== false) {
-          var layoutInitData = {'x': column*8, 'y': r*8, 'width': 8, 'height': 8};
+          var layoutInitData = {x: column*8, y: r*8, width: 8, height: 8};
           switch (idItem) {
             case 'floor':
               this.initData.floors.push(layoutInitData);
@@ -265,11 +265,11 @@ export class GameAreaEntity extends AbstractEntity {
       var rampData = data.graphicData.ramp;
       var rampLength = this.app.hexToInt(rampData.length);
       var rampInitData = {
-        'gradient': rampData.gradient,
-        'width': rampLength*8,
-        'height': rampLength*8,
-        'frame': 0,
-        'direction': 0
+        gradient: rampData.gradient,
+        width: rampLength*8,
+        height: rampLength*8,
+        frame: 0,
+        direction: 0
       };
       switch (rampData.gradient) {
         case 'right':
@@ -313,13 +313,13 @@ export class GameAreaEntity extends AbstractEntity {
       entity.rotateSpriteRow(3, 0, -2*rotateDirection);
       entity.rotateSpriteRow(3, 2, 2*rotateDirection);
       var conveyorInitData = {
-        'x': conveyorData.location.x*8,
-        'y': conveyorData.location.y*8,
-        'width': this.app.hexToInt(conveyorData.length)*8,
-        'height': 8,
-        'frame': 0,
-        'direction': 0,
-        'moving': conveyorData.moving
+        x: conveyorData.location.x*8,
+        y: conveyorData.location.y*8,
+        width: this.app.hexToInt(conveyorData.length)*8,
+        height: 8,
+        frame: 0,
+        direction: 0,
+        moving: conveyorData.moving
       };
       if ((attr & 128) == 128) {
         var reverseSpriteData = '';
@@ -357,8 +357,8 @@ export class GameAreaEntity extends AbstractEntity {
         this.addEntity(entity);
         this.spriteEntities.ropes.push(entity);
         var ropeInitData = {
-          'x': x,
-          'y': y
+          x: x,
+          y: y
         };
         if (r == 0) {
           ropeInitData.length =  data.rope.length;
@@ -391,17 +391,17 @@ export class GameAreaEntity extends AbstractEntity {
               this.addEntity(entity);
               this.spriteEntities.guardians.push(entity);
               var guardianInitData = {
-                'type': guardianType,
-                'speed': guardian.speed,
-                'x': guardian.init.x,
-                'y': guardian.init.y,
-                'width': guardianDefs.width,
-                'height': guardianDefs.height,
-                'paintCorrectionsX': guardianDefs.paintCorrections.x,
-                'paintCorrectionsY': guardianDefs.paintCorrections.y,
-                'frame': guardian.init.frame,
-                'frames': guardianDefs.frames,
-                'direction': guardian.init.direction
+                type: guardianType,
+                speed: guardian.speed,
+                x: guardian.init.x,
+                y: guardian.init.y,
+                width: guardianDefs.width,
+                height: guardianDefs.height,
+                paintCorrectionsX: guardianDefs.paintCorrections.x,
+                paintCorrectionsY: guardianDefs.paintCorrections.y,
+                frame: guardian.init.frame,
+                frames: guardianDefs.frames,
+                direction: guardian.init.direction
               };
               switch (guardianType) {
                 case 'horizontal':
@@ -445,13 +445,13 @@ export class GameAreaEntity extends AbstractEntity {
         var penColor3 = this.app.platform.color(tmpColor);
         var entity = new SpriteEntity(this, item.x*8, item.y*8, false, false, 0, 0);
         this.addEntity(entity);
-        entity.setColorsMap({'1': {0: penColor0, 1: penColor1, 2: penColor2, 3: penColor3}});
+        entity.setColorsMap({1: {0: penColor0, 1: penColor1, 2: penColor2, 3: penColor3}});
         entity.setGraphicsDataFromHexStr(data.graphicData.item);
         entity.cloneSprite(0);
         entity.cloneSprite(0);
         entity.cloneSprite(0);
         this.spriteEntities.items.push(entity);
-        this.initData.items.push({'id': item.id, 'hide': false, 'x': item.x*8, 'y': item.y*8, 'width': 8, 'height': 8, 'frame': 0, 'direction': 0});
+        this.initData.items.push({id: item.id, hide: false, x: item.x*8, y: item.y*8, width: 8, height: 8, frame: 0, direction: 0});
         if (!('matchColorsOfItems' in data) && (!data.matchColorsOfItems)) {
           itemColor = this.app.rotateInc(itemColor, 3, 6);
         }
@@ -468,7 +468,7 @@ export class GameAreaEntity extends AbstractEntity {
         this.addEntity(entity);
         entity.setGraphicsData(decoration);
         this.spriteEntities.decorations.push(entity);
-        this.initData.decorations.push({'hide': false, 'kind': decoration.kind, 'x': decoration.x*8, 'y': decoration.y*8, 'frame': 0, 'direction': 0});
+        this.initData.decorations.push({hide: false, kind: decoration.kind, x: decoration.x*8, y: decoration.y*8, frame: 0, direction: 0});
       });
     }
   } // setData
@@ -554,6 +554,6 @@ export class GameAreaEntity extends AbstractEntity {
     });
   } // setMonochromeColors
 
-} // class GameAreaEntity
+} // GameAreaEntity
 
 export default GameAreaEntity;
