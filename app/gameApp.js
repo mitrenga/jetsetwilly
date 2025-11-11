@@ -10,6 +10,7 @@ const { MainModel } = await import('./mainModel.js?ver='+window.srcVersion);
 const { RoomModel } = await import('./roomModel.js?ver='+window.srcVersion);
 const { GameOverModel } = await import('./gameOverModel.js?ver='+window.srcVersion);
 const { TapeLoadingModel } = await import('./tapeLoadingModel.js?ver='+window.srcVersion);
+const { ZXErrorEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxErrorEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractApp from './svision/js/abstractApp.js';
 import AudioManager from './audioManager.js';
@@ -22,6 +23,7 @@ import MainModel from './mainModel.js';
 import RoomModel from './roomModel.js';
 import GameOverModel from './gameOverModel.js';
 import TapeLoadingModel from './tapeLoadingModel.js';
+import ZXErrorEntity from './svision/js/platform/canvas2D/zxSpectrum/zxErrorEntity.js';
 /**/
 // begin code
 
@@ -39,20 +41,31 @@ export class GameApp extends AbstractApp {
     this.fonts.zxFonts8x8Keys.setFontsData('00000000000000000010101010001000002424000000000014147E28FC505000107C507C14547C1042A44810244A8400001028102A443A00000810000000000000182020202018000030080808083000000014083E081400000008083E0808000000000000080810000000003E00000000000000001818000204081020408000007C4C5454647C000018280808083E00007C440438407C00007C441804447C00001828487E081C00007C407C04447C00007C407C44447C00007C440810101000007C443844447C00007C44447C047C000000001000001000000010000010102000000408100804000000003E003E00000000100804081000007C441C100010003C42BD85BDA5BE78003C42427E42E70000FC427C4242FC00007E424040427E0000FE42424242FE0000FE42784042FE0000FE42784040E000007E42404E427E0000E7427E4242E700007C101010107C00007E08080848780000E648705844E60000E040404242FE0000C3665A4242E70000C762524A46E700007E424242427E0000FE42427E40E000007E424242527E0800FE42427E44E700007E407E02427E0000FE92101010380000CE444444447E0000E742424224180000D7929292926C0000EE44382844EE0000EE442810103800007E440810227E001C10101010101C0000004020100804003808080808083800001038541010100000000000000000FF003C247020207C0000007C047C447E00C0407C4444447C0000007C4440407C000C047C4444447E0000007C447C407C003C2470202020700000007C44447C047CC0407C444444E6001000701010107C000800380808084878C0404C506058CC007010101010107C000000FC545454D6000000FC444444E60000007C4444447C0000007E22223E207000007C44447C040600007C242020700000007C407C04FC0000207820202038000000CC4444447E000000CE44442838000000D65454547E000000C6281028C6000000CC44447C047C00007E4418227E00000E083008080E0000080808080808000070100C1010700000142800000000003C4299A1A199423C');
     this.fonts.fonts5x5 = new Fonts5x5(this);
     this.fonts.fonts3x3 = new Fonts3x3(this);
+
+    this.controls.keyboard.left = 'ArrowLeft';
+    this.controls.keyboard.right = 'ArrowRight';
+    this.controls.keyboard.jump = 'ArrowUp';
+    this.controls.keyboard.music = 'M';
+    this.controls.keyboard.sounds = 'S';
+    this.controls.mouse.left = 'B0';
+    this.controls.mouse.right = 'B1';
+    this.controls.mouse.jump = 'B2';
+    this.controls.touchscreen.type = 'jump-left-right';
     
     this.roomNumber = false;
     this.roomName = '';
+    this.restartInGameMelody = true;
     this.timeCounter = 0;
     this.timeStr = '';
     this.demo = false;
     this.demoRooms = [];
     this.lives = 7;
     this.playerName = this.getCookie('playerName', '');
-    this.globalData = false;
     this.items = [];
     this.totalItems = 0;
     this.itemsCollected = {};
     this.willyRoomsCache = {willy: false};
+    this.globalData = false;
     this.setModel('LoadingModel');
   } // constructor
 
@@ -75,8 +88,11 @@ export class GameApp extends AbstractApp {
       case 'RoomModel':
         this.model = new RoomModel(this, this.roomNumber, this.demo);
         break;
+      case 'GameExitModel':
+        this.model = new GameOverModel(this, false, 'MenuModel');
+        break;
       case 'GameOverModel':
-        this.model = new GameOverModel(this);
+        this.model = new GameOverModel(this, true, 'MainModel');
         break;
       case 'TapeLoadingModel':
         this.model = new TapeLoadingModel(this);
@@ -94,6 +110,7 @@ export class GameApp extends AbstractApp {
       this.timeCounter = 0;
       this.timeStr = ' 7:00am';
       this.lives = 7;
+      this.restartInGameMelody = true;
       if (setInitRoom) {
         this.willyRoomsCache = {
           x: this.globalData.willy.init.x,
@@ -114,14 +131,14 @@ export class GameApp extends AbstractApp {
   } // startRoom
   
   setGlobalData(data) {
-    this.globalData = data;
+    this.globalData = data.data.global;
 
     this.items = [];
     var id = 0;
     for (var r = 0; r < this.globalData.roomsCount; r++) {
       this.items.push([]);
     }
-    var dataItems = data.items;
+    var dataItems = this.globalData.items;
     dataItems.forEach((item) => {
       var binaryItem = this.hexToBin(item);
       // The location of an item is defined by a pair of bytes. The meaning of the bits in each byte pair is as follows:
@@ -137,7 +154,26 @@ export class GameApp extends AbstractApp {
       id++;
     });
     this.totalItems = id;
+
+    Object.keys(data.data).forEach((key) => {
+      this.saveDataToStorage(key, data.data[key]);
+    });
   } // setGlobalData
+
+  showErrorMessage(message) {
+    var topModalEntity = this.model.desktopEntity.topModalEntity();
+    topModalEntity.addModalEntity(
+      new ZXErrorEntity(
+        topModalEntity,
+        -topModalEntity.absoluteX(),
+        -topModalEntity.absoluteY(),
+        this.fonts.zxFonts8x8,
+        message,
+        this.platform.colorByName('white'),
+        this.platform.colorByName('red')
+      )
+    );
+  } // showErrorMessage
 
 } // GameApp
 

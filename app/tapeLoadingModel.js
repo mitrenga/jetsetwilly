@@ -74,12 +74,16 @@ export class TapeLoadingModel extends AbstractModel {
     this.copyrightLine5.hide = true;
     this.desktopEntity.addEntity(this.copyrightLine5);
 
-    this.sendEvent(250, {id: 'openAudioChannel', channel: 'sounds'});
+    this.sendEvent(0, {id: 'openAudioChannel', channel: 'sounds', options: {}});
     this.sendEvent(1000, {id: 'updateCommand'});
 
     this.app.stack.flashState = false;
     this.sendEvent(330, {id: 'changeFlashState'});
   } // init
+
+  shutdown() {
+    this.app.audioManager.closeAllChannels();
+  } // shutdown
 
   handleEvent(event) {
     if (super.handleEvent(event)) {

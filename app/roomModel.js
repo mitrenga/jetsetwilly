@@ -120,17 +120,6 @@ export class RoomModel extends AbstractModel {
       }
     } // onmessage
 
-    const http = new XMLHttpRequest();
-    http.responser = this;
-    http.open('GET', 'room'+this.roomNumber.toString().padStart(2, '0')+'.data');
-    http.send();
-
-    http.onreadystatechange = function () {
-      if (this.readyState == 4 && this.status == 200) {
-        var data = JSON.parse(http.responseText);
-        this.responser.sendEvent(1, {id: 'setRoomData', data: data});
-      }
-    }
   } // constructor
 
   postWorkerMessage(message) {
@@ -152,10 +141,13 @@ export class RoomModel extends AbstractModel {
     this.app.stack.flashState = false;
     this.sendEvent(330, {id: 'changeFlashState'});
 
-    this.sendEvent(250, {id: 'openAudioChannel', channel: 'music'});
-    this.sendEvent(500, {id: 'playSound', channel: 'music', sound: 'inGameMelody', options: {repeat: true, lives: this.app.lives}});
-    this.sendEvent(250, {id: 'openAudioChannel', channel: 'sounds'});
-    this.sendEvent(250, {id: 'openAudioChannel', channel: 'extra'});
+    if (this.app.restartInGameMelody) {
+      this.app.restartInGameMelody = false;
+      this.sendEvent(0, {id: 'playSound', channel: 'music', sound: 'inGameMelody', options: {repeat: true, lives: this.app.lives}});
+    }
+
+    var roomId = 'room'+this.roomNumber.toString().padStart(2, '0');
+    this.fetchData(roomId+'.data', {key: roomId, when: 'required'}, {});
   } // init
 
   shutdown() {
@@ -164,16 +156,23 @@ export class RoomModel extends AbstractModel {
       this.worker.terminate();
       this.worker = null;
     }
+    this.app.audioManager.stopChannel('sounds');
+    this.app.audioManager.stopChannel('extra');
   } // shutdown
 
   setData(data) {
-    this.gameInfoEntity.roomNameEntity.setText(data.name);
-    this.app.roomName = data.name;
-    this.borderEntity.bkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(data.borderColor), 7, 1);
-    for (var l = 0; l < this.app.lives; l++) {
-      this.gameInfoEntity.liveEntities[l].setGraphicsData(data.willy);
+    this.adjoiningRoom = data.data.adjoiningRoom;
+    if (!('willy' in data.data)) {
+      data.data.willy = this.app.globalData.willy;
     }
-    super.setData(data);
+
+    this.gameInfoEntity.roomNameEntity.setText(data.data.name);
+    this.app.roomName = data.data.name;
+    this.borderEntity.bkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(data.data.borderColor), 7, 1);
+    for (var l = 0; l < this.app.lives; l++) {
+      this.gameInfoEntity.liveEntities[l].setGraphicsData(data.data.willy);
+    }
+    super.setData(data.data);
     this.postWorkerMessage({id: 'init', initData: this.initData});
     this.app.inputEventsManager.sendEventsActiveKeys('press');
   } // setData
@@ -184,16 +183,8 @@ export class RoomModel extends AbstractModel {
     }
 
     switch (event.id) {
-      case 'setRoomData':
-        this.adjoiningRoom = event.data.adjoiningRoom;
-        if (!('willy' in event.data)) {
-          event.data.willy = this.app.globalData.willy;
-        }
-        this.setData(event.data);
-        return true;
-      
       case 'blurWindow':
-        this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.borderEntity.bkColor));
+        this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.borderEntity.bkColor, 'GameExitModel'));
         return true;
 
       case 'keyPress':
@@ -203,7 +194,7 @@ export class RoomModel extends AbstractModel {
         }
         switch (event.key) {
           case 'Escape':
-            this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.borderEntity.bkColor));
+            this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.borderEntity.bkColor, 'GameExitModel'));
             return true;
 
           case 'ArrowRight':
@@ -298,6 +289,7 @@ export class RoomModel extends AbstractModel {
         this.sendEvent(0, {id: 'playSound', channel: 'sounds', sound: 'crashSound', options: false});
         this.animationTime = this.timer;
         this.animationType = 'crash';
+        this.app.restartInGameMelody = true;
         return true;
 
       case 'gameOver':

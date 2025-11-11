@@ -16,25 +16,26 @@ export class AudioManager extends AbstractAudioManager {
   constructor(app) {
     super(app);
     this.id = 'AudioManager';
-    this.sounds = Number(this.app.getCookie('audioChannelSounds', 0.2));
-    this.music = Number(this.app.getCookie('audioChannelMusic', 0.1));
+    this.volume = {};
+    this.volume.sounds = Math.min(10, Math.max(0, Math.round(Number(this.app.getCookie('audioChannelSounds', 5)))));
+    this.volume.music = Math.min(10, Math.max(0, Math.round(Number(this.app.getCookie('audioChannelMusic', 2)))));
   } // constructor
 
-createAudioHandler(channel) {
+createAudioHandler(channel, options) {
     var audioHandler = false;
 
     var volume = 0.0;
     switch (channel) {
       case 'music':
-        volume = this.music;
+        volume = this.volumeLevel(this.volume.music);
         break;
       case 'sounds':
       case 'extra':
-        volume = this.sounds;
+        volume = this.volumeLevel(this.volume.sounds);
         break;
     }
 
-    if (volume == 0.0) {
+    if ((!('audioDisableHandler' in options) || options.audioDisableHandler != 'disable') && volume == 0.0) {
       return new AudioDisableHandler(this.app);
     }
 
@@ -68,8 +69,10 @@ createAudioHandler(channel) {
     switch (sound) {
       case 'titleScreenMelody': return this.titleScreenMelody(sampleRate);
       case 'screechSound': return this.screechSound(sampleRate);
-      case 'inGameMelody': return this.inGameMelody(sampleRate, options.lives);
-      case 'jumpSound': return this.jumpSound(sampleRate);
+      case 'inGameMelody': return this.inGameMelody(sampleRate, options.lives, false);
+      case 'exampleInGameMelody': return this.inGameMelody(sampleRate, 7, true);
+      case 'jumpSound': return this.jumpSound(sampleRate, false);
+      case 'exampleJumpSound': return this.jumpSound(sampleRate, true);
       case 'fallingSound': return this.fallingSound(sampleRate);
       case 'crashSound': return this.crashSound(sampleRate);
       case 'itemSound': return this.itemSound(sampleRate);
@@ -105,6 +108,11 @@ createAudioHandler(channel) {
     pulses[pulsesCounter] = fKeys[pulse];
     return newPos;
   } // addPulse
+
+  volumeLevel(volume) { 
+    var levels = [0, 0.005, 0.01, 0.02, 0.04, 0.07, 0.1, 0.14, 0.18, 0.23, 0.29];
+    return levels[volume];
+  } // volumeLevel
 
   titleScreenMelody(sampleRate) {
     var titleScreenTuneData = [
@@ -151,7 +159,7 @@ createAudioHandler(channel) {
     }
     pulses = this.resizeArray(pulses, pulsesCounter);
     events[pulsesCounter] = {id: 'melodyEnd'};
-    return {fragments: fragments, pulses: pulses, volume: this.music, events: events};
+    return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.music), events: events};
   } // titleScreenMelody
 
   screechSound(sampleRate) {
@@ -200,15 +208,22 @@ createAudioHandler(channel) {
     pulses = this.resizeArray(pulses, pulsesCounter);
     events[0] = {id: 'screechBegin', duration: Math.round(lastPos/sampleRate*1000)};
     events[pulsesCounter] = {id: 'screechEnd'};
-    return {fragments: fragments, pulses: pulses, volume: this.music, events: events};
+    return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.music), events: events};
   } // screechSound
 
-  inGameMelody(sampleRate, lives) {
+  inGameMelody(sampleRate, lives, example) {
     var inGameTuneData = [
       0x56,0x60,0x56,0x60,0x66,0x66,0x80,0x80,0x80,0x80,0x66,0x60,0x56,0x60,0x56,0x60,0x66,0x60,0x56,0x4C,0x48,0x4C,0x48,0x4C,0x56,0x56,0x56,0x56,0x56,0x56,0x56,0x56,
       0x40,0x40,0x40,0x40,0x44,0x44,0x4C,0x4C,0x56,0x60,0x66,0x60,0x56,0x56,0x66,0x66,0x51,0x56,0x60,0x56,0x51,0x51,0x60,0x60,0x40,0x40,0x40,0x40,0x40,0x40,0x40,0x40
     ];
 
+    var data = [];
+    if (example) {
+      data = inGameTuneData.slice(0, 28); 
+    } else {
+      data = inGameTuneData;
+    }   
+    
     var fragments = [];
     var fKeys = {};
     var pulses = new Uint8Array(1500);
@@ -220,17 +235,17 @@ createAudioHandler(channel) {
     var m = 0;
 
     for (var r = 0; r < 2; r++) {
-      for (var t = 0; t < inGameTuneData.length; t++) {
+      for (var t = 0; t < data.length; t++) {
         m++;
         var n = (m&126)>>1;
-        var e = inGameTuneData[n]+28-4*lives;
+        var e = data[n]+28-4*lives;
         var b = 256;
         var c = 3;
         do {
           do {
             e--;
             if (e == 0) {
-              var e = inGameTuneData[n]+28-4*lives;
+              var e = data[n]+28-4*lives;
               if (pulsesCounter == pulses.length) {
                 pulses = this.extendArray(pulses, 500);
               }
@@ -253,10 +268,10 @@ createAudioHandler(channel) {
     }
 
     pulses = this.resizeArray(pulses, pulsesCounter);
-    return {fragments: fragments, pulses: pulses, volume: this.music};
+    return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.music)};
   } // inGameMelody
 
-  jumpSound(sampleRate) {
+  jumpSound(sampleRate, example) {
     var fragments = [];
     var pulses = new Uint8Array(30*18+18+33*27);
     var pulsesCounter = 0;
@@ -281,32 +296,39 @@ createAudioHandler(channel) {
       pulsesCounter++;
     }
 
-    k = Math.round(sampleRate/441)/100;
-    
-    var p = 4;
-    for (var x = 0; x < 27; x++) {
-      var d = Math.round(7+2.2*p*k);
-      p++;
-      if (p == 16) {
-        p = 12;
-      }
-      fragments.push(d);
-      for (var o = 0; o < 31; o++) {
+    if (!example) {
+      k = Math.round(sampleRate/441)/100;
+      
+      var p = 4;
+      for (var x = 0; x < 27; x++) {
+        var d = Math.round(7+2.2*p*k);
+        p++;
+        if (p == 16) {
+          p = 12;
+        }
+        fragments.push(d);
+        for (var o = 0; o < 31; o++) {
+          if (pulsesCounter == pulses.length) {
+            pulses = this.extendArray(pulses, 100);
+          }
+          pulses[pulsesCounter] = fragments.length-1;
+          pulsesCounter++;
+        }
         if (pulsesCounter == pulses.length) {
           pulses = this.extendArray(pulses, 100);
         }
-        pulses[pulsesCounter] = fragments.length-1;
+        pulses[pulsesCounter] = 0;
         pulsesCounter++;
       }
-      if (pulsesCounter == pulses.length) {
-        pulses = this.extendArray(pulses, 100);
-      }
-      pulses[pulsesCounter] = 0;
-      pulsesCounter++;
     }
 
     pulses = this.resizeArray(pulses, pulsesCounter);
-    this.audioDataCache.sounds.jumpSound = {fragments: fragments, pulses: pulses, volume: this.sounds};
+
+    if (example) {
+      return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)}
+    }
+    
+    this.audioDataCache.sounds.jumpSound = {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
     return this.audioDataCache.sounds.jumpSound;
   } // jumpSound
 
@@ -342,7 +364,7 @@ createAudioHandler(channel) {
     }
 
     pulses = this.resizeArray(pulses, pulsesCounter);
-    this.audioDataCache.sounds.fallingSound = {fragments: fragments, pulses: pulses, volume: this.sounds};
+    this.audioDataCache.sounds.fallingSound = {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
     return this.audioDataCache.sounds.fallingSound;
   } // fallingSound
 
@@ -386,7 +408,7 @@ createAudioHandler(channel) {
     }
 
     pulses = this.resizeArray(pulses, pulsesCounter);
-    return {fragments: fragments, pulses: pulses, volume: this.sounds*1.5};
+    return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
   } // crashSound
 
   itemSound(sampleRate) {
@@ -410,7 +432,7 @@ createAudioHandler(channel) {
     } while (c > 0);
 
     pulses = this.resizeArray(pulses, pulsesCounter);
-    this.audioDataCache.extra.itemSound = {fragments: fragments, pulses: pulses, volume: this.sounds};
+    this.audioDataCache.extra.itemSound = {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
     return this.audioDataCache.extra.itemSound;
   } // itemSound
 
@@ -436,7 +458,7 @@ createAudioHandler(channel) {
     } while (c > 0);
 
     pulses = this.resizeArray(pulses, pulsesCounter);
-    this.audioDataCache.extra.arrowSound = {fragments: fragments, pulses: pulses, volume: this.sounds};
+    this.audioDataCache.extra.arrowSound = {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
     return this.audioDataCache.extra.arrowSound;
   } // arrowSound
 
@@ -470,7 +492,7 @@ createAudioHandler(channel) {
     }
 
     pulses = this.resizeArray(pulses, pulsesCounter);
-    return {fragments: fragments, pulses: pulses, volume: this.sounds};
+    return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
   } // gameOverSound
 
   tapePilotToneSound(sampleRate) {
@@ -479,7 +501,7 @@ createAudioHandler(channel) {
     var pulse = Math.ceil(sampleRate*2168/3500000);
     var fragments = [pulse];
     var pulses = [0];
-    return {fragments: fragments, pulses: pulses, volume: this.sounds};
+    return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
   } // tapePilotToneSound
 
   tapeRndDataSound(sampleRate) {
@@ -492,7 +514,7 @@ createAudioHandler(channel) {
 
     var fragments = [f667, f735, f885, f1710];
     var pulses = [0, 0, 1, 1];
-    return {fragments: fragments, pulses: pulses, volume: this.sounds, infinityRndPulses: {fragments: [2, 3], quantity: 2}};
+    return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds), infinityRndPulses: {fragments: [2, 3], quantity: 2}};
   } // tapeRndDataSound
 
   basicBeepsSound(sampleRate) {
@@ -513,14 +535,14 @@ createAudioHandler(channel) {
       } while (duration < sampleRate/10);
       pulses.push(beeps.length);
     }
-    return {fragments: fragments, pulses: pulses, volume: this.sounds};
+    return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
   } // basicBeepsSound
 
   keyboardSound(sampleRate) {
     var pulse = Math.ceil(15*sampleRate/44100);
     var fragments = [pulse];
     var pulses = [0];
-    return {fragments: fragments, pulses: pulses, volume: this.sounds};
+    return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
   } // keyboardSound
 
 } // AudioManager

@@ -17,10 +17,12 @@ import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
 
 export class GameOverModel extends AbstractModel {
   
-  constructor(app) {
+  constructor(app, shoeAnimation, nextModel) {
     super(app);
     this.id = 'GameOverModel';
 
+    this.shoeAnimation = shoeAnimation;
+    this.nextModel = nextModel;
     this.gameInfoEntity = null;
     this.pillarEntity = null;
     this.footEntity = null;
@@ -42,19 +44,21 @@ export class GameOverModel extends AbstractModel {
     this.desktopEntity.addEntity(this.gameInfoEntity);
     this.gameInfoEntity.roomNameEntity.setText(this.app.roomName);
 
-    var barrelEntity = new SpriteEntity(this.desktopEntity, 15*8, 14*8, this.app.platform.penColorByAttr(this.app.hexToInt(this.app.globalData.gameOver.barrel.attribute)), false, 0, 0);
-    this.desktopEntity.addEntity(barrelEntity);
-    barrelEntity.setGraphicsData(this.app.globalData.gameOver.barrel);
-    var willyEntity = new SpriteEntity(this.desktopEntity, 15*8+3, 12*8, this.app.platform.penColorByAttr(this.app.hexToInt(this.app.globalData.gameOver.willy.attribute)), false, 0, 0);
-    this.desktopEntity.addEntity(willyEntity);
-    willyEntity.setGraphicsData(this.app.globalData.gameOver.willy);
-    this.footEntity = new AbstractEntity(this.desktopEntity, 15*8, 0, 16, 16, false, this.desktopEntity.bkColor);
-    this.desktopEntity.addEntity(this.footEntity);
-    var footSpriteEntity = new SpriteEntity(this.footEntity, 0, 0, this.app.platform.penColorByAttr(this.app.hexToInt(this.app.globalData.gameOver.foot.attribute)), false, 0, 0);
-    this.footEntity.addEntity(footSpriteEntity);
-    footSpriteEntity.setGraphicsData(this.app.globalData.gameOver.foot);
-    this.pillarEntity = new PillarEntity(this.desktopEntity, 15*8, 0, 16, 0, this.app.platform.penColorByAttr(this.app.hexToInt(this.app.globalData.gameOver.pillar.attribute)), this.app.globalData.gameOver.pillar);
-    this.desktopEntity.addEntity(this.pillarEntity);
+    if (this.shoeAnimation) {
+      var barrelEntity = new SpriteEntity(this.desktopEntity, 15*8, 14*8, this.app.platform.penColorByAttr(this.app.hexToInt(this.app.globalData.gameOver.barrel.attribute)), false, 0, 0);
+      this.desktopEntity.addEntity(barrelEntity);
+      barrelEntity.setGraphicsData(this.app.globalData.gameOver.barrel);
+      var willyEntity = new SpriteEntity(this.desktopEntity, 15*8+3, 12*8, this.app.platform.penColorByAttr(this.app.hexToInt(this.app.globalData.gameOver.willy.attribute)), false, 0, 0);
+      this.desktopEntity.addEntity(willyEntity);
+      willyEntity.setGraphicsData(this.app.globalData.gameOver.willy);
+      this.footEntity = new AbstractEntity(this.desktopEntity, 15*8, 0, 16, 16, false, this.desktopEntity.bkColor);
+      this.desktopEntity.addEntity(this.footEntity);
+      var footSpriteEntity = new SpriteEntity(this.footEntity, 0, 0, this.app.platform.penColorByAttr(this.app.hexToInt(this.app.globalData.gameOver.foot.attribute)), false, 0, 0);
+      this.footEntity.addEntity(footSpriteEntity);
+      footSpriteEntity.setGraphicsData(this.app.globalData.gameOver.foot);
+      this.pillarEntity = new PillarEntity(this.desktopEntity, 15*8, 0, 16, 0, this.app.platform.penColorByAttr(this.app.hexToInt(this.app.globalData.gameOver.pillar.attribute)), this.app.globalData.gameOver.pillar);
+      this.desktopEntity.addEntity(this.pillarEntity);
+    }
 
     var colorsMap = {};
     for (var ch = 0; ch < 4; ch++) {
@@ -79,9 +83,23 @@ export class GameOverModel extends AbstractModel {
     this.timerEntity.hide = true;
     this.desktopEntity.addEntity(this.timerEntity);
 
-    this.sendEvent(250, {id: 'openAudioChannel', channel: 'sounds'});
-    this.sendEvent(500, {id: 'playSound', channel: 'sounds', sound: 'gameOverSound', options: false});
+    this.app.audioManager.stopAllChannels();
+
+    if (this.shoeAnimation) {
+      this.sendEvent(0, {id: 'playSound', channel: 'sounds', sound: 'gameOverSound', options: false});
+    }
+
+    var score = Object.keys(this.app.itemsCollected).length;
+    if (score) {
+      this.fetchData('saveGame.db', false, {name: this.app.playerName, score: score});
+    }
   } // init
+
+  setData(data) {
+  } // setData
+
+  errorData(data) {
+  } // errorData
 
   handleEvent(event) {
     if (super.handleEvent(event)) {
@@ -99,7 +117,7 @@ export class GameOverModel extends AbstractModel {
             break;
           case 'Escape':
             if (this.app.roomNumber != this.app.globalData.initRoom && this.fallTimer == 2000) {
-              this.app.setModel('MainModel');
+              this.app.setModel(this.nextModel);
               return true;
             }
             break;
@@ -107,6 +125,9 @@ export class GameOverModel extends AbstractModel {
         break;
       case 'MainModel':
         this.app.setModel('MainModel');
+        return true;
+      case 'MenuModel':
+        this.app.setModel('MenuModel');
         return true;
     }
      false;
@@ -116,7 +137,11 @@ export class GameOverModel extends AbstractModel {
     super.loopModel(timestamp);
 
     if (this.timer === false) {
-      this.timer = timestamp;
+      if (this.shoeAnimation) {
+        this.timer = timestamp;
+      } else {
+        this.timer = timestamp-2000;
+      }
     }
     this.fallTimer = timestamp-this.timer;
     if (this.fallTimer > 2000) {
@@ -147,16 +172,18 @@ export class GameOverModel extends AbstractModel {
       }
       var countdown = countdownLength-Math.floor((timestamp-this.timer-2000)/1000);
       if (countdown < 0) {
-        this.sendEvent(1, {id: 'MainModel'});
+        this.sendEvent(1, {id: this.nextModel});
       } else {
         this.timerEntity.setText(countdown.toString());
       }
     }
 
     this.desktopEntity.bkColor = this.app.platform.color((Math.floor((this.fallTimer%200)/50)));
-    this.footEntity.bkColor = this.desktopEntity.bkColor;
-    this.footEntity.y = Math.round(12*8*this.fallTimer/2000);
-    this.pillarEntity.height = this.footEntity.y;
+    if (this.shoeAnimation) {
+      this.footEntity.bkColor = this.desktopEntity.bkColor;
+      this.footEntity.y = Math.round(12*8*this.fallTimer/2000);
+      this.pillarEntity.height = this.footEntity.y;
+    }
 
     this.drawModel();
   } // loopModel

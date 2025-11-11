@@ -27,11 +27,19 @@ window.ontouchstart = function(event) {gameApp.inputEventsManager.eventTouchStar
 window.ontouchend = function(event) {gameApp.inputEventsManager.eventTouchEnd(event); }
 window.ontouchcancel = function(event) {gameApp.inputEventsManager.eventTouchCancel(event); }
 window.ontouchmove = function(event) {gameApp.inputEventsManager.eventTouchMove(event); }
-window.ongamepadconnected = function(event) { gameApp.inputEventsManager.eventGamepadConnected(event); }
-window.ongamepaddisconnected = function(event) { gameApp.inputEventsManager.eventGamepadDisconnected(event); }
 window.onblur = function(event) { gameApp.inputEventsManager.eventBlurWindow(event); }
 window.onfocus = function(event) { gameApp.inputEventsManager.eventFocusWindow(event); }
 window.onresize = function(event) { gameApp.eventResizeWindow(event); }
+
+if ('GamepadEvent' in window) {
+  window.ongamepadconnected = function(event) { gameApp.inputEventsManager.eventGamepadConnected(event); }
+  window.ongamepaddisconnected = function(event) { gameApp.inputEventsManager.eventGamepadDisconnected(event); }
+  gameApp.controls.gamepad.supported = true;
+}
+
+if (window.matchMedia('(pointer: coarse)').matches) {
+  gameApp.controls.touchscreen.supported = true;
+}
 
 // start game
 gameApp.eventResizeWindow(null);

@@ -13,19 +13,7 @@ export class HallOfFameEntity extends AbstractEntity {
 
   constructor(parentEntity, x, y, width, height) {
     super(parentEntity, x, y, width, height, false, false);
-    this.id = 'HallOfFameEntity';    
-    this.tableHallOfFame = {
-      0: {name: 'bibix', score: '100%'},
-      1: {name: 'Matthew Smith', score: '71%'},
-      2: {name: 'bibix', score: '60%'},
-      3: {name: 'Libor Mitrenga', score: '35%'},
-      4: {name: 'hunter 007', score: '30%'},
-      5: {name: 'narci', score: '22%'},
-      6: {name: 'perpe2a', score: '21%'},
-      7: {name: 'noname001', score: '15%'},
-      8: {name: 'bibix', score: '10%'},
-      9: {name: 'Libor Mitrenga', score: '1%'}
-    };
+    this.id = 'HallOfFameEntity';
   } // constructor
 
   init() {
@@ -34,26 +22,41 @@ export class HallOfFameEntity extends AbstractEntity {
     this.addEntity(new AbstractEntity(this, 0, 6, this.width, this.height-6, false, this.app.platform.colorByName('black')));
     this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, 64, 7, 'HALL OF FAME', this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('black'), {topMargin: 1, leftMargin: 2}));
     this.addEntity(new AbstractEntity(this, 1, 7, this.width-2, this.height-8, false, this.app.platform.colorByName('brightWhite')));
+    
+    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', 'closeHallOfFame', ['Enter', 'Escape', ' '], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'), {align: 'center', margin: 4}));
 
-    for (var i = 0; i < 10; i++) {
-      var y = 12+i*10;
-      this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 2, y, 18, 8, (i+1)+'.', this.app.platform.colorByName('black'), false, {align: 'right'}));
-      this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 22, y, 100, 8, this.tableHallOfFame[i].name, this.app.platform.colorByName('black'), false, {}));
-      this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8Mono, this.width-71, y, 68, 8, this.tableHallOfFame[i].score, this.app.platform.colorByName('black'), false, {align: 'right'}));
+    this.fetchData('hallOfFame.db', {key: 'hallOfFame', when: 'offline'}, {});
+  } // init
+
+  setData(data) {
+    if (data.source == 'server') {
+      this.app.saveDataToStorage('hallOfFame', data.data);
     }
 
-    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', 'closeHallOfFame', ['Enter', 'Escape', ' '], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'), {align: 'center', margin: 4}));
-  } // init
+    for (var i = 0; i < Object.keys(data.data).length; i++) {
+      var y = 12+i*10;
+      this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 2, y, 18, 8, (i+1)+'.', this.app.platform.colorByName('black'), false, {align: 'right'}));
+      this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 24, y, 120, 8, data.data[i].name, this.app.platform.colorByName('black'), false, {}));
+      this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8Mono, this.width-71, y, 64, 8, data.data[i].score+'/'+(this.app.items.length+1), this.app.platform.colorByName('black'), false, {align: 'right'}));
+    }
+  } // setData
+
+  errorData(error) {
+    this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 0, this.height/2-20, this.width, 32, 'ERROR: '+error.message, this.app.platform.colorByName('brightRed'), false, {align: 'center', textWrap: true}));
+    super.errorData(error);
+  } // errorData
 
   handleEvent(event) {
     if (super.handleEvent(event)) {
       return true;
     }
+
     switch (event.id) {
       case 'closeHallOfFame':
         this.destroy();
         return true;
     }
+
     return false;
   } // handleEvent
 

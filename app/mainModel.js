@@ -45,13 +45,19 @@ export class MainModel extends AbstractModel {
     this.desktopEntity.addEntity(this.mainImageEntity);
     this.slidingTextEntity = new SlidingTextEntity(this.mainImageEntity, this.app.fonts.zxFonts8x8Mono, 0, 18*8, 32*8, 1*8, this.slidingText, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), {animation: 'custom', rightMargin: 256});
     this.mainImageEntity.addEntity(this.slidingTextEntity);
-    this.sendEvent(250, {id: 'openAudioChannel', channel: 'music'});
-    this.sendEvent(250, {id: 'openAudioChannel', channel: 'sounds'});
-    this.sendEvent(500, {id: 'playSound', channel: 'music', sound: 'titleScreenMelody', options: false});
+    this.sendEvent(0, {id: 'openAudioChannel', channel: 'music', options: {}});
+    this.sendEvent(0, {id: 'openAudioChannel', channel: 'sounds', options: {}});
+    this.sendEvent(0, {id: 'openAudioChannel', channel: 'extra', options: {}});
+    this.sendEvent(0, {id: 'playSound', channel: 'music', sound: 'titleScreenMelody', options: false});
 
     this.app.stack.flashState = false;
     this.sendEvent(330, {id: 'changeFlashState'});
   } // init
+
+  shutdown() {
+    super.shutdown();
+    this.app.audioManager.stopAllChannels();
+  } // shutdown
 
   handleEvent(event) {
     if (super.handleEvent(event)) {
@@ -101,7 +107,7 @@ export class MainModel extends AbstractModel {
               this.app.startRoom(false, true, true);
               return true;
             case 'Escape':
-              this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.app.platform.colorByName('blue')));
+              this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.app.platform.colorByName('blue'), 'MenuModel'));
               return true;
           }
         }

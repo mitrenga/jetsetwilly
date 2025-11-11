@@ -11,10 +11,11 @@ import ButtonEntity from './svision/js/platform/canvas2D/buttonEntity.js';
 
 export class PauseGameEntity extends AbstractEntity {
 
-  constructor(parentEntity, x, y, width, height, borderColor) {
+  constructor(parentEntity, x, y, width, height, borderColor, exitModel) {
     super(parentEntity, x, y, width, height, false, false);
     this.id = 'PauseGameEntity';
     this.borderColor = borderColor;
+    this.exitModel = exitModel;
     this.selectedButtonColor = this.app.platform.colorByName('yellow');
     if (this.borderColor == this.selectedButtonColor) {
       this.selectedButtonColor = this.app.platform.colorByName('brightWhite');
@@ -81,7 +82,7 @@ export class PauseGameEntity extends AbstractEntity {
         return true;
 
       case 'exitGame':
-        this.app.setModel('MenuModel');
+        this.app.setModel(this.exitModel);
         return true;
     }
 

@@ -4,8 +4,10 @@ const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+wi
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
 const { SignboardFonts } = await import('./signboardFonts.js?ver='+window.srcVersion);
 const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
-const { PlayerNameEntity } = await import('./playerNameEntity.js?ver='+window.srcVersion);
+const { ZXPlayerNameEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxPlayerNameEntity.js?ver='+window.srcVersion);
 const { HallOfFameEntity } = await import('./hallOfFameEntity.js?ver='+window.srcVersion);
+const { ZXVolumeEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxVolumeEntity.js?ver='+window.srcVersion);
+const { ZXControlsEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxControlsEntity.js?ver='+window.srcVersion);
 const { AboutEntity } = await import('./aboutEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
@@ -13,8 +15,10 @@ import AbstractEntity from './svision/js/abstractEntity.js';
 import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
 import SignboardFonts from './signboardFonts.js';
 import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
-import PlayerNameEntity from './playerNameEntity.js';
+import ZXPlayerNameEntity from './svision/js/platform/canvas2D/zxSpectrum/zxPlayerNameEntity.js';
 import HallOfFameEntity from './hallOfFameEntity.js';
+import ZXVolumeEntity from './svision/js/platform/canvas2D/zxSpectrum/zxVolumeEntity.js';
+import ZXControlsEntity from './svision/js/platform/canvas2D/zxSpectrum/zxControlsEntity.js';
 import AboutEntity from './aboutEntity.js';
 /**/
 // begin code
@@ -60,24 +64,12 @@ export class MenuModel extends AbstractModel {
       {label: 'HALL OF FAME', event: 'showHallOfFame'},
       {label: 'SOUNDS', event: 'setSounds'},
       {label: 'MUSIC', event: 'setMusic'},
-      {label: 'CONTROLS', event: 'showControls'},
+      {label: 'CONTROLS', event: 'setControls'},
       {label: 'SHOW TAPE LOADING', event: 'startTapeLoading'},
       {label: 'ABOUT GAME', event: 'showAbout'}
     ];
     this.sighboardEntity = null;
     this.copyrightEntity = null;
-
-    const http = new XMLHttpRequest();
-    http.responser = this;
-    http.open('GET', 'menu.data');
-    http.send();
-
-    http.onreadystatechange = function () {
-      if (this.readyState == 4 && this.status == 200) {
-        var data = JSON.parse(http.responseText);
-        this.responser.sendEvent(1, {id: 'setMenuData', data: data});
-      }
-    }
   } // constructor
 
   init() {
@@ -122,6 +114,10 @@ export class MenuModel extends AbstractModel {
 
     this.app.stack.flashState = false;
     this.sendEvent(330, {id: 'changeFlashState'});
+
+    this.fetchData('menu.data', {key: 'menu', when: 'required'}, {});
+    
+    this.app.audioManager.closeAllChannels();
   } // init
 
   menuParamValue(event) {
@@ -129,15 +125,21 @@ export class MenuModel extends AbstractModel {
       case 'setPlayerName':
         return this.app.playerName;
       case 'setSounds':
-        if (this.app.audioManager.sounds == 0) {
-          return 'OFF';
+        switch (this.app.audioManager.volume.sounds) {
+          case 0:
+            return 'OFF';
+          case 10:
+            return 'MAX';
         }
-        return 'ON';
+        return (this.app.audioManager.volume.sounds*10)+'%';
       case 'setMusic':
-        if (this.app.audioManager.music == 0) {
-          return 'OFF';
+        switch (this.app.audioManager.volume.music) {
+          case 0:
+            return 'OFF';
+          case 10:
+            return 'MAX';
         }
-        return 'ON';
+        return (this.app.audioManager.volume.music*10)+'%';
     }
     return '';
   } // menuParamValue
@@ -163,16 +165,16 @@ export class MenuModel extends AbstractModel {
 
   setData(data) {
     this.bodyEntities.forEach((entity, e) => {
-      entity.setGraphicsData(data.body);
+      entity.setGraphicsData(data.data.body);
       entity.enablePaintWithVisibility();
     });
 
-    this.headEntity.setGraphicsData(data.head);
+    this.headEntity.setGraphicsData(data.data.head);
     this.headEntity.enablePaintWithVisibility();
-    this.willyEntity.setGraphicsData(data.willy);
+    this.willyEntity.setGraphicsData(data.data.willy);
     this.willyEntity.enablePaintWithVisibility();
     this.dataLoaded = true;
-    super.setData(data);
+    super.setData(data.data);
   } // setData
 
   handleEvent(event) {
@@ -189,47 +191,39 @@ export class MenuModel extends AbstractModel {
 
       case 'startGame': 
         if (!this.app.playerName.length) {
-          this.desktopEntity.addModalEntity(new PlayerNameEntity(this.desktopEntity, 27, 24, 202, 134, true));
+          this.desktopEntity.addModalEntity(new ZXPlayerNameEntity(this.desktopEntity, 27, 24, 202, 134, true));
         } else {
           this.app.setModel('MainModel');
         }
         return true;
+
+      case 'setPlayerName':
+        this.desktopEntity.addModalEntity(new ZXPlayerNameEntity(this.desktopEntity, 27, 24, 202, 134, false));
+      return true;
       
-      case 'startTapeLoading': 
-        this.app.setModel('TapeLoadingModel');
+      case 'showHallOfFame':
+        this.desktopEntity.addModalEntity(new HallOfFameEntity(this.desktopEntity, 27, 25, 202, 138));
         return true;
 
       case 'setSounds':
-        if (this.app.audioManager.sounds == 0) {
-          this.app.audioManager.sounds = 0.2;
-        } else {
-          this.app.audioManager.sounds = 0;
-        }
-        this.app.setCookie('audioChannelSounds', this.app.audioManager.sounds);
-        this.refreshMenu();
+        this.desktopEntity.addModalEntity(new ZXVolumeEntity(this.desktopEntity, 27, 24, 202, 134, 'sounds', 'audioChannelSounds', 'exampleJumpSound'));
         return true;
 
       case 'setMusic':
-        if (this.app.audioManager.music == 0) {
-          this.app.audioManager.music = 0.1;
-        } else {
-          this.app.audioManager.music = 0;
-        }
-        this.app.setCookie('audioChannelMusic', this.app.audioManager.music);
-        this.refreshMenu();
+        this.desktopEntity.addModalEntity(new ZXVolumeEntity(this.desktopEntity, 27, 24, 202, 134, 'music', 'audioChannelMusic', 'exampleInGameMelody'));
+        return true;
+
+      case 'setControls':
+        this.desktopEntity.addModalEntity(new ZXControlsEntity(this.desktopEntity, 27, 24, 202, 134));
+        return true;
+
+      case 'startTapeLoading': 
+        this.app.setModel('TapeLoadingModel');
         return true;
     
-      case 'setPlayerName':
-        this.desktopEntity.addModalEntity(new PlayerNameEntity(this.desktopEntity, 27, 25, 202, 138, false));
-      return true;
-
-      case 'showHallOfFame':
-        this.desktopEntity.addModalEntity(new HallOfFameEntity(this.desktopEntity, 27, 25, 202, 138));
-      return true;
-
       case 'showAbout':
         this.desktopEntity.addModalEntity(new AboutEntity(this.desktopEntity, 27, 25, 202, 138));
-      return true;
+        return true;
 
       case 'changeFlashState':
         this.app.stack.flashState = !this.app.stack.flashState;
@@ -262,10 +256,6 @@ export class MenuModel extends AbstractModel {
           }
         }
         break;
-
-      case 'setMenuData':
-        this.setData(event.data);
-        return true;
     }
 
     return false;
