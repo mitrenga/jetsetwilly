@@ -137,7 +137,7 @@ function willyWalking() {
 
   canMovingDirection = 0;
 
-  var standingOn = checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]);
+  var standingOn = checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors], false);
 
   standingOn.forEach((object) => {
     if ('moving' in object) {
@@ -178,7 +178,7 @@ function willyWalking() {
         } else {
           willy.y += 1;
           fall--;
-          if (checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]).length) {
+          if (checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors], false).length) {
             fall = 0;
           }
         }
@@ -212,7 +212,7 @@ function willyWalking() {
         do {
           willy.y += 1;
           fall--;
-          if (checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors]).length) {
+          if (checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors], false).length) {
             fall = 0;
           }
         } while (fall > 0)
@@ -604,7 +604,7 @@ function checkInsideWithObjectsArray(x, y, width, height, objectsArray) {
 } // checkInsideWithObjectsArray
 */
 
-function checkStandingWithObjectsArray(x, y, width, height, objectsArray) {
+function checkStandingWithObjectsArray(x, y, width, height, objectsArray, ignoreRamps) {
   var result = [];
 
   if (jumpCounter && jumpMap[jumpCounter] < 0) {
@@ -621,6 +621,9 @@ function checkStandingWithObjectsArray(x, y, width, height, objectsArray) {
         }
       }
     }
+  }
+  if (ignoreRamps) {
+    return result;
   }
   return checkStandingOnRamps(result, x, y, width, height);
 } // checkStandingWithObjectsArray
@@ -667,7 +670,9 @@ function checkCrash() {
   if (checkTouchWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.nasties, gameData.guardians])) {
     gameData.info[5] = true;
   }
-  return 0;
+  if (checkStandingWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.nasties], true).length) {
+    gameData.info[5] = true;
+  }
 } // checkCrash
 
 function rampMovement(move, x, y, width, height) {
