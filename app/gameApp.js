@@ -117,11 +117,12 @@ export class GameApp extends AbstractApp {
           y: this.globalData.willy.init.y,
           width: this.globalData.willy.width,
           height: this.globalData.willy.height,
-          paintCorrectionsX: this.globalData.willy.paintCorrections.x,
-          paintCorrectionsY: this.globalData.willy.paintCorrections.y,
+          paintCorrections: this.globalData.willy.paintCorrections,
+          touchCorrections: this.globalData.willy.touchCorrections,
           frame: this.globalData.willy.init.frame,
-          frames: this.globalData.willy.init.frames,
-          direction: this.globalData.willy.init.direction
+          frames: this.globalData.willy.frames,
+          direction: this.globalData.willy.init.direction,
+          directions: this.globalData.willy.directions
         };
         this.roomNumber = this.globalData.initRoom;
       }

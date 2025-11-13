@@ -61,12 +61,18 @@
             ],
             "width":15,
             "height":16,
+            "frames":4,
+            "directions":1,
             "paintCorrections":{
                "x":-4,
                "y":0
             },
-            "frames":4,
-            "directions":1,
+            "touchCorrections": [
+               {"x1": 0, "x2": 15},
+               {"x1": -2, "x2": 12},
+               {"x1": -4, "x2": 11},
+               {"x1": -4, "x2": 10}
+            ],
             "sprite":[
               [
                 "------###----------",
@@ -163,10 +169,6 @@
             ],
             "width":16,
             "height":16,
-            "paintCorrections":{
-               "x":0,
-               "y":0
-            },
             "frames":4,
             "directions":2,
             "sprite":[

@@ -70,12 +70,18 @@
             ],
             "width":12,
             "height":16,
+            "frames":4,
+            "directions":1,
             "paintCorrections":{
                "x":-6,
                "y":0
             },
-            "frames":4,
-            "directions":1,
+            "touchCorrections": [
+               {"x1": 0, "x2": 8},
+               {"x1": -2, "x2": 12},
+               {"x1": -4, "x2": 12},
+               {"x1": -4, "x2": 10}
+            ],
             "sprite":[
                [
                   "--------####--",

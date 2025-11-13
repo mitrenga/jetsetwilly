@@ -578,8 +578,19 @@ function checkTouchWithObjectsArray(x, y, width, height, objectsArray) {
     for (var o = 0; o < objects.length; o++) {
       var obj = objects[o];
       if (!('hide' in obj) || !obj.hide) {
-        if (!(x+width <= obj.x || y+height <= obj.y || x >= obj.x+obj.width || y >= obj.y+obj.height)) {
-          return o+1;
+        if ('touchCorrections' in obj) {
+          var d = obj.direction;
+          if (d+1 > obj.directions) {
+            d = 0;
+          }
+          var f = obj.frame+d*obj.frames;
+          if (!(x+width <= obj.x+obj.touchCorrections[f].x1 || y+height <= obj.y || x >= obj.x+obj.touchCorrections[f].x2 || y >= obj.y+obj.height)) {
+            return o+1;
+          }
+        } else {
+          if (!(x+width <= obj.x || y+height <= obj.y || x >= obj.x+obj.width || y >= obj.y+obj.height)) {
+            return o+1;
+          }
         }
       }
     }
@@ -667,10 +678,15 @@ function checkTouchItems() {
 } // checkTouchItems
 
 function checkCrash() {
-  if (checkTouchWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.nasties, gameData.guardians])) {
+  var willy = gameData.willy[0];
+  var f = willy.frame+willy.direction*willy.frames;
+  if (checkTouchWithObjectsArray(willy.x+willy.touchCorrections[f].x1, willy.y, willy.touchCorrections[f].x2-willy.touchCorrections[f].x1, 16, [gameData.guardians])) {
     gameData.info[5] = true;
   }
-  if (checkStandingWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.nasties], true).length) {
+  if (checkTouchWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.nasties])) {
+    gameData.info[5] = true;
+  }
+  if (checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.nasties], true).length) {
     gameData.info[5] = true;
   }
 } // checkCrash
