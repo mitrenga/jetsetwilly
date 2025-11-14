@@ -578,19 +578,31 @@ function checkTouchWithObjectsArray(x, y, width, height, objectsArray) {
     for (var o = 0; o < objects.length; o++) {
       var obj = objects[o];
       if (!('hide' in obj) || !obj.hide) {
+        var d = obj.direction;
+        if (d+1 > obj.directions) {
+          d = 0;
+        }
+        var f = obj.frame+d*obj.frames;
+        var x1 = obj.x;
+        var x2 = obj.x+obj.width;
+        var y1 = obj.y;
+        var y2 = obj.y+obj.height;
         if ('touchCorrections' in obj) {
-          var d = obj.direction;
-          if (d+1 > obj.directions) {
-            d = 0;
+          if ('x1' in obj.touchCorrections[f]) {
+            x1 += obj.touchCorrections[f].x1;
           }
-          var f = obj.frame+d*obj.frames;
-          if (!(x+width <= obj.x+obj.touchCorrections[f].x1 || y+height <= obj.y || x >= obj.x+obj.touchCorrections[f].x2 || y >= obj.y+obj.height)) {
-            return o+1;
+          if ('y1' in obj.touchCorrections[f]) {
+            y1 += obj.touchCorrections[f].y1;
           }
-        } else {
-          if (!(x+width <= obj.x || y+height <= obj.y || x >= obj.x+obj.width || y >= obj.y+obj.height)) {
-            return o+1;
+          if ('x2' in obj.touchCorrections[f]) {
+            x2 = obj.x+obj.touchCorrections[f].x2;
           }
+          if ('y2' in obj.touchCorrections[f]) {
+            y2 = obj.y+obj.touchCorrections[f].y2;
+          }
+        }
+        if (!(x+width <= x1 || y+height <= y1 || x >= x2 || y >= y2)) {
+          return o+1;
         }
       }
     }
