@@ -161,7 +161,7 @@ export class GameApp extends AbstractApp {
     });
   } // setGlobalData
 
-  showErrorMessage(message) {
+  showErrorMessage(message, action) {
     var topModalEntity = this.model.desktopEntity.topModalEntity();
     topModalEntity.addModalEntity(
       new ZXErrorEntity(
@@ -170,6 +170,7 @@ export class GameApp extends AbstractApp {
         -topModalEntity.absoluteY(),
         this.fonts.zxFonts8x8,
         message,
+        action,
         this.platform.colorByName('white'),
         this.platform.colorByName('red')
       )

@@ -120,6 +120,10 @@ export class MainModel extends AbstractModel {
       case 'newDemoRoom':
         this.app.startRoom(true, true, true);
         return true;
+
+      case 'errorAudioChannel':
+        this.app.showErrorMessage(event.error, 'reopen');
+        return true;
     }
     
     return false;
