@@ -211,7 +211,7 @@ export class GameAreaEntity extends AbstractEntity {
     this.initData.willy = [];
     if (!this.demo) {
       var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(data.willy.attribute));
-      var entity = new SpriteEntity(this, data.willy.init.x, data.willy.init.y, penColor, false, data.willy.init.frame, data.willy.init.direction);
+      var entity = new SpriteEntity(this, data.willy.init.x+data.willy.paintCorrections.x, data.willy.init.y, penColor, false, data.willy.init.frame, data.willy.init.direction);
       this.addEntity(entity);
       entity.setGraphicsData(data.willy);
       this.spriteEntities.willy.push(entity);
