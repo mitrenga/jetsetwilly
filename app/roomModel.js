@@ -174,7 +174,7 @@ export class RoomModel extends AbstractModel {
     }
     super.setData(data.data);
     this.postWorkerMessage({id: 'init', initData: this.initData});
-    this.app.inputEventsManager.sendEventsActiveKeys('press');
+    this.app.inputEventsManager.sendEventsActiveKeys('Press');
   } // setData
 
   handleEvent(event) {
@@ -201,6 +201,7 @@ export class RoomModel extends AbstractModel {
           case 'p':
           case 'P':
           case 'MouseButton2':
+          case 'TouchArea2':
             this.postWorkerMessage({id: 'controls', action: 'right', value: true});
             return true;
 
@@ -208,12 +209,14 @@ export class RoomModel extends AbstractModel {
           case 'o':
           case 'O':
           case 'MouseButton1':
+          case 'TouchArea1':
             this.postWorkerMessage({id: 'controls', action: 'left', value: true});
             return true;
 
           case 'ArrowUp':
           case ' ':
           case 'MouseButton4':
+          case 'TouchArea4':
             this.postWorkerMessage({id: 'controls', action: 'jump', value: true});
             return true;
         }
@@ -225,6 +228,7 @@ export class RoomModel extends AbstractModel {
           case 'p':
           case 'P':
           case 'MouseButton2':
+          case 'TouchArea2':
             this.postWorkerMessage({id: 'controls', action: 'right', value: false});
             return true;
 
@@ -232,12 +236,14 @@ export class RoomModel extends AbstractModel {
           case 'o':
           case 'O':
           case 'MouseButton1':
+          case 'TouchArea1':
             this.postWorkerMessage({id: 'controls', action: 'left', value: false});
             return true;
 
           case 'ArrowUp':
           case ' ':
           case 'MouseButton4':
+          case 'TouchArea4':
             this.postWorkerMessage({id: 'controls', action: 'jump', value: false});
             return true;
         }
