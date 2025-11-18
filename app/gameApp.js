@@ -44,13 +44,17 @@ export class GameApp extends AbstractApp {
 
     this.controls.keyboard.left = 'ArrowLeft';
     this.controls.keyboard.right = 'ArrowRight';
-    this.controls.keyboard.jump = 'ArrowUp';
+    this.controls.keyboard.jump = ' ';
     this.controls.keyboard.music = 'M';
     this.controls.keyboard.sounds = 'S';
-    this.controls.mouse.left = 'B0';
-    this.controls.mouse.right = 'B1';
-    this.controls.mouse.jump = 'B2';
+    this.controls.mouse.enable = true;
+    this.controls.mouse.left = 'Mouse1';
+    this.controls.mouse.right = 'Mouse2';
+    this.controls.mouse.jump = 'Mouse4';
     this.controls.touchscreen.type = 'jump-left-right';
+    this.controls.gamepads = {};
+    this.controls.gamepads['1038-1420-Nimbus'] = {};
+    this.controls.gamepads['1038-1420-Nimbus'].buttons = [{id: 2, event: 'GamepadRight'}, {id: 3, event: 'GamepadLeft'}, {id: 7, event: 'GamepadJump'}];
     
     this.roomNumber = false;
     this.roomName = '';

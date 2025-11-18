@@ -197,26 +197,33 @@ export class RoomModel extends AbstractModel {
             this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.borderEntity.bkColor, 'GameExitModel'));
             return true;
 
-          case 'ArrowRight':
-          case 'p':
-          case 'P':
-          case 'MouseButton2':
-          case 'TouchArea2':
+          case this.app.controls.mouse.right:
+            if (!this.app.controls.mouse.enable) {
+              break;
+            }
+          case this.app.controls.keyboard.right:
+          case 'Touch2':
+          case 'GamepadRight':  
             this.postWorkerMessage({id: 'controls', action: 'right', value: true});
             return true;
 
-          case 'ArrowLeft':
-          case 'o':
-          case 'O':
-          case 'MouseButton1':
-          case 'TouchArea1':
+          case this.app.controls.mouse.left:
+            if (!this.app.controls.mouse.enable) {
+              break;
+            }
+          case this.app.controls.keyboard.left:
+          case 'Touch1':
+          case 'GamepadLeft':  
             this.postWorkerMessage({id: 'controls', action: 'left', value: true});
             return true;
 
-          case 'ArrowUp':
-          case ' ':
-          case 'MouseButton4':
-          case 'TouchArea4':
+          case this.app.controls.mouse.jump:
+            if (!this.app.controls.mouse.enable) {
+              break;
+            }
+          case this.app.controls.keyboard.jump:
+          case 'Touch4':
+          case 'GamepadJump':  
             this.postWorkerMessage({id: 'controls', action: 'jump', value: true});
             return true;
         }
@@ -224,26 +231,33 @@ export class RoomModel extends AbstractModel {
 
       case 'keyRelease':
         switch (event.key) {
-          case 'ArrowRight':
-          case 'p':
-          case 'P':
-          case 'MouseButton2':
-          case 'TouchArea2':
+          case this.app.controls.mouse.right:
+            if (!this.app.controls.mouse.enable) {
+              break;
+            }
+          case this.app.controls.keyboard.right:
+          case 'Touch2':
+          case 'GamepadRight':  
             this.postWorkerMessage({id: 'controls', action: 'right', value: false});
             return true;
 
-          case 'ArrowLeft':
-          case 'o':
-          case 'O':
-          case 'MouseButton1':
-          case 'TouchArea1':
+          case this.app.controls.mouse.left:
+            if (!this.app.controls.mouse.enable) {
+              break;
+            }
+          case this.app.controls.keyboard.left:
+          case 'Touch1':
+          case 'GamepadLeft':  
             this.postWorkerMessage({id: 'controls', action: 'left', value: false});
             return true;
 
-          case 'ArrowUp':
-          case ' ':
-          case 'MouseButton4':
-          case 'TouchArea4':
+          case this.app.controls.mouse.jump:
+            if (!this.app.controls.mouse.enable) {
+              break;
+            }
+          case this.app.controls.keyboard.jump:
+          case 'Touch4':
+          case 'GamepadJump':  
             this.postWorkerMessage({id: 'controls', action: 'jump', value: false});
             return true;
         }
