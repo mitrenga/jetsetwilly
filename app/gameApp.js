@@ -54,7 +54,11 @@ export class GameApp extends AbstractApp {
     this.controls.touchscreen.type = 'jump-left-right';
     this.controls.gamepads = {};
     this.controls.gamepads['1038-1420-Nimbus'] = {};
-    this.controls.gamepads['1038-1420-Nimbus'].buttons = [{id: 2, event: 'GamepadRight'}, {id: 3, event: 'GamepadLeft'}, {id: 7, event: 'GamepadJump'}];
+    this.controls.gamepads['1038-1420-Nimbus'].buttons = [];
+    this.controls.gamepads['1038-1420-Nimbus'].axes = [];
+    //this.controls.gamepads['1038-1420-Nimbus'].buttons = [{id: 2, event: 'GamepadRight'}, {id: 3, event: 'GamepadLeft'}, {id: 7, event: 'GamepadJump'}];
+    this.controls.gamepads['1038-1420-Nimbus'].buttons = [{id: 7, event: 'GamepadJump'}];
+    this.controls.gamepads['1038-1420-Nimbus'].axes = [{id: 2, event: 'GamepadRight', min: 0.01, max: 1.0}, {id: 2, event: 'GamepadLeft', min: -1.0, max: -0.01}];
     
     this.roomNumber = false;
     this.roomName = '';
