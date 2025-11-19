@@ -34,7 +34,7 @@ window.onresize = function(event) { gameApp.eventResizeWindow(event); }
 if ('GamepadEvent' in window) {
   window.ongamepadconnected = function(event) { gameApp.inputEventsManager.eventGamepadConnected(event); }
   window.ongamepaddisconnected = function(event) { gameApp.inputEventsManager.eventGamepadDisconnected(event); }
-  gameApp.controls.gamepad.supported = true;
+  gameApp.controls.gamepads.supported = true;
 }
 
 if (window.matchMedia('(pointer: coarse)').matches) {
