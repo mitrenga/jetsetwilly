@@ -52,7 +52,7 @@ export class GameApp extends AbstractApp {
         sounds: 'S'
       },
       mouse: {
-        enable: true,
+        enable: false,
         left: 'Mouse1',
         right: 'Mouse2',
         jump: 'Mouse4'
@@ -69,9 +69,9 @@ export class GameApp extends AbstractApp {
               {id: 7, event: 'GamepadJump'}
             ],
             axes: [
-              {id: 1, event: 'GamepadJump', min: 0.01, max: 1.0},
-              {id: 2, event: 'GamepadRight', min: 0.01, max: 1.0},
-              {id: 2, event: 'GamepadLeft', min: -1.0, max: -0.01}
+              {id: 1, event: 'GamepadJump', direction: 1},
+              {id: 2, event: 'GamepadRight', direction: 1},
+              {id: 2, event: 'GamepadLeft', direction: -1}
             ]
           }
         }
