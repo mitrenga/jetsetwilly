@@ -41,6 +41,11 @@ if (window.matchMedia('(pointer: coarse)').matches) {
   gameApp.controls.touchscreen.supported = true;
 }
 
+// disable gesture on Safari mobile
+document.addEventListener("gesturestart", (event) => event.preventDefault());
+document.addEventListener("gestureend", (event) => event.preventDefault());
+document.addEventListener("gesturechange", (event) => event.preventDefault());
+
 // start game
 gameApp.eventResizeWindow(null);
 requestAnimationFrame(loopGame);
