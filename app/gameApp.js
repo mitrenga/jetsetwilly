@@ -88,14 +88,15 @@ export class GameApp extends AbstractApp {
           supported: false,
           devices: {
             '1038-1420-Nimbus': {
-              buttons: [
-                {id: 7, event: 'GamepadJump'}
-              ],
-              axes: [
-               {id: 1, event: 'GamepadJump', direction: 1},
-                {id: 2, event: 'GamepadRight', direction: 1},
-                {id: 2, event: 'GamepadLeft', direction: -1}
-              ]
+              buttons: {
+                7: {action: 'jump', event: 'GamepadJump'}
+              },
+              axes: {
+                2: {
+                  '>': {action: 'right', event: 'GamepadRight'},
+                  '<': {action: 'left', event: 'GamepadLeft'}
+                }
+              }
             }
           }
         }
