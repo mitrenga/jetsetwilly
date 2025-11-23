@@ -225,7 +225,11 @@ export class GameApp extends AbstractApp {
       )
     );
   } // showErrorMessage
-
+  
+  buttonClickColor() {
+    return '#7a7a7aff';
+  } // buttonClickColor
+  
 } // GameApp
 
 export default GameApp;
