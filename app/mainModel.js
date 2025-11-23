@@ -109,13 +109,20 @@ export class MainModel extends AbstractModel {
             case 'Escape':
               this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.app.platform.colorByName('blue'), 'MenuModel'));
               return true;
+            case 'Mouse1':
+              this.app.inputEventsManager.keysMap.Mouse1 = this;
+              return true;
           }
         }
         break;
 
-      case 'mouseClick':
-        this.app.startRoom(false, true, true);
-        return true;
+      case 'keyRelease':
+        switch (event.key) {
+          case 'Mouse1':
+            this.app.startRoom(false, true, true);
+            return true;
+        }        
+        break;
 
       case 'newDemoRoom':
         this.app.startRoom(true, true, true);

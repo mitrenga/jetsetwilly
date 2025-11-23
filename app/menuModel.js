@@ -242,18 +242,28 @@ export class MenuModel extends AbstractModel {
           case 'ArrowUp':
             this.changeMenuItem(this.selectedItem-1);
             return true;
-          }
+          case 'Mouse1':
+            for (var i = 0; i < this.menuItems.length; i++) {
+              if ((this.menuEntities[i][0].pointOnEntity(event)) || (this.menuEntities[i][1].pointOnEntity(event))) {
+                this.app.inputEventsManager.keysMap.Mouse1 = this.menuEntities[i][0];
+                return true;
+              }
+            }
+        }
         break;
 
-      case 'mouseClick':
-        if (event.key == 'left') {
-          for (var i = 0; i < this.menuItems.length; i++) {
-            if ((this.menuEntities[i][0].pointOnEntity(event)) || (this.menuEntities[i][1].pointOnEntity(event))) {
-              this.changeMenuItem(i);
-              this.sendEvent(0, {id: this.menuItems[this.selectedItem].event});
-              return true;
+      case 'keyRelease':
+        switch (event.key) {
+          case 'Mouse1':
+            for (var i = 0; i < this.menuItems.length; i++) {
+              if ((this.menuEntities[i][0].pointOnEntity(event)) || (this.menuEntities[i][1].pointOnEntity(event))) {
+                if (this.app.inputEventsManager.keysMap.Mouse1 === this.menuEntities[i][0]) {
+                  this.changeMenuItem(i);
+                  this.sendEvent(0, {id: this.menuItems[this.selectedItem].event});
+                  return true;
+                }
+              }
             }
-          }
         }
         break;
     }

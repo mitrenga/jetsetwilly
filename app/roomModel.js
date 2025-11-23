@@ -189,8 +189,14 @@ export class RoomModel extends AbstractModel {
 
       case 'keyPress':
         if (this.demo) {
-          this.app.setModel('MainModel');
-          return true;
+          if (event.key.substring(0, 5) != 'Mouse') {
+            this.app.setModel('MainModel');
+            return true;
+          }
+          if (event.key == 'Mouse1') {
+            this.app.inputEventsManager.keysMap.Mouse1 = this;
+            return true;
+          }
         }
         var key = event.key;
         if (key.length == 1) {
@@ -202,7 +208,7 @@ export class RoomModel extends AbstractModel {
             return true;
 
           case this.app.controls.mouse.right:
-            if (!this.app.controls.mouse.enable) {
+            if (!this.app.controls.mouse.enable || this.app.inputEventsManager.keysMap[this.app.controls.mouse.right] !== false) {
               break;
             }
           case this.app.controls.keyboard.right:
@@ -212,7 +218,7 @@ export class RoomModel extends AbstractModel {
             return true;
 
           case this.app.controls.mouse.left:
-            if (!this.app.controls.mouse.enable) {
+            if (!this.app.controls.mouse.enable || this.app.inputEventsManager.keysMap[this.app.controls.mouse.left] !== false) {
               break;
             }
           case this.app.controls.keyboard.left:
@@ -222,7 +228,7 @@ export class RoomModel extends AbstractModel {
             return true;
 
           case this.app.controls.mouse.jump:
-            if (!this.app.controls.mouse.enable) {
+            if (!this.app.controls.mouse.enable || this.app.inputEventsManager.keysMap[this.app.controls.mouse.jump] !== false) {
               break;
             }
           case this.app.controls.keyboard.jump:
@@ -234,13 +240,19 @@ export class RoomModel extends AbstractModel {
         break;
 
       case 'keyRelease':
+        if (this.demo) {
+          if (event.key == 'Mouse1') {
+            this.app.setModel('MainModel');
+            return true;
+          }
+        }
         var key = event.key;
         if (key.length == 1) {
           key = key.toUpperCase();
         }
         switch (key) {
           case this.app.controls.mouse.right:
-            if (!this.app.controls.mouse.enable) {
+            if (!this.app.controls.mouse.enable || this.app.inputEventsManager.keysMap[this.app.controls.mouse.right] !== false) {
               break;
             }
           case this.app.controls.keyboard.right:
@@ -250,7 +262,7 @@ export class RoomModel extends AbstractModel {
             return true;
 
           case this.app.controls.mouse.left:
-            if (!this.app.controls.mouse.enable) {
+            if (!this.app.controls.mouse.enable || this.app.inputEventsManager.keysMap[this.app.controls.mouse.left] !== false) {
               break;
             }
           case this.app.controls.keyboard.left:
@@ -260,7 +272,7 @@ export class RoomModel extends AbstractModel {
             return true;
 
           case this.app.controls.mouse.jump:
-            if (!this.app.controls.mouse.enable) {
+            if (!this.app.controls.mouse.enable || this.app.inputEventsManager.keysMap[this.app.controls.mouse.jump] !== false) {
               break;
             }
           case this.app.controls.keyboard.jump:
@@ -268,13 +280,6 @@ export class RoomModel extends AbstractModel {
           case 'GamepadJump':  
             this.postWorkerMessage({id: 'controls', action: 'jump', value: false});
             return true;
-        }
-        break;
-
-      case 'mouseClick':
-        if (this.demo) {
-          this.app.setModel('MainModel');
-          return true;
         }
         break;
 
