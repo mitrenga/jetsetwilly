@@ -29,8 +29,29 @@ export class MenuModel extends AbstractModel {
     super(app);
     this.id = 'MenuModel';
 
-    this.prevCounter = 0;
     this.gameFrame = 0;
+    this.dataLoaded = false;
+
+    this.bkEntity = null;
+    this.selection = 0;
+    this.hoverColor = 'rgba(0, 0, 0, 0.1)';
+    this.selectionHoverColor = 'rgba(0, 0, 0, 0.40)';
+    this.selectionEntity = null;
+    this.itemPenColor = 'rgb(127, 127, 127)';
+    this.selectionItemPenColor = 'rgba(255, 255, 255, 1)';
+    this.menuEntities = [];
+    this.menuItems = [
+      {label: 'START GAME', event: 'startGame'},
+      {label: 'PLAYER NAME', event: 'setPlayerName'},
+      {label: 'HALL OF FAME', event: 'showHallOfFame'},
+      {label: 'SOUNDS', event: 'setSounds'},
+      {label: 'MUSIC', event: 'setMusic'},
+      {label: 'CONTROLS', event: 'setControls'},
+      {label: 'SHOW TAPE LOADING', event: 'startTapeLoading'},
+      {label: 'ABOUT GAME', event: 'showAbout'}
+    ];
+
+    this.prevCounter = 0;
     this.bodyObjects = [
       {id: 'body', trackX: 0, trackY: 26, color: 'rgb(217, 41, 188)'},
       {id: 'body', trackX: 8, trackY: 29, color: 'rgb(230, 241, 13)'},
@@ -38,7 +59,6 @@ export class MenuModel extends AbstractModel {
       {id: 'body', trackX: 24, trackY: 35, color: 'rgb(42, 165, 63)'},
       {id: 'body', trackX: 32, trackY: 38, color: 'rgb(192, 81, 81)'}
     ];
-    this.dataLoaded = false;
     this.bodyEntities = [];
     this.headEntity = null;
     this.headX = -16;
@@ -52,22 +72,6 @@ export class MenuModel extends AbstractModel {
     this.wave = [0, 2, 4, 5, 6, 7, 7, 7, 6, 5, 4, 2, 0, -2, -4, -5, -6, -7, -7, -7, -6, -5, -4, -2];
     this.waveCounter = 0;
     this.willyEntity = null;
-    this.selectedItem = 0;
-    this.bkEntity = null;
-    this.menuSelectedRow = null;
-    this.penMenuItemColor = 'rgb(127, 127, 127)';
-    this.penSelectedMenuItemColor = 'rgb(0, 0, 0)';
-    this.menuEntities = [];
-    this.menuItems = [
-      {label: 'START GAME', event: 'startGame'},
-      {label: 'PLAYER NAME', event: 'setPlayerName'},
-      {label: 'HALL OF FAME', event: 'showHallOfFame'},
-      {label: 'SOUNDS', event: 'setSounds'},
-      {label: 'MUSIC', event: 'setMusic'},
-      {label: 'CONTROLS', event: 'setControls'},
-      {label: 'SHOW TAPE LOADING', event: 'startTapeLoading'},
-      {label: 'ABOUT GAME', event: 'showAbout'}
-    ];
     this.sighboardEntity = null;
     this.copyrightEntity = null;
   } // constructor
@@ -78,7 +82,7 @@ export class MenuModel extends AbstractModel {
     this.borderEntity.bkColor = this.app.platform.colorByName('white');
     this.desktopEntity.bkColor = this.app.platform.colorByName('white');
 
-      this.bodyObjects.forEach((object, o) => {
+    this.bodyObjects.forEach((object, o) => {
       this.bodyEntities[o] = new SpriteEntity(this.desktopEntity, this.headX, this.headY, object.color, false, 0, this.track[o].direction);
       this.desktopEntity.addEntity(this.bodyEntities[o]);
     });
@@ -90,18 +94,24 @@ export class MenuModel extends AbstractModel {
 
     this.bkEntity = new AbstractEntity(this.desktopEntity, 13, 22, 230, 144, false, 'rgba(223, 218, 208, 0.8)');
     this.desktopEntity.addEntity(this.bkEntity);
-    this.menuSelectedRow = new AbstractEntity(this.bkEntity, 10, 10+this.selectedItem*16, 210, 12, false, 'rgba(0, 0, 0, 0.15)');
-    this.bkEntity.addEntity(this.menuSelectedRow);
+
+    this.selectionEntity = new AbstractEntity(this.bkEntity, 10, 10+this.selection*16, 210, 12, false, 'rgba(0, 0, 0, 0.35)');
+    this.bkEntity.addEntity(this.selectionEntity);
 
     for (var y = 0; y < this.menuItems.length; y++) {
-      var color = this.penMenuItemColor;
-      if (y == this.selectedItem) {
-        color = this.penSelectedMenuItemColor;
+      var penColor = this.itemPenColor;
+      if (y == this.selection) {
+        penColor = this.selectionItemPenColor;
       }
       this.menuEntities[y] = [];
-      this.menuEntities[y][0] = new TextEntity(this.bkEntity, this.app.fonts.zxFonts8x8, 10, 10+y*16, 138, 12, this.menuItems[y].label, color, false, {margin: 2});
+      this.menuEntities[y][0] = new TextEntity(this.bkEntity, this.app.fonts.zxFonts8x8, 10, 10+y*16, 210, 12, this.menuItems[y].label, penColor, false, {margin: 2});
+      if (y != this.selection) {
+        this.menuEntities[y][0].hoverColor = this.hoverColor;
+      } else {
+        this.menuEntities[y][0].hoverColor = this.selectionHoverColor;
+      }
       this.bkEntity.addEntity(this.menuEntities[y][0]);
-      this.menuEntities[y][1] = new TextEntity(this.bkEntity, this.app.fonts.zxFonts8x8, 120, 10+y*16, 100, 12, this.menuParamValue(this.menuItems[y].event), color, false, {margin: 2, align: 'right'});
+      this.menuEntities[y][1] = new TextEntity(this.bkEntity, this.app.fonts.zxFonts8x8, 120, 10+y*16, 100, 12, this.menuParamValue(this.menuItems[y].event), penColor, false, {margin: 2, align: 'right'});
       this.bkEntity.addEntity(this.menuEntities[y][1]);
     }
 
@@ -151,16 +161,18 @@ export class MenuModel extends AbstractModel {
     }
   } // refreshMenu
 
-  changeMenuItem(newItem) {
-    if (newItem < 0 || newItem >= this.menuItems.length) {
+  changeMenuItem(newSelection) {
+    if (newSelection < 0 || newSelection >= this.menuItems.length) {
       return;
     }
-    this.menuEntities[this.selectedItem][0].setPenColor(this.penMenuItemColor);
-    this.menuEntities[this.selectedItem][1].setPenColor(this.penMenuItemColor);
-    this.selectedItem = newItem;
-    this.menuEntities[this.selectedItem][0].setPenColor(this.penSelectedMenuItemColor);
-    this.menuEntities[this.selectedItem][1].setPenColor(this.penSelectedMenuItemColor);
-    this.menuSelectedRow.y = 10+this.selectedItem*16;
+    this.menuEntities[this.selection][0].hoverColor = this.hoverColor;
+    this.menuEntities[this.selection][0].setPenColor(this.itemPenColor);
+    this.menuEntities[this.selection][1].setPenColor(this.itemPenColor);
+    this.selection = newSelection;
+    this.menuEntities[this.selection][0].hoverColor = this.selectionHoverColor;
+    this.menuEntities[this.selection][0].setPenColor(this.selectionItemPenColor);
+    this.menuEntities[this.selection][1].setPenColor(this.selectionItemPenColor);
+    this.selectionEntity.y = 10+this.selection*16;
   } // changeMenuItem
 
   setData(data) {
@@ -234,13 +246,13 @@ export class MenuModel extends AbstractModel {
         switch (event.key) {
           case 'Enter':
           case ' ':
-              this.sendEvent(0, {id: this.menuItems[this.selectedItem].event});
+              this.sendEvent(0, {id: this.menuItems[this.selection].event});
             return true;
           case 'ArrowDown':
-            this.changeMenuItem(this.selectedItem+1);
+            this.changeMenuItem(this.selection+1);
             return true;
           case 'ArrowUp':
-            this.changeMenuItem(this.selectedItem-1);
+            this.changeMenuItem(this.selection-1);
             return true;
           case 'Mouse1':
             for (var i = 0; i < this.menuItems.length; i++) {
@@ -259,7 +271,7 @@ export class MenuModel extends AbstractModel {
               if ((this.menuEntities[i][0].pointOnEntity(event)) || (this.menuEntities[i][1].pointOnEntity(event))) {
                 if (this.app.inputEventsManager.keysMap.Mouse1 === this.menuEntities[i][0]) {
                   this.changeMenuItem(i);
-                  this.sendEvent(0, {id: this.menuItems[this.selectedItem].event});
+                  this.sendEvent(0, {id: this.menuItems[this.selection].event});
                   return true;
                 }
               }
