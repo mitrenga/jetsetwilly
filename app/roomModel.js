@@ -184,7 +184,14 @@ export class RoomModel extends AbstractModel {
 
     switch (event.id) {
       case 'blurWindow':
+        this.postWorkerMessage({id: 'pause'});
+        this.app.audioManager.pauseAllChannels();
         this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.borderEntity.bkColor, 'GameExitModel'));
+        return true;
+
+      case 'continueGame':        
+        this.postWorkerMessage({id: 'continue'});
+        this.app.audioManager.continueAllChannels();
         return true;
 
       case 'keyPress':
@@ -204,6 +211,8 @@ export class RoomModel extends AbstractModel {
         }
         switch (key) {
           case 'Escape':
+            this.postWorkerMessage({id: 'pause'});
+            this.app.audioManager.pauseAllChannels();
             this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 9*8, 5*8, 14*8+1, 14*8+2, this.borderEntity.bkColor, 'GameExitModel'));
             return true;
 

@@ -26,9 +26,12 @@ var previousDirection = 0;
 var ropePosition = 0;
 var ropeProhibited = 0;
 var operation = 'walking';
+var pause = false;
 
 function gameLoop() {
-  setTimeout(gameLoop, 77);
+  if (!pause) {
+    setTimeout(gameLoop, 77);
+  }
 
   if (gameData != null) {
     counter++;
@@ -744,6 +747,15 @@ onmessage = (event) => {
 
     case 'controls':
       controls[event.data.action] = event.data.value;
+      break;
+
+    case 'pause':
+      this.pause = true;
+      break;
+
+    case 'continue':
+      this.pause = false;
+      gameLoop();
       break;
 
     }
