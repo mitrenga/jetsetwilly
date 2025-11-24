@@ -2,6 +2,7 @@
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
+const { MenuEntity } = await import('./svision/js/platform/canvas2D/menuEntity.js?ver='+window.srcVersion);
 const { SignboardFonts } = await import('./signboardFonts.js?ver='+window.srcVersion);
 const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
 const { ZXPlayerNameEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxPlayerNameEntity.js?ver='+window.srcVersion);
@@ -13,6 +14,7 @@ const { AboutEntity } = await import('./aboutEntity.js?ver='+window.srcVersion);
 import AbstractModel from './svision/js/abstractModel.js';
 import AbstractEntity from './svision/js/abstractEntity.js';
 import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
+import MenuEntity from './svision/js/platform/canvas2D/menuEntity.js';
 import SignboardFonts from './signboardFonts.js';
 import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
 import ZXPlayerNameEntity from './svision/js/platform/canvas2D/zxSpectrum/zxPlayerNameEntity.js';
@@ -29,27 +31,36 @@ export class MenuModel extends AbstractModel {
     super(app);
     this.id = 'MenuModel';
 
-    this.gameFrame = 0;
-    this.dataLoaded = false;
-
-    this.bkEntity = null;
-    this.selection = 0;
-    this.hoverColor = 'rgba(0, 0, 0, 0.1)';
-    this.selectionHoverColor = 'rgba(0, 0, 0, 0.40)';
-    this.selectionEntity = null;
-    this.itemPenColor = 'rgb(127, 127, 127)';
-    this.selectionItemPenColor = 'rgba(255, 255, 255, 1)';
-    this.menuEntities = [];
     this.menuItems = [
-      {label: 'START GAME', event: 'startGame'},
-      {label: 'PLAYER NAME', event: 'setPlayerName'},
-      {label: 'HALL OF FAME', event: 'showHallOfFame'},
-      {label: 'SOUNDS', event: 'setSounds'},
-      {label: 'MUSIC', event: 'setMusic'},
-      {label: 'CONTROLS', event: 'setControls'},
-      {label: 'SHOW TAPE LOADING', event: 'startTapeLoading'},
-      {label: 'ABOUT GAME', event: 'showAbout'}
+      {t1: 'START GAME', event: 'startGame'},
+      {t1: 'PLAYER NAME', event: 'setPlayerName'},
+      {t1: 'HALL OF FAME', event: 'showHallOfFame'},
+      {t1: 'SOUNDS', event: 'setSounds'},
+      {t1: 'MUSIC', event: 'setMusic'},
+      {t1: 'CONTROLS', event: 'setControls'},
+      {t1: 'SHOW TAPE LOADING', event: 'startTapeLoading'},
+      {t1: 'ABOUT GAME', event: 'showAbout'}
     ];
+    this.menuOptions = {
+      fonts: this.app.fonts.zxFonts8x8,
+      leftMargin: 9,
+      rightMargin: 9,
+      topMargin: 8,
+      itemHeight: 12,
+      t1LeftMargin: 3,
+      t1TopMargin: 2, 
+      t2Width: 114,
+      t2RightMargin: 3,
+      t2TopMargin: 2, 
+      textColor: 'rgb(127, 127, 127)',
+      selectionTextColor: 'rgba(255, 255, 255, 1)',
+      selectionBarColor: 'rgba(0, 0, 0, 0.35)',
+      hoverColor: 'rgba(0, 0, 0, 0.1)',
+      selectionHoverColor: 'rgba(0, 0, 0, 0.40)'
+    };  
+
+    this.sighboardEntity = null;
+    this.copyrightEntity = null;
 
     this.prevCounter = 0;
     this.bodyObjects = [
@@ -72,8 +83,8 @@ export class MenuModel extends AbstractModel {
     this.wave = [0, 2, 4, 5, 6, 7, 7, 7, 6, 5, 4, 2, 0, -2, -4, -5, -6, -7, -7, -7, -6, -5, -4, -2];
     this.waveCounter = 0;
     this.willyEntity = null;
-    this.sighboardEntity = null;
-    this.copyrightEntity = null;
+    this.gameFrame = 0;
+    this.dataLoaded = false;
   } // constructor
 
   init() {
@@ -92,28 +103,7 @@ export class MenuModel extends AbstractModel {
     this.willyEntity = new SpriteEntity(this.desktopEntity, this.headX-4, this.headY-11, '#7c7c7c', false, 0, 0);
     this.desktopEntity.addEntity(this.willyEntity);
 
-    this.bkEntity = new AbstractEntity(this.desktopEntity, 13, 22, 230, 144, false, 'rgba(223, 218, 208, 0.8)');
-    this.desktopEntity.addEntity(this.bkEntity);
-
-    this.selectionEntity = new AbstractEntity(this.bkEntity, 10, 10+this.selection*16, 210, 12, false, 'rgba(0, 0, 0, 0.35)');
-    this.bkEntity.addEntity(this.selectionEntity);
-
-    for (var y = 0; y < this.menuItems.length; y++) {
-      var penColor = this.itemPenColor;
-      if (y == this.selection) {
-        penColor = this.selectionItemPenColor;
-      }
-      this.menuEntities[y] = [];
-      this.menuEntities[y][0] = new TextEntity(this.bkEntity, this.app.fonts.zxFonts8x8, 10, 10+y*16, 210, 12, this.menuItems[y].label, penColor, false, {margin: 2});
-      if (y != this.selection) {
-        this.menuEntities[y][0].hoverColor = this.hoverColor;
-      } else {
-        this.menuEntities[y][0].hoverColor = this.selectionHoverColor;
-      }
-      this.bkEntity.addEntity(this.menuEntities[y][0]);
-      this.menuEntities[y][1] = new TextEntity(this.bkEntity, this.app.fonts.zxFonts8x8, 120, 10+y*16, 100, 12, this.menuParamValue(this.menuItems[y].event), penColor, false, {margin: 2, align: 'right'});
-      this.bkEntity.addEntity(this.menuEntities[y][1]);
-    }
+    this.desktopEntity.addEntity(new MenuEntity(this.desktopEntity, 13, 22, 230, 144, 'rgba(223, 218, 208, 0.8)', this.menuOptions, this, this.getMenuData));
 
     var signboardFonts = new SignboardFonts(this.app);
     this.sighboardEntity = new TextEntity(this.desktopEntity, signboardFonts, 144, 6, 93, 10, 'JET SET WILlY', 'rgb(91, 91, 91)', false, {scale: 2, animationMode: 'flashPenColor', flashColor: 'rgb(155, 155, 155)'});
@@ -130,50 +120,44 @@ export class MenuModel extends AbstractModel {
     this.app.audioManager.closeAllChannels();
   } // init
 
-  menuParamValue(event) {
-    switch (event) {
-      case 'setPlayerName':
-        return this.app.playerName;
-      case 'setSounds':
-        switch (this.app.audioManager.volume.sounds) {
-          case 0:
-            return 'OFF';
-          case 10:
-            return 'MAX';
+  getMenuData(self, key, row) {
+    switch (key) {
+      
+      case 'numberOfItems':
+        return self.menuItems.length;
+
+      case 't2':
+        switch (row) {
+          case 1:
+            return self.app.playerName;
+          case 3:
+            switch (self.app.audioManager.volume.sounds) {
+              case 0:
+                return 'OFF';
+              case 10:
+                return 'MAX';
+            }
+            return (self.app.audioManager.volume.sounds*10)+'%';
+          case 4:
+            switch (self.app.audioManager.volume.music) {
+              case 0:
+                return 'OFF';
+              case 10:
+                return 'MAX';
+            }
+            return (self.app.audioManager.volume.music*10)+'%';
         }
-        return (this.app.audioManager.volume.sounds*10)+'%';
-      case 'setMusic':
-        switch (this.app.audioManager.volume.music) {
-          case 0:
-            return 'OFF';
-          case 10:
-            return 'MAX';
+        break;
+
+      default:
+        if (key in self.menuItems[row]) {
+          return self.menuItems[row][key];
         }
-        return (this.app.audioManager.volume.music*10)+'%';
+        break;
+
     }
     return '';
-  } // menuParamValue
-
-  refreshMenu() {
-    for (var y = 0; y < this.menuItems.length; y++) {
-      this.menuEntities[y][0].setText(this.menuItems[y].label);
-      this.menuEntities[y][1].setText(this.menuParamValue(this.menuItems[y].event));
-    }
-  } // refreshMenu
-
-  changeMenuItem(newSelection) {
-    if (newSelection < 0 || newSelection >= this.menuItems.length) {
-      return;
-    }
-    this.menuEntities[this.selection][0].hoverColor = this.hoverColor;
-    this.menuEntities[this.selection][0].setPenColor(this.itemPenColor);
-    this.menuEntities[this.selection][1].setPenColor(this.itemPenColor);
-    this.selection = newSelection;
-    this.menuEntities[this.selection][0].hoverColor = this.selectionHoverColor;
-    this.menuEntities[this.selection][0].setPenColor(this.selectionItemPenColor);
-    this.menuEntities[this.selection][1].setPenColor(this.selectionItemPenColor);
-    this.selectionEntity.y = 10+this.selection*16;
-  } // changeMenuItem
+  } // getMenuData
 
   setData(data) {
     this.bodyEntities.forEach((entity, e) => {
@@ -195,12 +179,6 @@ export class MenuModel extends AbstractModel {
     }
 
     switch (event.id) {
-
-      case 'refreshMenu': 
-        this.refreshMenu();
-        return true;
-      
-
       case 'startGame': 
         if (!this.app.playerName.length) {
           this.desktopEntity.addModalEntity(new ZXPlayerNameEntity(this.desktopEntity, 27, 24, 202, 134, true));
@@ -241,43 +219,6 @@ export class MenuModel extends AbstractModel {
         this.app.stack.flashState = !this.app.stack.flashState;
         this.sendEvent(330, {id: 'changeFlashState'});
         return true;
-
-      case 'keyPress':
-        switch (event.key) {
-          case 'Enter':
-          case ' ':
-              this.sendEvent(0, {id: this.menuItems[this.selection].event});
-            return true;
-          case 'ArrowDown':
-            this.changeMenuItem(this.selection+1);
-            return true;
-          case 'ArrowUp':
-            this.changeMenuItem(this.selection-1);
-            return true;
-          case 'Mouse1':
-            for (var i = 0; i < this.menuItems.length; i++) {
-              if ((this.menuEntities[i][0].pointOnEntity(event)) || (this.menuEntities[i][1].pointOnEntity(event))) {
-                this.app.inputEventsManager.keysMap.Mouse1 = this.menuEntities[i][0];
-                return true;
-              }
-            }
-        }
-        break;
-
-      case 'keyRelease':
-        switch (event.key) {
-          case 'Mouse1':
-            for (var i = 0; i < this.menuItems.length; i++) {
-              if ((this.menuEntities[i][0].pointOnEntity(event)) || (this.menuEntities[i][1].pointOnEntity(event))) {
-                if (this.app.inputEventsManager.keysMap.Mouse1 === this.menuEntities[i][0]) {
-                  this.changeMenuItem(i);
-                  this.sendEvent(0, {id: this.menuItems[this.selection].event});
-                  return true;
-                }
-              }
-            }
-        }
-        break;
     }
 
     return false;
