@@ -33,6 +33,7 @@ export class GameApp extends AbstractApp {
     super(platform, 'bodyApp',  importPath, wsURL);
 
     this.audioManager = new AudioManager(this);
+    this.muted = {sounds: false, music: false};
 
     this.fonts = {
       zxFonts8x8Mono: new ZXFonts8x8(this, false),

@@ -45,9 +45,9 @@ export class MainModel extends AbstractModel {
     this.desktopEntity.addEntity(this.mainImageEntity);
     this.slidingTextEntity = new SlidingTextEntity(this.mainImageEntity, this.app.fonts.zxFonts8x8Mono, 0, 18*8, 32*8, 1*8, this.slidingText, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), {animation: 'custom', rightMargin: 256});
     this.mainImageEntity.addEntity(this.slidingTextEntity);
-    this.sendEvent(0, {id: 'openAudioChannel', channel: 'music', options: {}});
-    this.sendEvent(0, {id: 'openAudioChannel', channel: 'sounds', options: {}});
-    this.sendEvent(0, {id: 'openAudioChannel', channel: 'extra', options: {}});
+    this.sendEvent(0, {id: 'openAudioChannel', channel: 'music', options: {muted: this.app.muted.music}});
+    this.sendEvent(0, {id: 'openAudioChannel', channel: 'sounds', options: {muted: this.app.muted.sounds}});
+    this.sendEvent(0, {id: 'openAudioChannel', channel: 'extra', options: {muted: this.app.muted.sounds}});
     this.sendEvent(0, {id: 'playSound', channel: 'music', sound: 'titleScreenMelody', options: false});
 
     this.app.stack.flashState = false;
@@ -102,7 +102,11 @@ export class MainModel extends AbstractModel {
 
       case 'keyPress':
         if (this.desktopEntity.modalEntity == null) {
-          switch (event.key) {
+          var key = event.key;
+          if (key.length == 1) {
+            key = key.toUpperCase();
+          }
+          switch (key) {
             case 'Enter':
               this.app.startRoom(false, true, true);
               return true;
@@ -111,6 +115,15 @@ export class MainModel extends AbstractModel {
               return true;
             case 'Mouse1':
               this.app.inputEventsManager.keysMap.Mouse1 = this;
+              return true;
+            case this.app.controls.keyboard.music:
+              this.app.muted.music = !this.app.muted.music;
+              this.app.audioManager.muteChannel('music', this.app.muted.music);
+              return true;
+            case this.app.controls.keyboard.sounds:
+              this.app.muted.sounds = !this.app.muted.sounds;
+              this.app.audioManager.muteChannel('sounds', this.app.muted.sounds);
+              this.app.audioManager.muteChannel('extra', this.app.muted.sounds);
               return true;
           }
         }
