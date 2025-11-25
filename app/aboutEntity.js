@@ -33,11 +33,7 @@ export class AboutEntity extends AbstractEntity {
                     'ROOMS LIKE THE BANYAN TREE OR CONSERVATORY ROOF.';
     this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 1, 7, this.width-2, 120, aboutText, this.app.platform.colorByName('black'), false, {align: 'justify', textWrap: true, margin: 2}));
     
-    this.addEntity(new ButtonEntity(
-      this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', 'closeAbout', ['Enter', 'Escape', ' '],
-      this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'),
-      {align: 'center', margin: 4, clickColor: this.app.buttonClickColor(), hoverColor: this.app.platform.colorByName('blue')}
-    ));
+    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', 'closeAbout', ['Enter', 'Escape', ' '], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('blue'), {align: 'center', margin: 4}));
   } // init
 
   handleEvent(event) {
