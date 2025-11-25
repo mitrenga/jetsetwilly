@@ -52,11 +52,11 @@ export class MenuModel extends AbstractModel {
       t2Width: 114,
       t2RightMargin: 3,
       t2TopMargin: 2, 
-      textColor: 'rgb(127, 127, 127)',
-      selectionTextColor: 'rgba(255, 255, 255, 1)',
-      selectionBarColor: 'rgba(0, 0, 0, 0.35)',
-      hoverColor: 'rgba(0, 0, 0, 0.1)',
-      selectionHoverColor: 'rgba(0, 0, 0, 0.40)'
+      textColor: '#7f7f7f',
+      selectionTextColor: '#ffffff',
+      selectionBarColor: '#00000059',
+      hoverColor: '#0000001a',
+      selectionHoverColor: '#00000066'
     };  
 
     this.sighboardEntity = null;
@@ -64,11 +64,11 @@ export class MenuModel extends AbstractModel {
 
     this.prevCounter = 0;
     this.bodyObjects = [
-      {id: 'body', trackX: 0, trackY: 26, color: 'rgb(217, 41, 188)'},
-      {id: 'body', trackX: 8, trackY: 29, color: 'rgb(230, 241, 13)'},
-      {id: 'body', trackX: 16, trackY: 32, color: 'rgb(90, 72, 209)'},
-      {id: 'body', trackX: 24, trackY: 35, color: 'rgb(42, 165, 63)'},
-      {id: 'body', trackX: 32, trackY: 38, color: 'rgb(192, 81, 81)'}
+      {id: 'body', trackX: 0, trackY: 26, color: '#d929bc'},
+      {id: 'body', trackX: 8, trackY: 29, color: '#e6f10d'},
+      {id: 'body', trackX: 16, trackY: 32, color: '#5a48d1'},
+      {id: 'body', trackX: 24, trackY: 35, color: '#2aa53f'},
+      {id: 'body', trackX: 32, trackY: 38, color: '#c05151'}
     ];
     this.bodyEntities = [];
     this.headEntity = null;
@@ -98,15 +98,15 @@ export class MenuModel extends AbstractModel {
       this.desktopEntity.addEntity(this.bodyEntities[o]);
     });
 
-    this.headEntity = new SpriteEntity(this.desktopEntity, this.headX, this.headY, 'rgb(21, 147, 181)', false, 0, 0);
+    this.headEntity = new SpriteEntity(this.desktopEntity, this.headX, this.headY, '#1593b5', false, 0, 0);
     this.desktopEntity.addEntity(this.headEntity);
     this.willyEntity = new SpriteEntity(this.desktopEntity, this.headX-4, this.headY-11, '#7c7c7c', false, 0, 0);
     this.desktopEntity.addEntity(this.willyEntity);
 
-    this.desktopEntity.addEntity(new MenuEntity(this.desktopEntity, 13, 22, 230, 144, 'rgba(223, 218, 208, 0.8)', this.menuOptions, this, this.getMenuData));
+    this.desktopEntity.addEntity(new MenuEntity(this.desktopEntity, 13, 22, 230, 144, '#dfdad0cc', this.menuOptions, this, this.getMenuData));
 
     var signboardFonts = new SignboardFonts(this.app);
-    this.sighboardEntity = new TextEntity(this.desktopEntity, signboardFonts, 144, 6, 93, 10, 'JET SET WILlY', 'rgb(91, 91, 91)', false, {scale: 2, animationMode: 'flashPenColor', flashColor: 'rgb(155, 155, 155)'});
+    this.sighboardEntity = new TextEntity(this.desktopEntity, signboardFonts, 144, 6, 93, 10, 'JET SET WILlY', '#5b5b5bff', false, {scale: 2, animationMode: 'flashPenColor', flashColor: '#9b9b9bff'});
     this.desktopEntity.addEntity(this.sighboardEntity);
 
     this.copyrightEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, '© 2025 GNU General Public Licence', this.app.platform.colorByName('black'), false, {align: 'center'});
