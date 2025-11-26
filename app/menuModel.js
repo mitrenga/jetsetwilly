@@ -308,7 +308,11 @@ export class MenuModel extends AbstractModel {
         }
       }
     }
-  
+
+    if (this.desktopEntity.modalEntity) {
+      this.desktopEntity.modalEntity.loopEntity(timestamp);
+    }
+
     this.drawModel();
   } // loopModel
 
