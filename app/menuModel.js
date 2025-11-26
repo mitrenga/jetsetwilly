@@ -56,7 +56,9 @@ export class MenuModel extends AbstractModel {
       selectionTextColor: '#ffffff',
       selectionBarColor: '#00000059',
       hoverColor: '#0000001a',
-      selectionHoverColor: '#00000066'
+      selectionHoverColor: '#00000066',
+      clickColor: '#0000002a',
+      selectionClickColor: '#00000086'
     };  
 
     this.sighboardEntity = null;

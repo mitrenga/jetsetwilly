@@ -40,7 +40,9 @@ export class PauseGameEntity extends AbstractEntity {
       selectionTextColor: this.app.platform.colorByName('black'),
       selectionBarColor: '#dbdbdbff',
       hoverColor: '#0000001e',
-      selectionHoverColor: this.app.platform.colorByName('brightWhite')
+      selectionHoverColor: '#efefefff',
+      clickColor: '#0000002e',
+      selectionClickColor: '#ffffffff'
     }
   } // constructor
 
