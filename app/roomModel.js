@@ -198,24 +198,26 @@ export class RoomModel extends AbstractModel {
         return true;
 
       case 'keyPress':
-        if (this.demo) {
-          if (event.key.substring(0, 5) != 'Mouse' && event.key != 'Touch') {
-            this.app.setModel('MainModel');
-            return true;
-          }
-          if (event.key.substring(0, 5) == 'Mouse') {
-            this.app.inputEventsManager.keysMap[event.key] = this;
-            return true;
-          }
-          if (event.key == 'Touch') {
-            this.app.inputEventsManager.touchesMap[event.identifier] = this;
-            return true;
-          }
-        }
         var key = event.key;
         if (key.length == 1) {
           key = key.toUpperCase();
         }
+
+        if (this.demo) {
+          switch (key) {
+            case 'Mouse1':
+            case 'Mouse2':
+            case 'Mouse4':
+              this.app.inputEventsManager.keysMap[event.key] = this;
+              return true;
+            case 'Touch':
+              this.app.inputEventsManager.touchesMap[event.identifier] = this;
+              return true;
+          }
+          this.app.setModel('MainModel');
+          return true;
+        }
+
         switch (key) {
           case 'Escape':
             this.postWorkerMessage({id: 'pause'});
@@ -265,20 +267,31 @@ export class RoomModel extends AbstractModel {
         break;
 
       case 'keyRelease':
-        if (this.demo) {
-          if (event.key.substring(0, 5) == 'Mouse' && this.app.inputEventsManager.keysMap[event.key] === this) {
-            this.app.setModel('MainModel');
-            return true;
-          }
-          if (event.key == 'Touch' && this.app.inputEventsManager.touchesMap[event.identifier] === this) {
-            this.app.setModel('MainModel');
-            return true;
-          }
-        }
         var key = event.key;
         if (key.length == 1) {
           key = key.toUpperCase();
         }
+
+        if (this.demo) {
+          switch (key) {
+            case 'Mouse1':
+            case 'Mouse2':
+            case 'Mouse4':
+              if (this.app.inputEventsManager.keysMap[event.key] === this) {
+                this.app.setModel('MainModel');
+                return true;
+              }
+              break;
+            case 'Touch':
+              if (this.app.inputEventsManager.touchesMap[event.identifier] === this) {
+                this.app.setModel('MainModel');
+                return true;
+              }
+              break;
+          }
+          return true;
+        }
+
         switch (key) {
           case this.app.controls.mouse.right:
             if (!this.app.controls.mouse.enable || this.app.inputEventsManager.keysMap[this.app.controls.mouse.right] !== false) {

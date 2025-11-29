@@ -27,7 +27,7 @@ import AboutEntity from './aboutEntity.js';
 
 export class MenuModel extends AbstractModel {
   
-  constructor(app) {
+  constructor(app, selectionItem) {
     super(app);
     this.id = 'MenuModel';
 
@@ -58,7 +58,8 @@ export class MenuModel extends AbstractModel {
       hoverColor: '#0000001a',
       selectionHoverColor: '#00000066',
       clickColor: '#0000002a',
-      selectionClickColor: '#00000086'
+      selectionClickColor: '#00000086',
+      selection: selectionItem
     };  
 
     this.sighboardEntity = null;

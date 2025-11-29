@@ -121,7 +121,11 @@ export class GameApp extends AbstractApp {
 
   setModel(model) {
     var needResizeApp = false;
+    var selectionItem = 0;
     if (this.model) {
+      if (this.model.id == 'TapeLoadingModel') {
+        selectionItem = 6;
+      }
       this.model.shutdown();
       needResizeApp = true;
     }
@@ -130,7 +134,7 @@ export class GameApp extends AbstractApp {
         this.model = new ZXResetModel(this);
         break;
       case 'MenuModel':
-        this.model = new MenuModel(this);
+        this.model = new MenuModel(this, selectionItem);
         break;
       case 'MainModel':
         this.model = new MainModel(this);

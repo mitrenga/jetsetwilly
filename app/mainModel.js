@@ -136,13 +136,13 @@ export class MainModel extends AbstractModel {
         switch (event.key) {
           case 'Mouse1':
             if (this.app.inputEventsManager.keysMap.Mouse1 === this) {
-              this.app.startCave(false, true, true);
+              this.app.startRoom(false, true, true);
               return true;
             }
             break;
           case 'Touch':
             if (this.app.inputEventsManager.touchesMap[event.identifier] === this) {
-              this.app.startCave(false, true, true);
+              this.app.startRoom(false, true, true);
               return true;
             }
             break;
