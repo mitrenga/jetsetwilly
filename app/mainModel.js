@@ -116,6 +116,9 @@ export class MainModel extends AbstractModel {
             case 'Mouse1':
               this.app.inputEventsManager.keysMap.Mouse1 = this;
               return true;
+            case 'Touch':
+              this.app.inputEventsManager.touchesMap[event.identifier] = this;
+              return true;
             case this.app.controls.keyboard.music:
               this.app.muted.music = !this.app.muted.music;
               this.app.audioManager.muteChannel('music', this.app.muted.music);
@@ -132,8 +135,17 @@ export class MainModel extends AbstractModel {
       case 'keyRelease':
         switch (event.key) {
           case 'Mouse1':
-            this.app.startRoom(false, true, true);
-            return true;
+            if (this.app.inputEventsManager.keysMap.Mouse1 === this) {
+              this.app.startCave(false, true, true);
+              return true;
+            }
+            break;
+          case 'Touch':
+            if (this.app.inputEventsManager.touchesMap[event.identifier] === this) {
+              this.app.startCave(false, true, true);
+              return true;
+            }
+            break;
         }        
         break;
 
