@@ -5,6 +5,7 @@ const { GameInfoEntity } = await import('./gameInfoEntity.js?ver='+window.srcVer
 const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
 const { PillarEntity } = await import('./pillarEntity.js?ver='+window.srcVersion);
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
+const { ButtonEntity } = await import('./svision/js/platform/canvas2D/buttonEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import AbstractEntity from './svision/js/abstractEntity.js';
@@ -12,6 +13,7 @@ import GameInfoEntity from './gameInfoEntity.js';
 import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
 import PillarEntity from './pillarEntity.js';
 import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
+import ButtonEntity from './svision/js/platform/canvas2D/buttonEntity.js';
 /**/
 // begin code
 
@@ -29,6 +31,8 @@ export class GameOverModel extends AbstractModel {
     this.gameEntity = null;
     this.overEntity = null;
     this.contiueEntity = null;
+    this.buttonYesEntity = null;
+    this.buttonNoEntity = null;
     this.timerEntity = null;
     this.colorCounter = 65;
     this.colorTimer = false;
@@ -65,23 +69,23 @@ export class GameOverModel extends AbstractModel {
       colorsMap[ch] = this.app.platform.penColorByAttr(this.colorCounter);
       this.colorCounter = this.app.rotateInc(this.colorCounter, 65, 71);
     }
-    this.gameEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 10*8, 6*8, 4*8, 8, 'Game', this.app.platform.colorByName('brightWhite'), false, {penColorsMap: colorsMap}, true);
-    this.gameEntity.hide = true;
+    this.gameEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 10*8, 6*8, 4*8, 8, 'Game', this.app.platform.colorByName('brightWhite'), false, {penColorsMap: colorsMap, hide: true});
     this.desktopEntity.addEntity(this.gameEntity);
     colorsMap = {};
     for (var ch = 0; ch < 4; ch++) {
       colorsMap[ch] = this.app.platform.penColorByAttr(this.colorCounter);
       this.colorCounter = this.app.rotateInc(this.colorCounter, 65, 71);
     }
-    this.overEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 18*8, 6*8, 4*8, 8, 'Over', this.app.platform.colorByName('brightWhite'), false, {penColorsMap: colorsMap}, true);
-    this.overEntity.hide = true;
+    this.overEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 18*8, 6*8, 4*8, 8, 'Over', this.app.platform.colorByName('brightWhite'), false, {penColorsMap: colorsMap, hide: true});
     this.desktopEntity.addEntity(this.overEntity);
-    this.contiueEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 21*8, 32*8, 8, 'Press ENTER to continue', this.app.platform.colorByName('brightWhite'), false, {align: 'center'});
-    this.contiueEntity.hide = true;
+    this.contiueEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 21*8, 32*8, 8, 'Continue in the last room?', this.app.platform.colorByName('brightWhite'), false, {align: 'center', hide: true});
     this.desktopEntity.addEntity(this.contiueEntity);
-    this.timerEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, '10', this.app.platform.colorByName('brightWhite'), false, {align: 'center'});
-    this.timerEntity.hide = true;
-    this.desktopEntity.addEntity(this.timerEntity);
+    this.buttonYesEntity = new ButtonEntity(this.desktopEntity, this.app.fonts.zxFonts8x8Mono, 42, 23*8-4, 70, 12, 'YES', 'restartRoom', ['Enter'], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightGreen'), {topMargin: 2, align: 'center', hide: true});
+    this.desktopEntity.addEntity(this.buttonYesEntity);
+    this.buttonNoEntity = new ButtonEntity(this.desktopEntity, this.app.fonts.zxFonts8x8Mono, 256-(42+70), 23*8-4, 70, 12, 'NO', this.nextModel, ['Escape'], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightRed'), {topMargin: 2, align: 'center', hide: true});
+    this.desktopEntity.addEntity(this.buttonNoEntity);
+    this.timerEntity = new TextEntity(this.buttonNoEntity, this.app.fonts.fonts5x5, 8, 4, 10, 5, '10', this.app.platform.colorByName('white'), false, {align: 'center'});
+    this.buttonNoEntity.addEntity(this.timerEntity);
 
     this.app.audioManager.stopAllChannels();
 
@@ -107,22 +111,9 @@ export class GameOverModel extends AbstractModel {
     }
 
     switch (event.id) {
-      case 'keyPress':
-        switch (event.key) {
-          case 'Enter':
-            if (this.app.roomNumber != this.app.globalData.initRoom && this.fallTimer == 2000) {
-              this.app.startRoom(false, true, false);
-              return true;
-            }
-            break;
-          case 'Escape':
-            if (this.app.roomNumber != this.app.globalData.initRoom && this.fallTimer == 2000) {
-              this.app.setModel(this.nextModel);
-              return true;
-            }
-            break;
-        }
-        break;
+      case 'restartRoom':
+        this.app.startRoom(false, true, false);
+        return true;
       case 'MainModel':
         this.app.setModel('MainModel');
         return true;
@@ -151,7 +142,8 @@ export class GameOverModel extends AbstractModel {
       var countdownLength = 2;
       if (this.app.roomNumber != this.app.globalData.initRoom) {
         this.contiueEntity.hide = false;
-        this.timerEntity.hide = false;
+        this.buttonYesEntity.hide = false;
+        this.buttonNoEntity.hide = false;
         countdownLength = 10;
       }
       if (this.colorTimer === false) {
