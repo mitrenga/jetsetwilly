@@ -17,8 +17,8 @@ export class AudioManager extends AbstractAudioManager {
     super(app);
     this.id = 'AudioManager';
     this.volume = {};
-    this.volume.sounds = Math.min(10, Math.max(0, Math.round(Number(this.app.getCookie('audioChannelSounds', 5)))));
-    this.volume.music = Math.min(10, Math.max(0, Math.round(Number(this.app.getCookie('audioChannelMusic', 2)))));
+    this.volume.sounds = Math.min(10, Math.max(0, Math.round(Number(this.app.readCookie('audioChannelSounds', 5)))));
+    this.volume.music = Math.min(10, Math.max(0, Math.round(Number(this.app.readCookie('audioChannelMusic', 2)))));
   } // constructor
 
 createAudioHandler(channel, options) {
@@ -40,7 +40,7 @@ createAudioHandler(channel, options) {
     }
 
     if (this.unsupportedAudioChannel == false) {
-      this.unsupportedAudioChannel = this.app.getCookie('unsupportedAudioChannel', false);
+      this.unsupportedAudioChannel = this.app.readCookie('unsupportedAudioChannel', false);
     }
 
     switch (this.unsupportedAudioChannel) {
@@ -48,11 +48,11 @@ createAudioHandler(channel, options) {
         audioHandler = new AudioWorkletHandler(this.app);
         break;
       case 'AudioWorkletHandler':
-        this.app.setCookie('unsupportedAudioChannel', 'AudioWorkletHandler');
+        this.app.writeCookie('unsupportedAudioChannel', 'AudioWorkletHandler');
         audioHandler = new AudioScriptProcessorHandler(this.app);
         break;
       case 'AudioScriptProcessorHandler':
-        this.app.setCookie('unsupportedAudioChannel', 'AudioScriptProcessorHandler');
+        this.app.writeCookie('unsupportedAudioChannel', 'AudioScriptProcessorHandler');
         break;
     }
 
