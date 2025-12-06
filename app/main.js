@@ -31,9 +31,7 @@ window.addEventListener('blur', (event) => gameApp.inputEventsManager.eventBlurW
 window.addEventListener('focus', (event) => gameApp.inputEventsManager.eventFocusWindow(event));
 window.addEventListener('resize', (event) => gameApp.eventResizeWindow(event));
 
-if ('GamepadEvent' in window) {
-  window.addEventListener('gamepadconnected', (event) => gameApp.inputEventsManager.eventGamepadConnected(event));
-  window.addEventListener('gamepaddisconnected', (event) => gameApp.inputEventsManager.eventGamepadDisconnected(event));
+if (navigator.getGamepads) {
   gameApp.controls.gamepads.supported = true;
 }
 
