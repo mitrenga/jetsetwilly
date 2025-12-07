@@ -169,7 +169,7 @@ export class TapeLoadingModel extends AbstractModel {
       case 'keyPress':
         switch (event.key) {
           case 'Escape':
-          case 'GampepadExit':
+          case 'GamepadExit':
             this.app.setModel('MenuModel');            
             return true;
           case ' ':
