@@ -10,6 +10,7 @@ const { HallOfFameEntity } = await import('./hallOfFameEntity.js?ver='+window.sr
 const { ZXVolumeEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxVolumeEntity.js?ver='+window.srcVersion);
 const { ZXControlsEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxControlsEntity.js?ver='+window.srcVersion);
 const { AboutEntity } = await import('./aboutEntity.js?ver='+window.srcVersion);
+const { ZXWaitForAudioEventEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxWaitForAudioEventEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import AbstractEntity from './svision/js/abstractEntity.js';
@@ -22,6 +23,7 @@ import HallOfFameEntity from './hallOfFameEntity.js';
 import ZXVolumeEntity from './svision/js/platform/canvas2D/zxSpectrum/zxVolumeEntity.js';
 import ZXControlsEntity from './svision/js/platform/canvas2D/zxSpectrum/zxControlsEntity.js';
 import AboutEntity from './aboutEntity.js';
+import ZXWaitForAudioEventEntity from './svision/js/platform/canvas2D/zxSpectrum/zxWaitForAudioEventEntity.js';
 /**/
 // begin code
 
@@ -210,7 +212,12 @@ export class MenuModel extends AbstractModel {
         this.desktopEntity.addModalEntity(new ZXControlsEntity(this.desktopEntity, 27, 24, 202, 134));
         return true;
 
-      case 'startTapeLoading': 
+      case 'startTapeLoading':
+        if (this.app.inputEventsManager.needEventForAudio()) {
+          this.desktopEntity.addModalEntity(new ZXWaitForAudioEventEntity(this.desktopEntity, 64, 75, 128, 45, this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('magenta'), 'startTapeLoading2'));
+          return true;
+        }
+      case 'startTapeLoading2': 
         this.app.setModel('TapeLoadingModel');
         return true;
     
