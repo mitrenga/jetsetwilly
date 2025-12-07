@@ -23,7 +23,7 @@ export class HallOfFameEntity extends AbstractEntity {
     this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, 64, 7, 'HALL OF FAME', this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('black'), {topMargin: 1, leftMargin: 2}));
     this.addEntity(new AbstractEntity(this, 1, 7, this.width-2, this.height-8, false, this.app.platform.colorByName('brightWhite')));
     
-    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', 'closeHallOfFame', ['Enter', 'Escape', ' '], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'), {align: 'center', margin: 4}));
+    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', 'closeHallOfFame', ['Enter', 'Escape', ' ', 'GamepadOK', 'GamepadExit'], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'), {align: 'center', margin: 4}));
 
     this.fetchData('hallOfFame.db', {key: 'hallOfFame', when: 'offline'}, {});
   } // init

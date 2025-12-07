@@ -80,9 +80,9 @@ export class GameOverModel extends AbstractModel {
     this.desktopEntity.addEntity(this.overEntity);
     this.contiueEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 21*8, 32*8, 8, 'Continue in the last room?', this.app.platform.colorByName('brightWhite'), false, {align: 'center', hide: true});
     this.desktopEntity.addEntity(this.contiueEntity);
-    this.buttonYesEntity = new ButtonEntity(this.desktopEntity, this.app.fonts.zxFonts8x8Mono, 42, 23*8-4, 70, 12, 'YES', 'restartRoom', ['Enter'], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightGreen'), {topMargin: 2, align: 'center', hide: true});
+    this.buttonYesEntity = new ButtonEntity(this.desktopEntity, this.app.fonts.zxFonts8x8Mono, 42, 23*8-4, 70, 12, 'YES', 'restartRoom', ['Enter', 'GamepadOK'], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightGreen'), {topMargin: 2, align: 'center', hide: true});
     this.desktopEntity.addEntity(this.buttonYesEntity);
-    this.buttonNoEntity = new ButtonEntity(this.desktopEntity, this.app.fonts.zxFonts8x8Mono, 256-(42+70), 23*8-4, 70, 12, 'NO', this.nextModel, ['Escape'], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightRed'), {topMargin: 2, align: 'center', hide: true});
+    this.buttonNoEntity = new ButtonEntity(this.desktopEntity, this.app.fonts.zxFonts8x8Mono, 256-(42+70), 23*8-4, 70, 12, 'NO', this.nextModel, ['Escape', 'GamepadExit'], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightRed'), {topMargin: 2, align: 'center', hide: true});
     this.desktopEntity.addEntity(this.buttonNoEntity);
     this.timerEntity = new TextEntity(this.buttonNoEntity, this.app.fonts.fonts5x5, 8, 4, 10, 5, '10', this.app.platform.colorByName('white'), false, {align: 'center'});
     this.buttonNoEntity.addEntity(this.timerEntity);
