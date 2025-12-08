@@ -187,9 +187,15 @@ export class MenuModel extends AbstractModel {
       case 'startGame': 
         if (!this.app.playerName.length) {
           this.desktopEntity.addModalEntity(new ZXPlayerNameEntity(this.desktopEntity, 27, 24, 202, 134, true));
+          return true;
         } else {
-          this.app.setModel('MainModel');
+          if (this.app.inputEventsManager.needEventForAudio()) {
+            this.desktopEntity.addModalEntity(new ZXWaitForAudioEventEntity(this.desktopEntity, 64, 75, 128, 45, this.app.platform.colorByName('black'), this.app.platform.colorByName('green'), 'startGame2'));
+            return true;
+          }
         }
+      case 'startGame2':
+        this.app.setModel('MainModel');
         return true;
 
       case 'setPlayerName':
