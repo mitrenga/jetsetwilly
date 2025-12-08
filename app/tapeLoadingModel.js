@@ -181,10 +181,10 @@ export class TapeLoadingModel extends AbstractModel {
           case 'Mouse1':
           case 'Mouse2':
           case 'Mouse4':
-            this.app.inputEventsManager.keysMap[event.key] = this;
+            this.app.inputEventsManager.keysMap[event.key] = this.borderEntity;
             return true;
           case 'Touch':
-            this.app.inputEventsManager.touchesMap[event.identifier] = this;
+            this.app.inputEventsManager.touchesMap[event.identifier] = this.borderEntity;
             return true;
         }
         break;
@@ -194,12 +194,12 @@ export class TapeLoadingModel extends AbstractModel {
           case 'Mouse1':
           case 'Mouse2':
           case 'Mouse4':
-            if (this.app.inputEventsManager.keysMap[event.key] === this && this.break()) {
+            if (this.app.inputEventsManager.keysMap[event.key] === this.borderEntity && this.break()) {
               return true;
             }
             return true;
           case 'Touch':
-            if (this.app.inputEventsManager.touchesMap[event.identifier] === this && this.break()) {
+            if (this.app.inputEventsManager.touchesMap[event.identifier] === this.borderEntity && this.break()) {
               return true;
             }
             return true;
