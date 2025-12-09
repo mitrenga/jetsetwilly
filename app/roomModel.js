@@ -214,10 +214,10 @@ export class RoomModel extends AbstractModel {
             case 'Mouse1':
             case 'Mouse2':
             case 'Mouse4':
-              this.app.inputEventsManager.keysMap[event.key] = this;
+              this.app.inputEventsManager.keysMap[event.key] = this.borderEntity;
               return true;
             case 'Touch':
-              this.app.inputEventsManager.touchesMap[event.identifier] = this;
+              this.app.inputEventsManager.touchesMap[event.identifier] = this.borderEntity;
               return true;
           }
           this.app.setModel('MainModel');
@@ -284,13 +284,13 @@ export class RoomModel extends AbstractModel {
             case 'Mouse1':
             case 'Mouse2':
             case 'Mouse4':
-              if (this.app.inputEventsManager.keysMap[event.key] === this) {
+              if (this.app.inputEventsManager.keysMap[event.key] === this.borderEntity) {
                 this.app.setModel('MainModel');
                 return true;
               }
               break;
             case 'Touch':
-              if (this.app.inputEventsManager.touchesMap[event.identifier] === this) {
+              if (this.app.inputEventsManager.touchesMap[event.identifier] === this.borderEntity) {
                 this.app.setModel('MainModel');
                 return true;
               }
