@@ -20,10 +20,10 @@ export class PauseGameEntity extends AbstractEntity {
     this.title = title;
     this.exitModel = exitModel;
     this.menuItems = [
-      {t1: 'RESUME GAME', event: 'closePauseGame'},
-      {t1: 'SOUNDS', event: 'changeSoundsState'},
-      {t1: 'MUSIC', event: 'changeMusicState'},
-      {t1: 'EXIT GAME', event: 'exitGame'}
+      {t1: 'RESUME GAME', event: {id: 'closePauseGame'}},
+      {t1: 'SOUNDS', event: {id: 'changeSoundsState'}},
+      {t1: 'MUSIC', event: {id: 'changeMusicState'}},
+      {t1: 'EXIT GAME', event: {id: 'exitGame'}}
     ];
     this.menuOptions = {
       fonts: this.app.fonts.zxFonts8x8,
