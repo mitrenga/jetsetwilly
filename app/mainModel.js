@@ -120,10 +120,10 @@ export class MainModel extends AbstractModel {
               this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 52, 40, 153, 85, 'OPTIONS', 'MenuModel'));
               return true;
             case 'Mouse1':
-              this.app.inputEventsManager.keysMap.Mouse1 = this;
+              this.app.inputEventsManager.keysMap.Mouse1 = this.borderEntity;
               return true;
             case 'Touch':
-              this.app.inputEventsManager.touchesMap[event.identifier] = this;
+              this.app.inputEventsManager.touchesMap[event.identifier] = this.borderEntity;
               return true;
             case this.app.controls.keyboard.music:
               this.app.muted.music = !this.app.muted.music;
@@ -141,13 +141,13 @@ export class MainModel extends AbstractModel {
       case 'keyRelease':
         switch (event.key) {
           case 'Mouse1':
-            if (this.app.inputEventsManager.keysMap.Mouse1 === this) {
+            if (this.app.inputEventsManager.keysMap.Mouse1 === this.borderEntity) {
               this.app.startRoom(false, true, true);
               return true;
             }
             break;
           case 'Touch':
-            if (this.app.inputEventsManager.touchesMap[event.identifier] === this) {
+            if (this.app.inputEventsManager.touchesMap[event.identifier] === this.borderEntity) {
               this.app.startRoom(false, true, true);
               return true;
             }
