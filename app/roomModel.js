@@ -233,38 +233,44 @@ export class RoomModel extends AbstractModel {
             return true;
 
           case this.app.controls.mouse.right:
-            if (!this.app.controls.mouse.enable || this.app.inputEventsManager.keysMap[this.app.controls.mouse.right] !== false) {
-              break;
+            if (this.app.controls.mouse.enable && this.app.inputEventsManager.keysMap[this.app.controls.mouse.right] === false) {
+              this.postWorkerMessage({id: 'controls', action: 'right', value: true});
             }
+            return true;
+
           case this.app.controls.keyboard.right:
-          case 'Touch2':
           case 'GamepadRight':  
             this.postWorkerMessage({id: 'controls', action: 'right', value: true});
             return true;
 
           case this.app.controls.mouse.left:
-            if (!this.app.controls.mouse.enable || this.app.inputEventsManager.keysMap[this.app.controls.mouse.left] !== false) {
-              break;
+            if (this.app.controls.mouse.enable && this.app.inputEventsManager.keysMap[this.app.controls.mouse.left] === false) {
+              this.postWorkerMessage({id: 'controls', action: 'left', value: true});
             }
+            return true;
+
           case this.app.controls.keyboard.left:
-          case 'Touch1':
           case 'GamepadLeft':  
             this.postWorkerMessage({id: 'controls', action: 'left', value: true});
             return true;
 
           case this.app.controls.mouse.jump:
-            if (!this.app.controls.mouse.enable || this.app.inputEventsManager.keysMap[this.app.controls.mouse.jump] !== false) {
+            if (this.app.controls.mouse.enable && this.app.inputEventsManager.keysMap[this.app.controls.mouse.jump] === false) {
+              this.postWorkerMessage({id: 'controls', action: 'jump', value: true});
               break;
             }
+            return true;
+
           case this.app.controls.keyboard.jump:
-          case 'Touch4':
           case 'GamepadJump':  
             this.postWorkerMessage({id: 'controls', action: 'jump', value: true});
             return true;
+
           case this.app.controls.keyboard.music:
             this.app.muted.music = !this.app.muted.music;
             this.app.audioManager.muteChannel('music', this.app.muted.music);
             return true;
+
           case this.app.controls.keyboard.sounds:
             this.app.muted.sounds = !this.app.muted.sounds;
             this.app.audioManager.muteChannel('sounds', this.app.muted.sounds);
@@ -301,31 +307,34 @@ export class RoomModel extends AbstractModel {
 
         switch (key) {
           case this.app.controls.mouse.right:
-            if (!this.app.controls.mouse.enable || this.app.inputEventsManager.keysMap[this.app.controls.mouse.right] !== false) {
-              break;
+            if (this.app.controls.mouse.enable && this.app.inputEventsManager.keysMap[this.app.controls.mouse.right] === false) {
+              this.postWorkerMessage({id: 'controls', action: 'right', value: false});
             }
+            return true;
+
           case this.app.controls.keyboard.right:
-          case 'Touch2':
           case 'GamepadRight':  
             this.postWorkerMessage({id: 'controls', action: 'right', value: false});
             return true;
 
           case this.app.controls.mouse.left:
-            if (!this.app.controls.mouse.enable || this.app.inputEventsManager.keysMap[this.app.controls.mouse.left] !== false) {
-              break;
+            if (this.app.controls.mouse.enable && this.app.inputEventsManager.keysMap[this.app.controls.mouse.left] === false) {
+              this.postWorkerMessage({id: 'controls', action: 'left', value: false});
             }
+            return true;
+
           case this.app.controls.keyboard.left:
-          case 'Touch1':
           case 'GamepadLeft':  
             this.postWorkerMessage({id: 'controls', action: 'left', value: false});
             return true;
 
           case this.app.controls.mouse.jump:
-            if (!this.app.controls.mouse.enable || this.app.inputEventsManager.keysMap[this.app.controls.mouse.jump] !== false) {
-              break;
+            if (this.app.controls.mouse.enable && this.app.inputEventsManager.keysMap[this.app.controls.mouse.jump] === false) {
+              this.postWorkerMessage({id: 'controls', action: 'jump', value: false});
             }
+            return true;
+
           case this.app.controls.keyboard.jump:
-          case 'Touch4':
           case 'GamepadJump':  
             this.postWorkerMessage({id: 'controls', action: 'jump', value: false});
             return true;
