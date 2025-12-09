@@ -1,7 +1,9 @@
 /**/
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
+const { ButtonEntity } = await import('./svision/js/platform/canvas2D/buttonEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractEntity from './svision/js/abstractEntity.js';
+import ButtonEntity from './svision/js/platform/canvas2D/buttonEntity.js';
 /**/
 // begin code
 
@@ -20,10 +22,38 @@ export class BorderEntity  extends AbstractEntity {
       screech: {colors: ['white', 'yellow', 'cyan', 'green', 'magenta', 'red', 'blue', 'black'], stripeHeight: 1}
     };
 
+    this.escapeEntity = null;
+    this.scale = 2;
   } // constructor
+
+  init() {
+    super.init();
+
+    if (this.app.layout.ratio > 2) {
+      this.scale = 1;
+    }
+    this.escapeEntity = new ButtonEntity(this, this.app.fonts.zxFonts8x8Mono, 0, 0, this.scale*8, this.scale*8, 'X', {id: 'keyPress', key: 'Escape'}, [], false, false, {scale: this.scale, clickColor: '#7a7a7aff'});
+    this.addEntity(this.escapeEntity);
+  } // init
 
   drawEntity() {
     super.drawEntity();
+
+    var penColor = this.app.platform.colorByName('brightWhite');
+    if (this.animation !== false) {
+      penColor = this.app.platform.colorByName('black');
+    }
+    switch (this.bkColor) {
+      case this.app.platform.colorByName('white'):
+      case this.app.platform.colorByName('yellow'):
+      case this.app.platform.colorByName('cyan'):
+        penColor = this.app.platform.colorByName('black');
+        break;
+    }
+    if (this.escapeEntity.penColor !== penColor) {
+      this.escapeEntity.setPenColor(penColor);
+    }
+
     if (this.animation === false) {
       this.drawSubEntities();
       return;
@@ -92,6 +122,10 @@ export class BorderEntity  extends AbstractEntity {
           this.sendEvent(0, 50, {id: 'moveStripes'});
         }
         return true;
+      case 'resizeModel':
+        this.escapeEntity.x = this.app.model.desktopEntity.x+this.app.model.desktopEntity.width-this.scale*8;
+        this.escapeEntity.y = this.app.model.desktopEntity.y-this.scale*8;
+        break;
     }
 
     return false;

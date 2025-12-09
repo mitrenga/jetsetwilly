@@ -59,6 +59,10 @@ export class MainModel extends AbstractModel {
     this.app.audioManager.stopAllChannels();
   } // shutdown
 
+  newBorderEntity() {
+    return new BorderEntity(null, 0, 0, 0, 0, false, false);
+  } // newBorderEntity
+
   handleEvent(event) {
     if (super.handleEvent(event)) {
       return true;

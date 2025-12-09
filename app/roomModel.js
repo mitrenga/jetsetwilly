@@ -1,10 +1,12 @@
 /**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
+const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion);
 const { GameAreaEntity } = await import('./gameAreaEntity.js?ver='+window.srcVersion);
 const { GameInfoEntity } = await import('./gameInfoEntity.js?ver='+window.srcVersion);
 const { PauseGameEntity } = await import('./pauseGameEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
+import BorderEntity from './borderEntity.js';
 import GameAreaEntity from './gameAreaEntity.js';
 import GameInfoEntity from './gameInfoEntity.js';
 import PauseGameEntity from './pauseGameEntity.js';
@@ -162,6 +164,10 @@ export class RoomModel extends AbstractModel {
     this.app.audioManager.stopChannel('sounds');
     this.app.audioManager.stopChannel('extra');
   } // shutdown
+
+  newBorderEntity() {
+    return new BorderEntity(null, 0, 0, 0, 0, false, false);
+  } // newBorderEntity
 
   setData(data) {
     this.adjoiningRoom = data.data.adjoiningRoom;

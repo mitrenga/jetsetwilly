@@ -46,10 +46,6 @@ export class TapeLoadingModel extends AbstractModel {
     ];
   } // constructor
 
-  newBorderEntity() {
-    return new BorderEntity(null, 0, 0, 0, 0, false, false);
-  } // newBorderEntity
-
   init() {
     super.init();
 
@@ -82,6 +78,10 @@ export class TapeLoadingModel extends AbstractModel {
     this.app.stack.flashState = false;
     this.sendEvent(330, {id: 'changeFlashState'});
   } // init
+
+  newBorderEntity() {
+    return new BorderEntity(null, 0, 0, 0, 0, false, false);
+  } // newBorderEntity
 
   shutdown() {
     this.app.audioManager.closeAllChannels();
