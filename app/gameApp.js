@@ -190,6 +190,9 @@ export class GameApp extends AbstractApp {
           directions: this.globalData.willy.directions
         };
         this.roomNumber = this.globalData.initRoom;
+        this.inputEventsManager.touchesControls.left = {};
+        this.inputEventsManager.touchesControls.right = {};
+        this.inputEventsManager.touchesControls.jump = {};
       }
     }
     this.demo = demo;
