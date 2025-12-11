@@ -9,9 +9,12 @@ import ButtonEntity from './svision/js/platform/canvas2D/buttonEntity.js';
 
 export class BorderEntity  extends AbstractEntity {
 
-  constructor() {
+  constructor(enableExit, enableGameControls) {
     super();
     this.id = 'BorderEntity';
+
+    this.enableExit = enableExit;
+    this.enableGameControls = enableGameControls;
 
     this.diff = 0;
     this.animation = false;
@@ -24,16 +27,31 @@ export class BorderEntity  extends AbstractEntity {
 
     this.escapeEntity = null;
     this.scale = 2;
+
+    this.leftControlEntity = null;
+    this.rightControlEntity = null;
+    this.jumpControlEntity = null;
   } // constructor
 
   init() {
     super.init();
 
-    if (this.app.layout.ratio > 2) {
-      this.scale = 1;
+    if (this.enableExit) {
+      if (this.app.layout.ratio > 2) {
+        this.scale = 1;
+      }
+      this.escapeEntity = new ButtonEntity(this, this.app.fonts.zxFonts8x8Mono, 0, 0, this.scale*8, this.scale*8, 'X', {id: 'keyPress', key: 'Escape'}, [], false, false, {scale: this.scale, clickColor: '#7a7a7aff'});
+      this.addEntity(this.escapeEntity);
     }
-    this.escapeEntity = new ButtonEntity(this, this.app.fonts.zxFonts8x8Mono, 0, 0, this.scale*8, this.scale*8, 'X', {id: 'keyPress', key: 'Escape'}, [], false, false, {scale: this.scale, clickColor: '#7a7a7aff'});
-    this.addEntity(this.escapeEntity);
+
+    if (this.enableGameControls) {
+      this.leftControlEntity = new AbstractEntity(this, 0, 0, 0, 0, false, '#00000020');
+      this.addEntity(this.leftControlEntity);
+      this.rightControlEntity = new AbstractEntity(this, 0, 0, 0, 0, false, '#00000020');
+      this.addEntity(this.rightControlEntity);
+      this.jumpControlEntity = new AbstractEntity(this, 0, 0, 0, 0, false, '#00000020');
+      this.addEntity(this.jumpControlEntity);
+    }
   } // init
 
   drawEntity() {
@@ -123,8 +141,29 @@ export class BorderEntity  extends AbstractEntity {
         }
         return true;
       case 'resizeModel':
-        this.escapeEntity.x = this.app.model.desktopEntity.x+this.app.model.desktopEntity.width-this.scale*8;
-        this.escapeEntity.y = this.app.model.desktopEntity.y-this.scale*8;
+        this.escapeEntity.x = this.model.borderWidth+this.model.desktopEntity.width-this.scale*8;
+        this.escapeEntity.y = this.model.borderHeight-this.scale*8;
+        
+        
+        if (this.enableGameControls) {
+          var width = Math.round(180/this.app.layout.ratio);
+          var height = Math.round(180/this.app.layout.ratio);
+
+          this.leftControlEntity.width = width;
+          this.leftControlEntity.height = height;
+          this.leftControlEntity.x = this.width-2*this.leftControlEntity.width-2;
+          this.leftControlEntity.y = this.height-this.leftControlEntity.height;
+
+          this.rightControlEntity.width = width;
+          this.rightControlEntity.height = height;
+          this.rightControlEntity.x = this.width-this.leftControlEntity.width;
+          this.rightControlEntity.y = this.height-this.leftControlEntity.height;
+
+          this.jumpControlEntity.width = width;
+          this.jumpControlEntity.height = height;
+          this.jumpControlEntity.x = 0;
+          this.jumpControlEntity.y = this.height-this.leftControlEntity.height;
+        }
         break;
     }
 

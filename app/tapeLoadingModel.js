@@ -80,7 +80,7 @@ export class TapeLoadingModel extends AbstractModel {
   } // init
 
   newBorderEntity() {
-    return new BorderEntity(null, 0, 0, 0, 0, false, false);
+    return new BorderEntity(true, false);
   } // newBorderEntity
 
   shutdown() {
