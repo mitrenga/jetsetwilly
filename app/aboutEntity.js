@@ -14,13 +14,15 @@ export class AboutEntity extends AbstractEntity {
   constructor(parentEntity, x, y, width, height) {
     super(parentEntity, x, y, width, height, false, false);
     this.id = 'AboutEntity';    
+
+    this.sysInfoCounter = 0;
   } // constructor
 
   init() {
     super.init();
     
     this.addEntity(new AbstractEntity(this, 0, 6, this.width, this.height-6, false, this.app.platform.colorByName('black')));
-    this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, 59, 7, 'ABOUT GAME', this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('black'), {topMargin: 1, leftMargin: 2}));
+    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, 0, 0, 59, 7, 'ABOUT GAME', {id: 'sysInfo'}, [], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('black'), {topMargin: 1, leftMargin: 2, member: 'titleBar', hoverColor: this.app.platform.colorByName('black'), clickColor: this.app.platform.colorByName('black')}));
     this.addEntity(new AbstractEntity(this, 1, 7, this.width-2, this.height-8, false, this.app.platform.colorByName('brightWhite')));
 
     var aboutText = 'JET SET WILLY IS A REMAKE OF THE ORIGINAL 1984 GAME BY MATTHEW SMITH.\n' +
@@ -31,19 +33,46 @@ export class AboutEntity extends AbstractEntity {
                     'AND I ONLY FOUND OUT ABOUT IT 40 YEARS LATER :-) SO MANY MONTHS AND ' +
                     'SLEEPLESS NIGHTS WERE SPENT WITH FRIENDS TRYING TO GET THROUGH ' +
                     'ROOMS LIKE THE BANYAN TREE OR CONSERVATORY ROOF.';
-    this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 1, 7, this.width-2, 120, aboutText, this.app.platform.colorByName('black'), false, {align: 'justify', textWrap: true, margin: 2}));
+    this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 1, 7, this.width-2, 120, aboutText, this.app.platform.colorByName('black'), false, {align: 'justify', textWrap: true, margin: 2, member: 'aboutText'}));
     
     this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', {id: 'closeAbout'}, ['Enter', 'Escape', ' ', 'GamepadOK', 'GamepadExit'], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('blue'), {align: 'center', margin: 4}));
   } // init
+
+  updateSysInfo() {
+    this.sendEvent(0, 0, {id: 'updateEntity', member: 'aboutText', text:
+      'version: ' + this.app.version + '\n' +
+      'canvas size: ' + this.app.element.clientWidth + ' x ' + this.app.element.clientHeight + '\n' +
+      'pixels ratio: ' + this.app.layout.ratio + '\n' +
+      'client ip: ' + window.clientIP + '\n' +
+      'server ip: ' + window.serverIP + '\n'          
+    });
+  } // updateSysInfo
 
   handleEvent(event) {
     if (super.handleEvent(event)) {
       return true;
     }
     switch (event.id) {
+
       case 'closeAbout':
         this.destroy();
         return true;
+
+      case 'sysInfo':
+        if (this.sysInfoCounter == 4) {
+          this.sendEvent(0, 0, {id: 'updateEntity', member: 'titleBar', text: 'SYSTEM INFO'});
+          this.updateSysInfo();
+        }
+        if (this.sysInfoCounter < 4) {
+          this.sysInfoCounter++;
+        }
+        return true;
+      case 'resizeModel':
+        if (this.sysInfoCounter == 4) {
+          this.updateSysInfo();
+        }
+        return false;
+
     }
     return false;
   } // handleEvent

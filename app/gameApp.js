@@ -32,6 +32,8 @@ export class GameApp extends AbstractApp {
   constructor(platform, importPath, wsURL) {
     super(platform, 'bodyApp',  importPath, wsURL);
 
+    this.version = '2025.12.30';
+    
     this.audioManager = new AudioManager(this);
     this.muted = {sounds: false, music: false};
 
