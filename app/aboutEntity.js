@@ -45,10 +45,9 @@ export class AboutEntity extends AbstractEntity {
     }
     var sysInfoText =
       'version: ' + this.app.version + '\n' +
-      'canvas size: ' + this.app.element.clientWidth + ' x ' + this.app.element.clientHeight + '\n' +
-      'pixels ratio: ' + this.app.layout.ratio + '\n' +
-      'client ip:' + ipLabelSeparator + window.clientIP + '\n' +
-      'server ip:' + ipLabelSeparator + window.serverIP + '\n';
+      'canvas: ' + this.app.element.clientWidth + ' x ' + this.app.element.clientHeight + '\n' +
+      'ratio: ' + this.app.layout.ratio + '\n' +
+      'ip:' + ipLabelSeparator + window.clientIP + '\n'
     this.sendEvent(0, 0, {id: 'updateEntity', member: 'aboutText', text: sysInfoText});
   } // updateSysInfo
 
