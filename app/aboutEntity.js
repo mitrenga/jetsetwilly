@@ -45,7 +45,8 @@ export class AboutEntity extends AbstractEntity {
     }
     var sysInfoText =
       'version: ' + this.app.version + '\n' +
-      'canvas: ' + this.app.element.clientWidth + ' x ' + this.app.element.clientHeight + '\n' +
+      'screen: ' + this.app.element.clientWidth + ' x ' + this.app.element.clientHeight + '\n' +
+      'canvas: ' + this.app.element.width + ' x ' + this.app.element.height + '\n' +
       'ratio: ' + this.app.layout.ratio + '\n' +
       'ip:' + ipLabelSeparator + window.clientIP + '\n'
     this.sendEvent(0, 0, {id: 'updateEntity', member: 'aboutText', text: sysInfoText});
