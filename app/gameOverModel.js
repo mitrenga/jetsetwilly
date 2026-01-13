@@ -140,7 +140,7 @@ export class GameOverModel extends AbstractModel {
       this.gameEntity.hide = false;
       this.overEntity.hide = false;
       var countdownLength = 2;
-      if (this.app.roomNumber != this.app.globalData.initRoom) {
+      if (this.nextModel == 'MainModel' && this.app.roomNumber != this.app.globalData.initRoom) {
         this.contiueEntity.hide = false;
         this.buttonYesEntity.hide = false;
         this.buttonNoEntity.hide = false;
