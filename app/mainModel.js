@@ -3,12 +3,16 @@ const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+wind
 const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion);
 const { MainImageEntity } = await import('./mainImageEntity.js?ver='+window.srcVersion);
 const { SlidingTextEntity } = await import('./svision/js/platform/canvas2D/slidingTextEntity.js?ver='+window.srcVersion);
+const { MainFonts } = await import('./mainFonts.js?ver='+window.srcVersion);
+const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
 const { PauseGameEntity } = await import('./pauseGameEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import BorderEntity from './borderEntity.js';
 import MainImageEntity from './mainImageEntity.js';
 import SlidingTextEntity from './svision/js/platform/canvas2D/slidingTextEntity.js';
+import MainFonts from './mainFonts.js';
+import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
 import PauseGameEntity from './pauseGameEntity.js';
 /**/
 // begin code
@@ -31,6 +35,7 @@ export class MainModel extends AbstractModel {
       ' . . . . . . ';
     this.slidingTextEntity = null;
     this.screechDuration = 0;
+    this.spaceEntity = null;
   } // constructor
 
   init() {
@@ -39,8 +44,10 @@ export class MainModel extends AbstractModel {
     this.borderEntity.bkColor = this.app.platform.colorByName('black');
     this.mainImageEntity = new MainImageEntity(this.desktopEntity, 0, 0, 32*8, 24*8, this.flashState);
     this.desktopEntity.addEntity(this.mainImageEntity);
-    this.slidingTextEntity = new SlidingTextEntity(this.mainImageEntity, this.app.fonts.zxFonts8x8Mono, 0, 18*8, 32*8, 1*8, this.slidingText, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), {animation: 'custom', rightMargin: 256});
+    this.slidingTextEntity = new SlidingTextEntity(this.mainImageEntity, this.app.fonts.zxFonts8x8Mono, 0, 18*8, 32*8, 8, this.slidingText, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), {animation: 'custom', rightMargin: 256});
     this.mainImageEntity.addEntity(this.slidingTextEntity);
+    this.spaceEntity = new TextEntity(this.mainImageEntity, new MainFonts(this.app), 0, 21*8, 32*8, 7, 'PRESS SPACE TO SELECT ROOMS MAP', this.app.platform.colorByName('brightWhite'), false, {align: 'center'});
+    this.mainImageEntity.addEntity(this.spaceEntity);
     this.sendEvent(0, {id: 'openAudioChannel', channel: 'music', options: {muted: this.app.muted.music}});
     this.sendEvent(0, {id: 'openAudioChannel', channel: 'sounds', options: {muted: this.app.muted.sounds}});
     this.sendEvent(0, {id: 'openAudioChannel', channel: 'extra', options: {muted: this.app.muted.sounds}});
