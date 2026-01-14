@@ -32,7 +32,8 @@ export class GameApp extends AbstractApp {
   constructor(platform, importPath, wsURL) {
     super(platform, 'bodyApp',  importPath, wsURL);
 
-    this.version = '2025.12.30';
+    this.version = '2026.01.14';
+    this.copyright = '© 2026 GNU General Public Licence';
     
     this.audioManager = new AudioManager(this);
     this.muted = {sounds: false, music: false};
@@ -144,7 +145,7 @@ export class GameApp extends AbstractApp {
     }
     switch (model) {
       case 'LoadingModel':
-        this.model = new ZXResetModel(this);
+        this.model = new ZXResetModel(this, this.copyright);
         break;
       case 'MenuModel':
         this.model = new MenuModel(this, selectionItem);
