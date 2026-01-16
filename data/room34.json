@@ -1,5 +1,6 @@
 {
    "name":"Top Landing",
+   "shortName":"Top Landing",
    "bkColor":"00",
    "borderColor":"01",
    "layout":[

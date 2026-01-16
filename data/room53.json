@@ -1,5 +1,6 @@
 {
   "name": "Back Door",
+  "shortName": "Back Door",
   "bkColor": "00",
   "borderColor": "01",
   "layout": [

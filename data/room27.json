@@ -1,5 +1,6 @@
 {
    "name":"The Chapel",
+   "shortName":"The Chapel",
    "bkColor":"00",
    "borderColor":"02",
    "layout":[

@@ -1,5 +1,6 @@
 {
   "name": "Emergency Generator",
+  "shortName": "Emergency Generator",
   "bkColor": "08",
   "borderColor": "02",
   "layout": [

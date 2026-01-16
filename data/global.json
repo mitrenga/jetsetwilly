@@ -354,5 +354,21 @@
             ]
          ]
       }
+   },
+   "roomsMap":{
+      "positions": [
+         [false, false, false, false, false, false, false, false, false, 50,    false, false, false, false, false, false, false, false],
+         [false, false, false, false, false, false, 48   , 18   , 17   , 16   , 15   , 14   , 44   , false, false, false, false, false],
+         [false, false, false, false, false, 43   , 42   , 41   , 40   , 39   , 38   , false, false, false, false, false, false, false],
+         [false, false, false, 57   , 56   , 37   , 36   , 35   , 34   , 33   , 32   , false, false, false, false, false, false, false],
+         [false, false, false, 55   , 54   , 31   , 30   , 29   , 28   , 27   , 26   , false, false, 13   , 12   , false, false, false],
+         [false, false, false, 53   , 52   , 25   , 24   , 23   , 22   , 21   , 20   , 11   , 10   , 9    , 8    , 7    , false, false],
+         [60   , 59   , 58   , 51   , 49   , false, false, false, false, false, false, 19   , 5    , 4    , 3    , 2    , 1    , 0    ],
+         [false, false, false, false, false, false, false, false, false, false, false, false, 6    , 45   , 46   , false, false, false]
+      ],
+      "initPosition": {
+         "x": 9,
+         "y": 3
+      }
    }
 }

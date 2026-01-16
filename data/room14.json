@@ -1,5 +1,6 @@
 {
    "name":"Rescue Esmerelda",
+   "shortName":"Rescue Esmerelda",
    "bkColor":"10",
    "borderColor":"01",
    "matchColorsOfItems":true,
