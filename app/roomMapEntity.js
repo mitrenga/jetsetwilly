@@ -19,7 +19,8 @@ export class RoomMapEntity extends AbstractEntity {
     this.locked = locked;
     this.app.layout.newDrawingCache(this, 0);
     this.roomData = null;
-    this.mapKinds = ['floor', 'wall', 'nasty', 'conveyor'];
+    this.mapKinds = ['floor', 'wall', 'nasty'];
+    this.layoutObjects = [false, 'floor', 'wall', 'nasty'];
     this.roomNameEntity = null;
   } // constructor
 
@@ -70,11 +71,10 @@ export class RoomMapEntity extends AbstractEntity {
       if (this.drawingCache[0].needToRefresh(this, this.width, this.height)) {
 
         // layout
-        var layoutObjects = [false, 'floor', 'wall', 'nasty'];
         this.roomData.layout.forEach((row, r) => {
           for (var column = 0; column < 32; column++) {
             var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
-            var idItem = layoutObjects[item];
+            var idItem = this.layoutObjects[item];
             if (idItem !== false) {
               var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
               if (this.mapKinds.includes(idItem)) {

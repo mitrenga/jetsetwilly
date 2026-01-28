@@ -30,6 +30,7 @@ export class GameAreaEntity extends AbstractEntity {
     this.app.layout.newDrawingCache(this, 3); 
     this.graphicCache = {};
     this.staticKinds = ['floor', 'wall', 'nasty'];
+    this.layoutObjects = [false, 'floor', 'wall', 'nasty'];
 
     this.spriteEntities = {conveyors: [], ropes: [], guardians: [], items: [], decorations: [], willy: [], ramps: []};
     this.ropeRelativeCoordinates = [
@@ -43,15 +44,13 @@ export class GameAreaEntity extends AbstractEntity {
 
       this.app.layout.paint(this, 0, 0, this.width, this.height, this.bkColor);
 
-      var layoutObjects = [false, 'floor', 'wall', 'nasty'];
-
       for (var f = 0; f < 2; f++) {
         if (this.drawingCache[f].needToRefresh(this, this.width, this.height)) {
           // layout - bkColor
           this.roomData.layout.forEach((row, r) => {
             for (var column = 0; column < 32; column++) {
               var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
-              var idItem = layoutObjects[item];
+              var idItem = this.layoutObjects[item];
               if (idItem !== false) {
                 var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
                 if (this.staticKinds.includes(idItem)) {
@@ -90,7 +89,7 @@ export class GameAreaEntity extends AbstractEntity {
           this.roomData.layout.forEach((row, r) => {
             for (var column = 0; column < 32; column++) {
               var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
-              var idItem = layoutObjects[item];
+              var idItem = this.layoutObjects[item];
               if (idItem !== false) {
                 var attr = this.roomData.graphicData[idItem].substring(0, 2);
                 if (this.staticKinds.includes(idItem)) {
@@ -153,7 +152,7 @@ export class GameAreaEntity extends AbstractEntity {
           }
         }
 
-        layoutObjects.forEach((idItem) => {
+        this.layoutObjects.forEach((idItem) => {
           if (idItem !== false && idItem in this.roomData.graphicData) {            
             var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
             if ((attr&128) == 128) {
