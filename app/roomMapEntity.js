@@ -18,7 +18,6 @@ export class RoomMapEntity extends AbstractEntity {
     this.roomNumber = roomNumber;
     this.locked = locked;
     this.app.layout.newDrawingCache(this, 0);
-    this.app.layout.newDrawingCache(this, 1);
     this.roomData = null;
     this.mapKinds = ['floor', 'wall', 'nasty', 'conveyor'];
     this.roomNameEntity = null;
@@ -68,141 +67,128 @@ export class RoomMapEntity extends AbstractEntity {
       this.app.layout.paint(this, 0, 0, this.width, this.height-6, this.bkColor);
       this.app.layout.paint(this, 0, this.height-6, this.width, 6, this.app.platform.colorByName('black'));
 
-      for (var f = 0; f < 2; f++) {
-        if (this.drawingCache[f].needToRefresh(this, this.width, this.height)) {
+      if (this.drawingCache[0].needToRefresh(this, this.width, this.height)) {
 
-          // layout
-          var layoutObjects = [false, 'floor', 'wall', 'nasty'];
-          this.roomData.layout.forEach((row, r) => {
-            for (var column = 0; column < 32; column++) {
-              var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
-              var idItem = layoutObjects[item];
-              if (idItem !== false) {
-                var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
-                if (this.mapKinds.includes(idItem)) {
-                  var penColor = this.app.platform.penColorByAttr(attr);
-                  var bkColor = this.app.platform.bkColorByAttr(attr);
-                  if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor))) {
-                    bkColor = false;
-                  }
-                  if (f == 1 && (attr&128) == 128) {
-                    penColor = bkColor;
-                    bkColor = this.app.platform.penColorByAttr(attr);
-                  }
-                  if (bkColor != false) {
-                    this.app.layout.paintRect(this.drawingCache[f].ctx, column*2, r*2, 1, 1, bkColor);
-                  }
-                  this.app.layout.paintRect(this.drawingCache[f].ctx, column*2, r*2, 1, 1, penColor);
+        // layout
+        var layoutObjects = [false, 'floor', 'wall', 'nasty'];
+        this.roomData.layout.forEach((row, r) => {
+          for (var column = 0; column < 32; column++) {
+            var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
+            var idItem = layoutObjects[item];
+            if (idItem !== false) {
+              var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
+              if (this.mapKinds.includes(idItem)) {
+                var penColor = this.app.platform.penColorByAttr(attr);
+                var bkColor = this.app.platform.bkColorByAttr(attr);
+                if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor))) {
+                  bkColor = false;
+                }
+                if (bkColor != false) {
+                  this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 1, 1, bkColor);
+                }
+                this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 1, 1, penColor);
+              }
+            }
+          }
+        });
+
+        /*
+        this.caveData.layout.forEach((row, r) => {
+          for (var column = 0; column < row.length/2; column++) {
+            var attr = row.substring(column*2, column*2+2);
+            if (attr != this.caveData.bkColor) {
+              if (this.mapKinds.includes(this.caveData.graphicData[attr].kind)) {
+                var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(attr));
+                if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.caveData.bkColor))) {
+                  bkColor = false;
+                }
+                if (bkColor != false) {
+                  this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 2, 2, bkColor);
+                }
+                var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(attr));
+                switch (this.caveData.graphicData[attr].kind) {
+                  case 'floor':
+                  case 'crumblingFloor':
+                    this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 2, 1, penColor);
+                    this.app.layout.paintRect(this.drawingCache[0].ctx, column*2+1, r*2+1, 1, 1, penColor);
+                    break;
+                  case 'wall':
+                    this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 1, 1, penColor);
+                    this.app.layout.paintRect(this.drawingCache[0].ctx, column*2+1, r*2+1, 1, 1, penColor);
+                    break;
+                  case 'conveyor':
+                    this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 2, 1, penColor);
+                    break;
+                  case 'nasty':
+                    this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 2, 1, penColor);
+                    this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2+1, 1, 1, penColor);
+                    break;
+                  default:
+                    this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 2, 2, penColor);
+                    break;
                 }
               }
             }
-          });
+          }
+        });
+        */
 
-          /*
-          this.caveData.layout.forEach((row, r) => {
-            for (var column = 0; column < row.length/2; column++) {
-              var attr = row.substring(column*2, column*2+2);
-              if (attr != this.caveData.bkColor) {
-                if (this.mapKinds.includes(this.caveData.graphicData[attr].kind)) {
-                  var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(attr));
-                  if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.caveData.bkColor))) {
-                    bkColor = false;
-                  }
-                  if (bkColor != false) {
-                    this.app.layout.paintRect(this.drawingCache[f].ctx, column*2, r*2, 2, 2, bkColor);
-                  }
-                  var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(attr));
-                  switch (this.caveData.graphicData[attr].kind) {
-                    case 'floor':
-                    case 'crumblingFloor':
-                      this.app.layout.paintRect(this.drawingCache[f].ctx, column*2, r*2, 2, 1, penColor);
-                      this.app.layout.paintRect(this.drawingCache[f].ctx, column*2+1, r*2+1, 1, 1, penColor);
-                      break;
-                    case 'wall':
-                      this.app.layout.paintRect(this.drawingCache[f].ctx, column*2, r*2, 1, 1, penColor);
-                      this.app.layout.paintRect(this.drawingCache[f].ctx, column*2+1, r*2+1, 1, 1, penColor);
-                      break;
-                    case 'conveyor':
-                      this.app.layout.paintRect(this.drawingCache[f].ctx, column*2, r*2, 2, 1, penColor);
-                      break;
-                    case 'nasty':
-                      this.app.layout.paintRect(this.drawingCache[f].ctx, column*2, r*2, 2, 1, penColor);
-                      this.app.layout.paintRect(this.drawingCache[f].ctx, column*2, r*2+1, 1, 1, penColor);
-                      break;
-                    default:
-                      this.app.layout.paintRect(this.drawingCache[f].ctx, column*2, r*2, 2, 2, penColor);
-                      break;
-                  }
-                }
-              }
-            }
-          });
-          */
+        // items
+        /*
+        this.caveData.items.data.forEach((item) => {
+          var itemColor = this.app.platform.color(this.app.hexToInt(item.initAttribute)&7);
+          var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(item.initAttribute));
+          if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.caveData.bkColor))) {
+            bkColor = false;
+          }
+          if (bkColor != false) {
+            this.app.layout.paintRect(this.drawingCache[0].ctx, item.x*2, item.y*2, 2, 2, bkColor);          
+          }
+          this.app.layout.paintRect(this.drawingCache[0].ctx, item.x*2, item.y*2, 1, 1, itemColor);
+          this.app.layout.paintRect(this.drawingCache[0].ctx, item.x*2+1, item.y*2+1, 1, 1, itemColor);
+        });
+        */
 
-          // items
-          /*
-          this.caveData.items.data.forEach((item) => {
-            var itemColor = this.app.platform.color(this.app.hexToInt(item.initAttribute)&7);
-            var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(item.initAttribute));
-            if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.caveData.bkColor))) {
-              bkColor = false;
-            }
-            if (bkColor != false) {
-              this.app.layout.paintRect(this.drawingCache[f].ctx, item.x*2, item.y*2, 2, 2, bkColor);          
-            }
-            this.app.layout.paintRect(this.drawingCache[f].ctx, item.x*2, item.y*2, 1, 1, itemColor);
-            this.app.layout.paintRect(this.drawingCache[f].ctx, item.x*2+1, item.y*2+1, 1, 1, itemColor);
-          });
-          */
-
-          // gurdians
-          if ('guardians' in this.roomData) {
-            ['horizontal', 'vertical', 'maria'].forEach((guardianType) => {
-              if (guardianType in this.roomData.guardians) {
-                var guardianTypeData = this.roomData.guardians[guardianType];
-                guardianTypeData.forEach((guardianDefs) => {
-                  guardianDefs.figures.forEach((guardian) => {
-                    var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(guardian.attribute));
-                    if ('mapSprite' in guardianDefs) {
-                      for (var r = 0; r < guardianDefs.mapSprite.length; r++) {
-                        for (var c = 0; c < guardianDefs.mapSprite[r].length; c++) {
-                          if (guardianDefs.mapSprite[r][c] == '#') {
-                            if (guardian.init.direction == 1) {
-                              this.app.layout.paintRect(this.drawingCache[f].ctx, Math.floor(guardian.init.x/4)+guardianDefs.mapSprite[r].length-c-1, Math.floor(guardian.init.y/4)+r, 1, 1, penColor);
-                            } else {
-                              this.app.layout.paintRect(this.drawingCache[f].ctx, Math.floor(guardian.init.x/4)+c, Math.floor(guardian.init.y/4)+r, 1, 1, penColor);
-                            }
+        // gurdians
+        if ('guardians' in this.roomData) {
+          ['horizontal', 'vertical', 'maria'].forEach((guardianType) => {
+            if (guardianType in this.roomData.guardians) {
+              var guardianTypeData = this.roomData.guardians[guardianType];
+              guardianTypeData.forEach((guardianDefs) => {
+                guardianDefs.figures.forEach((guardian) => {
+                  var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(guardian.attribute));
+                  if ('mapSprite' in guardianDefs) {
+                    for (var r = 0; r < guardianDefs.mapSprite.length; r++) {
+                      for (var c = 0; c < guardianDefs.mapSprite[r].length; c++) {
+                        if (guardianDefs.mapSprite[r][c] == '#') {
+                          if (guardian.init.direction == 1) {
+                            this.app.layout.paintRect(this.drawingCache[0].ctx, Math.floor(guardian.init.x/4)+guardianDefs.mapSprite[r].length-c-1, Math.floor(guardian.init.y/4)+r, 1, 1, penColor);
+                          } else {
+                            this.app.layout.paintRect(this.drawingCache[0].ctx, Math.floor(guardian.init.x/4)+c, Math.floor(guardian.init.y/4)+r, 1, 1, penColor);
                           }
                         }
                       }
-                    } else {
-                      this.app.layout.paintRect(
-                        this.drawingCache[f].ctx,
-                        Math.floor(guardian.init.x/4),
-                        Math.floor(guardian.init.y/4),
-                        Math.floor(guardianDefs.width/4),
-                        Math.floor(guardianDefs.height/4),
-                        penColor
-                      );
                     }
-                  });
+                  } else {
+                    this.app.layout.paintRect(
+                      this.drawingCache[0].ctx,
+                      Math.floor(guardian.init.x/4),
+                      Math.floor(guardian.init.y/4),
+                      Math.floor(guardianDefs.width/4),
+                      Math.floor(guardianDefs.height/4),
+                      penColor
+                    );
+                  }
                 });
-              }
-            });
-          }
-
+              });
+            }
+          });
         }
+
       }
     }
 
-    switch (this.app.stack.flashState) {
-      case false:
-        this.app.layout.paintCache(this, 0);
-        break;
-      case true:
-        this.app.layout.paintCache(this, 1);
-        break;
-    }
+    this.app.layout.paintCache(this, 0);
 
     this.drawSubEntities();
   } // drawEntity
