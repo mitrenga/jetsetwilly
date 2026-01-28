@@ -1,5 +1,6 @@
 /**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
+const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion);
 const { MainImageEntity } = await import('./mainImageEntity.js?ver='+window.srcVersion);
 const { SlidingTextEntity } = await import('./svision/js/platform/canvas2D/slidingTextEntity.js?ver='+window.srcVersion);
@@ -8,6 +9,7 @@ const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.j
 const { PauseGameEntity } = await import('./pauseGameEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
+import AbstractEntity from './svision/js/abstractEntity.js';
 import BorderEntity from './borderEntity.js';
 import MainImageEntity from './mainImageEntity.js';
 import SlidingTextEntity from './svision/js/platform/canvas2D/slidingTextEntity.js';
@@ -24,6 +26,7 @@ export class MainModel extends AbstractModel {
     this.id = 'MainModel';
 
     this.mainImageEntity = null;
+    this.blackBoxEntity = null;
     this.slidingText = 
       '+++++ Press ENTER to Start +++++' +
       '  ' +
@@ -46,8 +49,11 @@ export class MainModel extends AbstractModel {
     this.desktopEntity.addEntity(this.mainImageEntity);
     this.slidingTextEntity = new SlidingTextEntity(this.mainImageEntity, this.app.fonts.zxFonts8x8Mono, 0, 18*8, 32*8, 8, this.slidingText, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), {animation: 'custom', rightMargin: 256});
     this.mainImageEntity.addEntity(this.slidingTextEntity);
-    this.spaceEntity = new TextEntity(this.mainImageEntity, new MainFonts(this.app), 0, 21*8, 32*8, 7, 'PRESS SPACE TO SELECT ROOMS MAP', this.app.platform.colorByName('brightWhite'), false, {align: 'center'});
-    this.mainImageEntity.addEntity(this.spaceEntity);
+    this.blackBoxEntity = new AbstractEntity(this.mainImageEntity, 0, 19*8, 32*8, 5*8, false, this.app.platform.colorByName('black'));
+    this.blackBoxEntity.clickColor = '#444444';
+    this.mainImageEntity.addEntity(this.blackBoxEntity);
+    this.spaceEntity = new TextEntity(this.blackBoxEntity, new MainFonts(this.app), 0, 2*8, 32*8, 7, 'PRESS SPACE TO SELECT ROOMS MAP', this.app.platform.colorByName('brightWhite'), false, {align: 'center'});
+    this.blackBoxEntity.addEntity(this.spaceEntity);
     this.sendEvent(0, {id: 'openAudioChannel', channel: 'music', options: {muted: this.app.muted.music}});
     this.sendEvent(0, {id: 'openAudioChannel', channel: 'sounds', options: {muted: this.app.muted.sounds}});
     this.sendEvent(0, {id: 'openAudioChannel', channel: 'extra', options: {muted: this.app.muted.sounds}});
@@ -118,14 +124,28 @@ export class MainModel extends AbstractModel {
             case 'GamepadOK':
               this.app.startRoom(false, true, true);
               return true;
+            case ' ':
+            case 'GamepadDown':
+              this.app.setModel('RoomsMapModel');
+              return true;
             case 'Escape':
             case 'GamepadExit':
               this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 52, 40, 153, 85, 'OPTIONS', 'MenuModel'));
               return true;
             case 'Mouse1':
+              if (this.blackBoxEntity.pointOnEntity(event)) {
+                this.app.inputEventsManager.keysMap.Mouse1 = this.blackBoxEntity;
+                this.blackBoxEntity.clickState = true;
+                return true;
+              }
               this.app.inputEventsManager.keysMap.Mouse1 = this.borderEntity;
               return true;
             case 'Touch':
+              if (this.blackBoxEntity.pointOnEntity(event)) {
+                this.app.inputEventsManager.touchesMap[event.identifier] = this.blackBoxEntity;
+                this.blackBoxEntity.clickState = true;
+                return true;
+              }
               this.app.inputEventsManager.touchesMap[event.identifier] = this.borderEntity;
               return true;
             case this.app.controls.keyboard.music:
@@ -144,12 +164,24 @@ export class MainModel extends AbstractModel {
       case 'keyRelease':
         switch (event.key) {
           case 'Mouse1':
+            if (this.blackBoxEntity.pointOnEntity(event)) {
+              if (this.app.inputEventsManager.keysMap.Mouse1 === this.blackBoxEntity) {
+                this.app.setModel('RoomsMapModel');
+                return true;
+              }
+            }
             if (this.app.inputEventsManager.keysMap.Mouse1 === this.borderEntity) {
               this.app.startRoom(false, true, true);
               return true;
             }
             break;
           case 'Touch':
+            if (this.blackBoxEntity.pointOnEntity(event)) {
+              if (this.app.inputEventsManager.touchesMap[event.identifier] === this.blackBoxEntity) {
+                this.app.setModel('RoomsMapModel');
+                return true;
+              }
+            }
             if (this.app.inputEventsManager.touchesMap[event.identifier] === this.borderEntity) {
               this.app.startRoom(false, true, true);
               return true;

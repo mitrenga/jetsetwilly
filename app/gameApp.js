@@ -7,6 +7,7 @@ const { Fonts3x3 } = await import('./svision/js/platform/canvas2D/fonts3x3.js?ve
 const { ZXResetModel } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxResetModel.js?ver='+window.srcVersion);
 const { MenuModel } = await import('./menuModel.js?ver='+window.srcVersion);
 const { MainModel } = await import('./mainModel.js?ver='+window.srcVersion);
+const { RoomsMapModel } = await import('./roomsMapModel.js?ver='+window.srcVersion);
 const { RoomModel } = await import('./roomModel.js?ver='+window.srcVersion);
 const { GameOverModel } = await import('./gameOverModel.js?ver='+window.srcVersion);
 const { TapeLoadingModel } = await import('./tapeLoadingModel.js?ver='+window.srcVersion);
@@ -20,6 +21,7 @@ import Fonts3x3 from './svision/js/platform/canvas2D/fonts3x3.js';
 import ZXResetModel from './svision/js/platform/canvas2D/zxSpectrum/zxResetModel.js';
 import MenuModel from './menuModel.js';
 import MainModel from './mainModel.js';
+import RoomsMapModel from './roomsMapModel.js';
 import RoomModel from './roomModel.js';
 import GameOverModel from './gameOverModel.js';
 import TapeLoadingModel from './tapeLoadingModel.js';
@@ -152,6 +154,9 @@ export class GameApp extends AbstractApp {
         break;
       case 'MainModel':
         this.model = new MainModel(this);
+        break;
+      case 'RoomsMapModel':
+        this.model = new RoomsMapModel(this);
         break;
       case 'RoomModel':
         this.model = new RoomModel(this, this.roomNumber, this.demo);
