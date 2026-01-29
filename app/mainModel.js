@@ -49,10 +49,10 @@ export class MainModel extends AbstractModel {
     this.desktopEntity.addEntity(this.mainImageEntity);
     this.slidingTextEntity = new SlidingTextEntity(this.mainImageEntity, this.app.fonts.zxFonts8x8Mono, 0, 18*8, 32*8, 8, this.slidingText, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), {animation: 'custom', rightMargin: 256});
     this.mainImageEntity.addEntity(this.slidingTextEntity);
-    this.blackBoxEntity = new AbstractEntity(this.mainImageEntity, 0, 19*8, 32*8, 5*8, false, this.app.platform.colorByName('black'));
+    this.blackBoxEntity = new AbstractEntity(this.mainImageEntity, 0, 19*8+4, 32*8, 4*8+1, false, this.app.platform.colorByName('black'));
     this.blackBoxEntity.clickColor = '#444444';
     this.mainImageEntity.addEntity(this.blackBoxEntity);
-    this.spaceEntity = new TextEntity(this.blackBoxEntity, new MainFonts(this.app), 0, 2*8, 32*8, 7, 'PRESS SPACE TO SELECT ROOMS MAP', this.app.platform.colorByName('brightWhite'), false, {align: 'center'});
+    this.spaceEntity = new TextEntity(this.blackBoxEntity, new MainFonts(this.app), 0, 2*8-3, 32*8, 7, 'PRESS SPACE TO SELECT ROOMS MAP', this.app.platform.colorByName('brightWhite'), false, {align: 'center'});
     this.blackBoxEntity.addEntity(this.spaceEntity);
     this.sendEvent(0, {id: 'openAudioChannel', channel: 'music', options: {muted: this.app.muted.music}});
     this.sendEvent(0, {id: 'openAudioChannel', channel: 'sounds', options: {muted: this.app.muted.sounds}});
