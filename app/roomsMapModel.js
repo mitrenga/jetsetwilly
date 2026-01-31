@@ -20,8 +20,9 @@ export class RoomsMapModel extends AbstractModel {
     this.id = 'RoomsMapModel';
 
     this.roomSelectionEntity = null;
-    this.selectionRoom = 1;
-    this.roomsOpened = 19;
+    this.selectionX = this.app.globalData.roomsMap.initPosition.x;
+    this.selectionY = this.app.globalData.roomsMap.initPosition.y;
+    this.roomsOpened = 81;
   } // constructor
 
   init() {
@@ -29,14 +30,16 @@ export class RoomsMapModel extends AbstractModel {
 
     this.borderEntity.bkColor = this.app.platform.colorByName('cyan');
     this.desktopEntity.bkColor = false;
-    for (var x = 0; x < 5; x++) {
-      for (var y = 0; y < 6; y++) {
-        var roomNumber = x+y*5;
-        var roomMapEntity = new RoomMapEntity(this.desktopEntity, x*64-32, y*38-19, roomNumber, (roomNumber > this.roomsOpened));
+    for (var y = 0; y < this.app.globalData.roomsMap.positions.length; y++) {
+      for (var x = 0; x < this.app.globalData.roomsMap.positions[y].length; x++) {
+        var roomNumber = this.app.globalData.roomsMap.positions[y][x];
+        var posX = (x-this.selectionX+2)*64-32;
+        var posY = (y-this.selectionY+2)*38-19;
+        var roomMapEntity = new RoomMapEntity(this.desktopEntity, posX, posY, roomNumber, (roomNumber > this.roomsOpened));
         this.desktopEntity.addEntity(roomMapEntity);
       }
     }
-    this.roomSelectionEntity = new RoomSelectionEntity(this.desktopEntity, this.selectionRoom%4*64-32-3, Math.floor(this.selectionRoom/4)*38-19-3);
+    this.roomSelectionEntity = new RoomSelectionEntity(this.desktopEntity, 2*64-32-3, 2*38-19-3);
     this.desktopEntity.addEntity(this.roomSelectionEntity);
 
     this.app.stack.flashState = false;
@@ -67,35 +70,27 @@ export class RoomsMapModel extends AbstractModel {
           switch (key) {        
             case 'ArrowUp':
             case 'GamepadUp':
-              if (this.selectionRoom >= 5) {
-                this.selectionRoom -= 5;
+                this.selectionY--;
                 this.roomSelectionEntity.y -= 38;
-              }
               return true;
             case 'ArrowDown':
             case 'GamepadDown':
-              if (this.selectionRoom+5 <= this.roomsOpened) {
-                this.selectionRoom += 5;
+                this.selectionY++;
                 this.roomSelectionEntity.y += 38;
-              }
               return true;
             case 'ArrowLeft':
             case 'GamepadLeft':
-              if (this.selectionRoom % 5 > 0) {
-                this.selectionRoom -= 1;
+                this.selectionX--;
                 this.roomSelectionEntity.x -= 64;
-              }
               return true;
             case 'ArrowRight':
             case 'GamepadRight':
-              if (this.selectionRoom % 5 < 4 && this.selectionRoom+1 <= this.roomsOpened) {
-                this.selectionRoom += 1;
+                this.selectionX++;
                 this.roomSelectionEntity.x += 64;
-              }
               return true;
             case 'Enter':
             case 'GamepadOK':
-              this.app.roomNumber = this.selectionRoom;
+              this.app.roomNumber = this.app.globalData.roomsMap.positions[this.selectionY][this.selectionX];
               this.app.startRoom(false, true, false);
               return true;
             case 'Escape':

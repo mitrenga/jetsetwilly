@@ -30,17 +30,19 @@ export class RoomMapEntity extends AbstractEntity {
   init() {
     super.init();
 
-    this.roomNameEntity = new TextEntity(this, this.app.fonts.fonts3x3, 0, 32, 64, 6, '', this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlack'), {align: 'center', topMargin: 1});
-    this.roomNameEntity.enablePaintWithVisibility();
-    this.addEntity(this.roomNameEntity);
-    if (this.locked) {
-      this.padlockEntity = new SpriteEntity(this, Math.floor((this.width-11)/2), Math.floor((this.height-13)/2), this.app.platform.colorByName('red'), false, 0, 0);
-      this.padlockEntity.enablePaintWithVisibility();
-      this.padlockEntity.setCompressedGraphicsData('lP100B00D0B040307050209010F080A0G012334140414041415671815696A656', false);
-      this.addEntity(this.padlockEntity);
-    } 
-    var roomId = 'room'+this.roomNumber.toString().padStart(2, '0');
-    this.fetchData(roomId+'.data', {key: roomId, when: 'required'}, {});
+    if (this.roomNumber !== false) {
+      this.roomNameEntity = new TextEntity(this, this.app.fonts.fonts3x3, 0, 32, 64, 6, '', this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlack'), {align: 'center', topMargin: 1});
+      this.roomNameEntity.enablePaintWithVisibility();
+      this.addEntity(this.roomNameEntity);
+      if (this.locked) {
+        this.padlockEntity = new SpriteEntity(this, Math.floor((this.width-11)/2), Math.floor((this.height-13)/2), this.app.platform.colorByName('red'), false, 0, 0);
+        this.padlockEntity.enablePaintWithVisibility();
+        this.padlockEntity.setCompressedGraphicsData('lP100B00D0B040307050209010F080A0G012334140414041415671815696A656', false);
+        this.addEntity(this.padlockEntity);
+      }
+      var roomId = 'room'+this.roomNumber.toString().padStart(2, '0');
+      this.fetchData(roomId+'.data', {key: roomId, when: 'required'}, {});
+    }
   } // init
 
   setData(data) {
@@ -49,6 +51,13 @@ export class RoomMapEntity extends AbstractEntity {
   } // setData
 
   drawEntity() {
+    if (this.x >= this.parentEntity.width || this.y >= this.parentEntity.height) {
+      return;
+    }
+    if (this.x+this.width <= 0 || this.y+this.height <= 0) {
+      return;
+    }
+
     var cropX = 0;
     var cropY = 0;
     var moveX = 0;
@@ -75,8 +84,8 @@ export class RoomMapEntity extends AbstractEntity {
     }
 
     if (this.roomData) {
+
       this.app.layout.paint(this, moveX, moveY, cropWidth, cropHeight, this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor)));
-      //this.app.layout.paint(this, 0, this.height-6, this.width, 6, this.app.platform.colorByName('black'));
 
       if (this.drawingCache[0].needToRefresh(this, this.width, this.height)) {
 
@@ -196,19 +205,21 @@ export class RoomMapEntity extends AbstractEntity {
         }
 
       }
-    }
     
-    if (cropX != 0 || cropY != 0) {
-      this.app.layout.paintCropCache(this, 0, cropX, cropY, cropX, cropY);
-    } else {
-      this.app.layout.paintCache(this, 0);
-    }
-    
-    this.drawSubEntity(this.roomNameEntity);
+      if (cropX != 0 || cropY != 0) {
+        this.app.layout.paintCropCache(this, 0, cropX, cropY, cropX, cropY);
+      } else {
+        this.app.layout.paintCache(this, 0);
+      }
+      
+      this.drawSubEntity(this.roomNameEntity);
 
-    if (this.locked) {
-      this.app.layout.paint(this, moveX, moveY, cropWidth, cropHeight, '#9a9595c0');
-      this.drawSubEntity(this.padlockEntity);
+      if (this.locked) {
+        this.app.layout.paint(this, moveX, moveY, cropWidth, cropHeight, '#9a9595c0');
+        this.drawSubEntity(this.padlockEntity);
+      }      
+    } else {
+      this.app.layout.paint(this, moveX, moveY, cropWidth, cropHeight, this.app.platform.colorByName('black'));
     }
   } // drawEntity
 
