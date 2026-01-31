@@ -218,8 +218,6 @@ export class RoomMapEntity extends AbstractEntity {
         this.app.layout.paint(this, moveX, moveY, cropWidth, cropHeight, '#9a9595c0');
         this.drawSubEntity(this.padlockEntity);
       }      
-    } else {
-      this.app.layout.paint(this, moveX, moveY, cropWidth, cropHeight, this.app.platform.colorByName('black'));
     }
   } // drawEntity
 

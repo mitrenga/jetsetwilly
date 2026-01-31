@@ -22,6 +22,9 @@ export class RoomsMapModel extends AbstractModel {
     this.roomSelectionEntity = null;
     this.selectionX = this.app.globalData.roomsMap.initPosition.x;
     this.selectionY = this.app.globalData.roomsMap.initPosition.y;
+    this.adjustX = 0;
+    this.adjustY = 0;
+    this.roomMapEntities = [];
     this.roomsOpened = 81;
   } // constructor
 
@@ -29,14 +32,19 @@ export class RoomsMapModel extends AbstractModel {
     super.init();
 
     this.borderEntity.bkColor = this.app.platform.colorByName('cyan');
-    this.desktopEntity.bkColor = false;
+    this.desktopEntity.bkColor = this.app.platform.colorByName('black');
     for (var y = 0; y < this.app.globalData.roomsMap.positions.length; y++) {
+      this.roomMapEntities.push([]);
       for (var x = 0; x < this.app.globalData.roomsMap.positions[y].length; x++) {
+        this.roomMapEntities[y].push(null);
         var roomNumber = this.app.globalData.roomsMap.positions[y][x];
-        var posX = (x-this.selectionX+2)*64-32;
-        var posY = (y-this.selectionY+2)*38-19;
-        var roomMapEntity = new RoomMapEntity(this.desktopEntity, posX, posY, roomNumber, (roomNumber > this.roomsOpened));
-        this.desktopEntity.addEntity(roomMapEntity);
+        if (roomNumber !== false) {
+          var posX = (x-this.selectionX+2)*64-32;
+          var posY = (y-this.selectionY+2)*38-19;
+          var roomMapEntity = new RoomMapEntity(this.desktopEntity, posX, posY, roomNumber, (roomNumber > this.roomsOpened));
+          this.desktopEntity.addEntity(roomMapEntity);
+          this.roomMapEntities[y][x] = roomMapEntity;
+        }
       }
     }
     this.roomSelectionEntity = new RoomSelectionEntity(this.desktopEntity, 2*64-32-3, 2*38-19-3);
@@ -70,23 +78,61 @@ export class RoomsMapModel extends AbstractModel {
           switch (key) {        
             case 'ArrowUp':
             case 'GamepadUp':
-                this.selectionY--;
-                this.roomSelectionEntity.y -= 38;
+              if (this.adjustX == 0 && this.adjustY == 0) {
+                if (this.selectionY > 0 && this.app.globalData.roomsMap.positions[this.selectionY-1][this.selectionX] !== false) {
+                  this.selectionY--;
+                  this.roomSelectionEntity.y -= 38;
+                  if (this.roomSelectionEntity.y < 0) {
+                    this.adjustY += 38;
+                  }
+                } else {
+                  this.selectAdjoiningRoom(this.roomMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.above);
+                }
+              }
               return true;
             case 'ArrowDown':
             case 'GamepadDown':
-                this.selectionY++;
-                this.roomSelectionEntity.y += 38;
+              if (this.adjustX == 0 && this.adjustY == 0) {
+                var roomsMapPositions = this.app.globalData.roomsMap.positions;
+                if (this.selectionY < roomsMapPositions.length-1 && roomsMapPositions[this.selectionY+1][this.selectionX] !== false) {
+                  this.selectionY++;
+                  this.roomSelectionEntity.y += 38;
+                  if (this.roomSelectionEntity.y > 189-38) {
+                    this.adjustY -= 38;
+                  }
+                } else {
+                  this.selectAdjoiningRoom(this.roomMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.below);
+                }
+              }
               return true;
             case 'ArrowLeft':
             case 'GamepadLeft':
-                this.selectionX--;
-                this.roomSelectionEntity.x -= 64;
+              if (this.adjustX == 0 && this.adjustY == 0) {
+                if (this.selectionX > 0 && this.app.globalData.roomsMap.positions[this.selectionY][this.selectionX-1] !== false) {
+                  this.selectionX--;
+                  this.roomSelectionEntity.x -= 64;
+                  if (this.roomSelectionEntity.x < 0) {
+                    this.adjustX += 64;
+                  }
+                } else {
+                  this.selectAdjoiningRoom(this.roomMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.left);
+                }
+              }
               return true;
             case 'ArrowRight':
             case 'GamepadRight':
-                this.selectionX++;
-                this.roomSelectionEntity.x += 64;
+              if (this.adjustX == 0 && this.adjustY == 0) {
+                var roomsMapRowPositions = this.app.globalData.roomsMap.positions[this.selectionY];
+                if (this.selectionX < roomsMapRowPositions.length-1 && roomsMapRowPositions[this.selectionX+1] !== false) {
+                  this.selectionX++;
+                  this.roomSelectionEntity.x += 64;
+                  if (this.roomSelectionEntity.x > 255-64) {
+                    this.adjustX -= 64;
+                  }
+                } else {
+                  this.selectAdjoiningRoom(this.roomMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.right);
+                }
+              }
               return true;
             case 'Enter':
             case 'GamepadOK':
@@ -105,9 +151,53 @@ export class RoomsMapModel extends AbstractModel {
     return false;
   } // handleEvent
 
+  selectAdjoiningRoom(adjoiningRoom) {
+    if (adjoiningRoom !== false) {
+      for (var y = 0; y < this.app.globalData.roomsMap.positions.length; y++) {
+        for (var x = 0; x < this.app.globalData.roomsMap.positions[y].length; x++) {
+          if (this.app.globalData.roomsMap.positions[y][x] === this.app.hexToInt(adjoiningRoom)) {
+            var deltaX = x - this.selectionX;
+            var deltaY = y - this.selectionY;
+            this.selectionX = x;
+            this.selectionY = y;
+            this.roomSelectionEntity.x += deltaX*64;
+            this.roomSelectionEntity.y += deltaY*38;
+            this.adjustX -= 64*deltaX;
+            this.adjustY -= 38*deltaY;
+            return;
+          }
+        }
+      }
+    }
+  } // selectAdjoiningRoom
+
   loopModel(timestamp) {
     super.loopModel(timestamp);
     
+    if (this.adjustX != 0 || this.adjustY != 0) {
+      var corrX = 0;
+      var corrY = 0;
+      if (this.adjustX > 0) {
+        corrX = Math.min(this.adjustX, 4);
+      }
+      if (this.adjustX < 0) {
+        corrX = Math.max(this.adjustX, -4);
+      }
+      if (this.adjustY > 0) {
+        corrY = Math.min(this.adjustY, 2);
+      }
+      if (this.adjustY < 0) {
+        corrY = Math.max(this.adjustY, -2);
+      }
+      this.adjustX -= corrX;
+      this.adjustY -= corrY;
+
+      this.desktopEntity.entities.forEach ((entity) => {
+        entity.x += corrX;
+        entity.y += corrY;
+      });
+    }
+
     this.roomSelectionEntity.loopEntity(timestamp);
     this.drawModel();
   } // loopModel

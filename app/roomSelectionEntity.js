@@ -15,6 +15,13 @@ export class RoomSelectionEntity extends AbstractEntity {
   } // constructor
 
   drawEntity() {
+    if (this.x >= this.parentEntity.width || this.y >= this.parentEntity.height) {
+      return;
+    }
+    if (this.x+this.width <= 0 || this.y+this.height <= 0) {
+      return;
+    }
+
     var cropX = 0;
     var cropY = 0;
     var cropWidth = this.width;
