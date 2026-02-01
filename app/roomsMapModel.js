@@ -19,11 +19,13 @@ export class RoomsMapModel extends AbstractModel {
     super(app);
     this.id = 'RoomsMapModel';
 
+    this.adjustX = 0;
+    this.adjustY = 0;
     this.roomSelectionEntity = null;
     this.selectionX = this.app.globalData.roomsMap.initPosition.x;
     this.selectionY = this.app.globalData.roomsMap.initPosition.y;
-    this.adjustX = 0;
-    this.adjustY = 0;
+    this.adjustSelectionX = 0;
+    this.adjustSelectionY = 0;
     this.roomMapEntities = [];
     this.roomsOpened = 81;
   } // constructor
@@ -78,11 +80,11 @@ export class RoomsMapModel extends AbstractModel {
           switch (key) {        
             case 'ArrowUp':
             case 'GamepadUp':
-              if (this.adjustX == 0 && this.adjustY == 0) {
+              if (this.adjustX == 0 && this.adjustY == 0 && this.adjustSelectionX == 0 && this.adjustSelectionY == 0) {
                 if (this.selectionY > 0 && this.app.globalData.roomsMap.positions[this.selectionY-1][this.selectionX] !== false) {
                   this.selectionY--;
-                  this.roomSelectionEntity.y -= 38;
-                  if (this.roomSelectionEntity.y < 0) {
+                  this.adjustSelectionY -= 38;
+                  if (this.roomSelectionEntity.y+this.adjustSelectionY < 0) {
                     this.adjustY += 38;
                   }
                 } else {
@@ -92,12 +94,12 @@ export class RoomsMapModel extends AbstractModel {
               return true;
             case 'ArrowDown':
             case 'GamepadDown':
-              if (this.adjustX == 0 && this.adjustY == 0) {
+              if (this.adjustX == 0 && this.adjustY == 0 && this.adjustSelectionX == 0 && this.adjustSelectionY == 0) {
                 var roomsMapPositions = this.app.globalData.roomsMap.positions;
                 if (this.selectionY < roomsMapPositions.length-1 && roomsMapPositions[this.selectionY+1][this.selectionX] !== false) {
                   this.selectionY++;
-                  this.roomSelectionEntity.y += 38;
-                  if (this.roomSelectionEntity.y > 189-38) {
+                  this.adjustSelectionY += 38;
+                  if (this.roomSelectionEntity.y+this.adjustSelectionY > 189-38) {
                     this.adjustY -= 38;
                   }
                 } else {
@@ -107,11 +109,11 @@ export class RoomsMapModel extends AbstractModel {
               return true;
             case 'ArrowLeft':
             case 'GamepadLeft':
-              if (this.adjustX == 0 && this.adjustY == 0) {
+              if (this.adjustX == 0 && this.adjustY == 0 && this.adjustSelectionX == 0 && this.adjustSelectionY == 0) {
                 if (this.selectionX > 0 && this.app.globalData.roomsMap.positions[this.selectionY][this.selectionX-1] !== false) {
                   this.selectionX--;
-                  this.roomSelectionEntity.x -= 64;
-                  if (this.roomSelectionEntity.x < 0) {
+                  this.adjustSelectionX -= 64;
+                  if (this.roomSelectionEntity.x+this.adjustSelectionX < 0) {
                     this.adjustX += 64;
                   }
                 } else {
@@ -121,12 +123,12 @@ export class RoomsMapModel extends AbstractModel {
               return true;
             case 'ArrowRight':
             case 'GamepadRight':
-              if (this.adjustX == 0 && this.adjustY == 0) {
+              if (this.adjustX == 0 && this.adjustY == 0 && this.adjustSelectionX == 0 && this.adjustSelectionY == 0) {
                 var roomsMapRowPositions = this.app.globalData.roomsMap.positions[this.selectionY];
                 if (this.selectionX < roomsMapRowPositions.length-1 && roomsMapRowPositions[this.selectionX+1] !== false) {
                   this.selectionX++;
-                  this.roomSelectionEntity.x += 64;
-                  if (this.roomSelectionEntity.x > 255-64) {
+                  this.adjustSelectionX += 64;
+                  if (this.roomSelectionEntity.x+this.adjustSelectionX > 255-64) {
                     this.adjustX -= 64;
                   }
                 } else {
@@ -136,8 +138,10 @@ export class RoomsMapModel extends AbstractModel {
               return true;
             case 'Enter':
             case 'GamepadOK':
-              this.app.roomNumber = this.app.globalData.roomsMap.positions[this.selectionY][this.selectionX];
-              this.app.startRoom(false, true, false);
+              if (this.adjustX == 0 && this.adjustY == 0 && this.adjustSelectionX == 0 && this.adjustSelectionY == 0) {
+                this.app.roomNumber = this.app.globalData.roomsMap.positions[this.selectionY][this.selectionX];
+                this.app.startRoom(false, true, false);
+              }
               return true;
             case 'Escape':
             case 'GamepadExit':
@@ -160,10 +164,26 @@ export class RoomsMapModel extends AbstractModel {
             var deltaY = y - this.selectionY;
             this.selectionX = x;
             this.selectionY = y;
-            this.roomSelectionEntity.x += deltaX*64;
-            this.roomSelectionEntity.y += deltaY*38;
-            this.adjustX -= 64*deltaX;
-            this.adjustY -= 38*deltaY;
+            this.adjustSelectionX += deltaX*64;
+            this.adjustSelectionY += deltaY*38;
+
+            while (this.roomSelectionEntity.x+this.adjustX+this.adjustSelectionX < 0) {
+              this.adjustX += 64;
+            }
+            while (this.roomSelectionEntity.x+this.adjustX+this.adjustSelectionX > 255-64) {
+              this.adjustX -= 64;
+            }
+            while (this.roomSelectionEntity.y+this.adjustY+this.adjustSelectionY < 0) {
+              this.adjustY += 38;
+            }
+            while (this.roomSelectionEntity.y+this.adjustY+this.adjustSelectionY > 189-38) {
+              this.adjustY -= 38;
+            }
+            
+            if (false) {
+              this.adjustX -= deltaX*64;
+              this.adjustY -= deltaY*38;
+            }
             return;
           }
         }
@@ -192,10 +212,39 @@ export class RoomsMapModel extends AbstractModel {
       this.adjustX -= corrX;
       this.adjustY -= corrY;
 
-      this.desktopEntity.entities.forEach ((entity) => {
-        entity.x += corrX;
-        entity.y += corrY;
-      });
+      for (var y = 0; y < this.roomMapEntities.length; y++) {
+        for (var x = 0; x < this.roomMapEntities[y].length; x++) {
+          var roomMapEntity = this.roomMapEntities[y][x];
+          if (roomMapEntity !== null) {
+            roomMapEntity.x += corrX;
+            roomMapEntity.y += corrY;
+          }
+        }
+      }
+      this.roomSelectionEntity.x += corrX;
+      this.roomSelectionEntity.y += corrY;
+    }
+
+    if (this.adjustSelectionX != 0 || this.adjustSelectionY != 0) {
+      var corrX = 0;
+      var corrY = 0;
+      if (this.adjustSelectionX > 0) {
+        corrX = Math.min(this.adjustSelectionX, 4);
+      }
+      if (this.adjustSelectionX < 0) {
+        corrX = Math.max(this.adjustSelectionX, -4);
+      }
+      if (this.adjustSelectionY > 0) {
+        corrY = Math.min(this.adjustSelectionY, 2);
+      }
+      if (this.adjustSelectionY < 0) {
+        corrY = Math.max(this.adjustSelectionY, -2);
+      }
+      this.adjustSelectionX -= corrX;
+      this.adjustSelectionY -= corrY;
+
+      this.roomSelectionEntity.x += corrX;
+      this.roomSelectionEntity.y += corrY;
     }
 
     this.roomSelectionEntity.loopEntity(timestamp);
