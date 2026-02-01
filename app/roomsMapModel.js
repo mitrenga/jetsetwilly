@@ -19,15 +19,17 @@ export class RoomsMapModel extends AbstractModel {
     super(app);
     this.id = 'RoomsMapModel';
 
+    this.roomsMapEntities = [];
     this.adjustX = 0;
     this.adjustY = 0;
+
     this.roomSelectionEntity = null;
     this.selectionX = this.app.globalData.roomsMap.initPosition.x;
     this.selectionY = this.app.globalData.roomsMap.initPosition.y;
     this.adjustSelectionX = 0;
     this.adjustSelectionY = 0;
-    this.roomMapEntities = [];
-    this.roomsOpened = 81;
+    
+    this.roomsOpened = 81; // temporary
   } // constructor
 
   init() {
@@ -36,16 +38,16 @@ export class RoomsMapModel extends AbstractModel {
     this.borderEntity.bkColor = this.app.platform.colorByName('cyan');
     this.desktopEntity.bkColor = this.app.platform.colorByName('black');
     for (var y = 0; y < this.app.globalData.roomsMap.positions.length; y++) {
-      this.roomMapEntities.push([]);
+      this.roomsMapEntities.push([]);
       for (var x = 0; x < this.app.globalData.roomsMap.positions[y].length; x++) {
-        this.roomMapEntities[y].push(null);
+        this.roomsMapEntities[y].push(null);
         var roomNumber = this.app.globalData.roomsMap.positions[y][x];
         if (roomNumber !== false) {
           var posX = (x-this.selectionX+2)*64-32;
           var posY = (y-this.selectionY+2)*38-19;
           var roomMapEntity = new RoomMapEntity(this.desktopEntity, posX, posY, roomNumber, (roomNumber > this.roomsOpened));
           this.desktopEntity.addEntity(roomMapEntity);
-          this.roomMapEntities[y][x] = roomMapEntity;
+          this.roomsMapEntities[y][x] = roomMapEntity;
         }
       }
     }
@@ -88,7 +90,7 @@ export class RoomsMapModel extends AbstractModel {
                     this.adjustY += 38;
                   }
                 } else {
-                  this.selectAdjoiningRoom(this.roomMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.above);
+                  this.selectAdjoiningRoom(this.roomsMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.above);
                 }
               }
               return true;
@@ -103,7 +105,7 @@ export class RoomsMapModel extends AbstractModel {
                     this.adjustY -= 38;
                   }
                 } else {
-                  this.selectAdjoiningRoom(this.roomMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.below);
+                  this.selectAdjoiningRoom(this.roomsMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.below);
                 }
               }
               return true;
@@ -117,7 +119,7 @@ export class RoomsMapModel extends AbstractModel {
                     this.adjustX += 64;
                   }
                 } else {
-                  this.selectAdjoiningRoom(this.roomMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.left);
+                  this.selectAdjoiningRoom(this.roomsMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.left);
                 }
               }
               return true;
@@ -132,7 +134,7 @@ export class RoomsMapModel extends AbstractModel {
                     this.adjustX -= 64;
                   }
                 } else {
-                  this.selectAdjoiningRoom(this.roomMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.right);
+                  this.selectAdjoiningRoom(this.roomsMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.right);
                 }
               }
               return true;
@@ -212,9 +214,9 @@ export class RoomsMapModel extends AbstractModel {
       this.adjustX -= corrX;
       this.adjustY -= corrY;
 
-      for (var y = 0; y < this.roomMapEntities.length; y++) {
-        for (var x = 0; x < this.roomMapEntities[y].length; x++) {
-          var roomMapEntity = this.roomMapEntities[y][x];
+      for (var y = 0; y < this.roomsMapEntities.length; y++) {
+        for (var x = 0; x < this.roomsMapEntities[y].length; x++) {
+          var roomMapEntity = this.roomsMapEntities[y][x];
           if (roomMapEntity !== null) {
             roomMapEntity.x += corrX;
             roomMapEntity.y += corrY;
