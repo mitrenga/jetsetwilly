@@ -1,6 +1,6 @@
 {
   "name": "The Kitchen",
-  "shortName": "The Kitchen",
+  "shortName": "Kitchen",
   "bkColor": "00",
   "borderColor": "04",
   "layout": [
@@ -144,6 +144,12 @@
                 "-----##-###---#-",
                 "----###-------#-"
               ]
+            ],
+            "mapSprite": [
+               "###-",
+               "-#-#",
+               "####",
+               "#-#-"
             ]
          }
       ]

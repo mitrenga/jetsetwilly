@@ -1,6 +1,6 @@
 {
    "name":"On the Roof",
-   "shortName":"On the Roof",
+   "shortName":"On Roof",
    "bkColor":"44",
    "borderColor":"02",
    "layout":[
@@ -234,6 +234,12 @@
                   "----###-##",
                   "--####----"
                ]
+            ],
+            "mapSprite": [
+               "-#-",
+               "-##",
+               "-#-",
+               "#-#"
             ]
          }
       ]

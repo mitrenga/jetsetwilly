@@ -1,6 +1,6 @@
 {
    "name":"We must perform a Quirkafleeg",
-   "shortName":"We must perform a Quirkafleeg",
+   "shortName":"Must Quirkafleeg",
    "bkColor":"06",
    "borderColor":"02",
    "layout":[
@@ -225,6 +225,12 @@
                   "------------",
                   "------------"
                ]
+            ],
+            "mapSprite": [
+               "----",
+               "##--",
+               "####",
+               "----"
             ]
          }
       ],

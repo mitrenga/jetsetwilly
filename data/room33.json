@@ -1,6 +1,6 @@
 {
    "name":"The Bathroom",
-   "shortName":"The Bathroom",
+   "shortName":"Bathroom",
    "bkColor":"00",
    "borderColor":"02",
    "layout":[
@@ -156,6 +156,12 @@
                   "---------###-##-",
                   "----------####--"
                ]
+            ],
+            "mapSprite": [
+               "##--",
+               "##--",
+               "--##",
+               "--##"
             ]
          }
       ]
@@ -165,6 +171,8 @@
          "kind":"toilet",
          "x":28,
          "y":13,
+         "width": 16,
+         "height": 16,
          "attribute":"07",
          "frames":2,
          "directions":2,
@@ -241,6 +249,12 @@
                "----#########-##",
                "----#########-##"
             ]
+         ],
+         "mapSprite": [
+            "--##",
+            "--##",
+            "####",
+            "-###"
          ]
       }
    ]

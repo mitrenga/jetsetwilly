@@ -41,6 +41,7 @@ export class GameAreaEntity extends AbstractEntity {
 
   drawEntity() {
     if (this.roomData) {
+      var roomBkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(this.roomData.bkColor), 56, 8);
 
       this.app.layout.paint(this, 0, 0, this.width, this.height, this.bkColor);
 
@@ -56,7 +57,7 @@ export class GameAreaEntity extends AbstractEntity {
                 if (this.staticKinds.includes(idItem)) {
                   var penColor = this.penColorByAttr(attr);
                   var bkColor = this.bkColorByAttr(attr);
-                  if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor))) {
+                  if (bkColor == roomBkColor) {
                     bkColor = false;
                   }
                   if (f == 1 && (attr&128) == 128) {
@@ -96,7 +97,7 @@ export class GameAreaEntity extends AbstractEntity {
                   if (this.graphicCache[idItem].needToRefresh(this, 8, 8)) {
                     var penColor = this.penColorByAttr(this.app.hexToInt(attr));
                     var bkColor = this.bkColorByAttr(this.app.hexToInt(attr));
-                    if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor))) {
+                    if (bkColor == roomBkColor) {
                       bkColor = false;
                     }
                     if (f == 3) {
@@ -132,7 +133,7 @@ export class GameAreaEntity extends AbstractEntity {
               penColor = this.monochromeColor;
             }
             var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(attr)&63);
-            if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor))) {
+            if (bkColor == roomBkColor) {
               bkColor = false;
             }
             if (bkColor != false) {
@@ -290,7 +291,7 @@ export class GameAreaEntity extends AbstractEntity {
       var attr = this.app.hexToInt(conveyorData.data.substring(0, 2));
       var penColor = this.app.platform.penColorByAttr(attr);
       var bkColor = this.app.platform.bkColorByAttr(attr);
-      if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(data.bkColor))) {
+      if (bkColor == this.bkColor) {
         bkColor = false;
       }
       var entity = new SpriteEntity(this, conveyorData.location.x*8, conveyorData.location.y*8, penColor, bkColor, 0, 0);

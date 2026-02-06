@@ -1,6 +1,6 @@
 {
   "name": "On top of the house                 ",
-  "shortName": "On top of the house",
+  "shortName": "On top",
   "bkColor": "08",
   "borderColor": "03",
   "layout": [
@@ -138,6 +138,12 @@
                 "--###-----------",
                 "----------------"
               ]
+            ],
+            "mapSprite": [
+               "----",
+               "----",
+               "###-",
+               "-###"
             ]
          }
       ]

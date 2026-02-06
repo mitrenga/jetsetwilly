@@ -1,6 +1,6 @@
 {
    "name":"The Forgotten Abbey",
-   "shortName":"The Forgotten Abbey",
+   "shortName":"Forgotten Abbey",
    "bkColor":"00",
    "borderColor":"01",
    "layout":[
@@ -321,6 +321,12 @@
                   "--#---##---",
                   "-----###---"
                ]
+            ],
+            "mapSprite": [
+               "-##",
+               "-#-",
+               "###",
+               "-#-"
             ]
          }
       ]

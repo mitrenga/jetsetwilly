@@ -1,6 +1,6 @@
 {
   "name": "I'm sure I've seen this before..",
-  "shortName": "I'm sure I've seen this before..",
+  "shortName": "Seen this before",
   "bkColor": "08",
   "borderColor": "03",
   "layout": [
@@ -205,6 +205,12 @@
                   "------------",
                   "------------"
                ]
+            ],
+            "mapSprite": [
+               "----",
+               "##--",
+               "####",
+               "----"
             ]
          }
       ],
@@ -313,6 +319,12 @@
                 "-#---#-#-----#--",
                 "---###-###---#--"
               ]
+            ],
+            "mapSprite": [
+               "###-",
+               "-#-#",
+               "####",
+               "#-#-"
             ]
          }
       ],

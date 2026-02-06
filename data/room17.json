@@ -1,6 +1,6 @@
 {
   "name": "Up on the Battlements",
-  "shortName": "Up on the Battlements",
+  "shortName": "Battlements",
   "bkColor": "00",
   "borderColor": "01",
   "layout": [
@@ -145,6 +145,12 @@
                 "-#---#-#-----#--",
                 "---###-###---#--"
               ]
+            ],
+            "mapSprite": [
+               "###-",
+               "-#-#",
+               "####",
+               "#-#-"
             ]
          }
       ],

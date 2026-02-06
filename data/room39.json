@@ -1,6 +1,6 @@
 {
   "name": "Emergency Generator",
-  "shortName": "Emergency Generator",
+  "shortName": "Generator",
   "bkColor": "08",
   "borderColor": "02",
   "layout": [
@@ -216,6 +216,12 @@
                 "--------------",
                 "--------------"
               ]
+            ],
+            "mapSprite": [
+               "##--",
+               "###-",
+               "####",
+               "#-#-"
             ]
          }
       ]

@@ -1,6 +1,6 @@
 {
   "name": "Dr Jones will never believe this",
-  "shortName": "Dr Jones will never believe this",
+  "shortName": "Jones will never",
   "bkColor": "00",
   "borderColor": "01",
   "layout": [
@@ -145,6 +145,13 @@
                 "----#-######----",
                 "------#-##------"
               ]
+            ],
+            "mapSprite": [
+               "-###-",
+               "#-#-#",
+               "#####",
+               "#---#",
+               "-###-"
             ]
          },
          {
@@ -245,6 +252,12 @@
                 "------##--###---",
                 "-----###---#----"
               ]
+            ],
+            "mapSprite": [
+               "#-#-",
+               "-##-",
+               "-##-",
+               "-#-#"
             ]
          }
       ]

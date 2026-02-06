@@ -1,6 +1,6 @@
 {
   "name": "The Beach",
-  "shortName": "The Beach",
+  "shortName": "Beach",
   "bkColor": "0D",
   "borderColor": "02",
   "layout": [
@@ -93,6 +93,6 @@
             ]
          }
       ]
-    }
+   }
 }
 

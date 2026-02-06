@@ -1,6 +1,6 @@
 {
   "name": "              Conservatory Roof",
-  "shortName": "Conservatory Roof",
+  "shortName": "Conservatory",
   "bkColor": "00",
   "borderColor": "05",
   "layout": [
@@ -145,6 +145,12 @@
                   "--#-#------#-#--",
                   "--###------###--"
                ]
+            ],
+            "mapSprite": [
+               "###",
+               "###",
+               "#-#",
+               "#-#"
             ]
          },
          {
@@ -245,6 +251,12 @@
                 "--#--------#",
                 "--#--------#"
               ]
+            ],
+            "mapSprite": [
+               "-#-",
+               "-#-",
+               "#-#",
+               "#-#"
             ]
          }
       ]

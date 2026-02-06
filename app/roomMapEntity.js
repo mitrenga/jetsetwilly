@@ -25,6 +25,11 @@ export class RoomMapEntity extends AbstractEntity {
 
     this.app.layout.newDrawingCache(this, 0);
     this.app.layout.newDrawingCropCache(this);
+
+    this.ropeRelativeCoordinates = [
+      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1,1,2,1,1,2,2,3,2,3,2,3,3,3,3,3,3],
+      [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,2,3,2,3,2,3,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
+    ];
 } // constructor
 
   init() {
@@ -84,8 +89,9 @@ export class RoomMapEntity extends AbstractEntity {
     }
 
     if (this.roomData) {
+      var roomBkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor));
 
-      this.app.layout.paint(this, moveX, moveY, cropWidth, cropHeight, this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor)));
+      this.app.layout.paint(this, moveX, moveY, cropWidth, cropHeight, roomBkColor);
 
       if (this.drawingCache[0].needToRefresh(this, this.width, this.height)) {
 
@@ -99,44 +105,22 @@ export class RoomMapEntity extends AbstractEntity {
               if (this.mapKinds.includes(idItem)) {
                 var penColor = this.app.platform.penColorByAttr(attr);
                 var bkColor = this.app.platform.bkColorByAttr(attr);
-                if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor))) {
-                  bkColor = false;
-                }
-                if (bkColor != false) {
-                  this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 1, 1, bkColor);
-                }
-                this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 1, 1, penColor);
-              }
-            }
-          }
-        });
-
-        /*
-        this.caveData.layout.forEach((row, r) => {
-          for (var column = 0; column < row.length/2; column++) {
-            var attr = row.substring(column*2, column*2+2);
-            if (attr != this.caveData.bkColor) {
-              if (this.mapKinds.includes(this.caveData.graphicData[attr].kind)) {
-                var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(attr));
-                if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.caveData.bkColor))) {
+                if (bkColor == roomBkColor) {
                   bkColor = false;
                 }
                 if (bkColor != false) {
                   this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 2, 2, bkColor);
                 }
-                var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(attr));
-                switch (this.caveData.graphicData[attr].kind) {
+                switch (idItem) {
                   case 'floor':
-                  case 'crumblingFloor':
-                    this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 2, 1, penColor);
+                    if (bkColor === false || penColor != roomBkColor) {
+                      this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 2, 1, penColor);
+                    }
                     this.app.layout.paintRect(this.drawingCache[0].ctx, column*2+1, r*2+1, 1, 1, penColor);
                     break;
                   case 'wall':
                     this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 1, 1, penColor);
                     this.app.layout.paintRect(this.drawingCache[0].ctx, column*2+1, r*2+1, 1, 1, penColor);
-                    break;
-                  case 'conveyor':
-                    this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 2, 1, penColor);
                     break;
                   case 'nasty':
                     this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 2, 1, penColor);
@@ -150,23 +134,61 @@ export class RoomMapEntity extends AbstractEntity {
             }
           }
         });
-        */
 
-        // items
-        /*
-        this.caveData.items.data.forEach((item) => {
-          var itemColor = this.app.platform.color(this.app.hexToInt(item.initAttribute)&7);
-          var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(item.initAttribute));
-          if (bkColor == this.app.platform.bkColorByAttr(this.app.hexToInt(this.caveData.bkColor))) {
+        // ramp
+        if ('ramp' in this.roomData.graphicData) {
+          var rampData = this.roomData.graphicData.ramp;
+          var gradient = 1;
+          var corrX = 1;
+          if (rampData.gradient == 'left') {
+              gradient = -1;
+              corrX = 0;
+          }
+          var attr = rampData.data.substring(0, 2);
+          var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(attr));
+          var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(attr)&63);
+          if (bkColor == roomBkColor) {
+            bkColor = false;
+          }
+          for (var pos = 0; pos < this.app.hexToInt(rampData.length); pos++) {
+            if (bkColor != false) {
+              this.app.layout.paintRect(this.drawingCache[0].ctx, (rampData.location.x+pos*gradient)*2, (rampData.location.y-pos)*2, 2, 2, bkColor);
+            }
+            this.app.layout.paintRect(this.drawingCache[0].ctx, (rampData.location.x+pos*gradient)*2+corrX, (rampData.location.y-pos)*2, 1, 1, penColor);
+            this.app.layout.paintRect(this.drawingCache[0].ctx, (rampData.location.x+pos*gradient)*2-gradient+corrX, (rampData.location.y-pos)*2+1, 1, 1, penColor);
+          }
+        }
+
+        // conveyor
+        if ('conveyor' in this.roomData.graphicData) {
+          var conveyorData = this.roomData.graphicData.conveyor;
+          var attr = this.app.hexToInt(conveyorData.data.substring(0, 2));
+          var penColor = this.app.platform.penColorByAttr(attr);
+          var bkColor = this.app.platform.bkColorByAttr(attr);
+          if (bkColor == roomBkColor) {
             bkColor = false;
           }
           if (bkColor != false) {
-            this.app.layout.paintRect(this.drawingCache[0].ctx, item.x*2, item.y*2, 2, 2, bkColor);          
+            this.app.layout.paintRect(this.drawingCache[0].ctx, conveyorData.location.x*2, conveyorData.location.y*2, this.app.hexToInt(conveyorData.length)*2, 2, bkColor);
           }
-          this.app.layout.paintRect(this.drawingCache[0].ctx, item.x*2, item.y*2, 1, 1, itemColor);
-          this.app.layout.paintRect(this.drawingCache[0].ctx, item.x*2+1, item.y*2+1, 1, 1, itemColor);
-        });
-        */
+          this.app.layout.paintRect(this.drawingCache[0].ctx, conveyorData.location.x*2, conveyorData.location.y*2, this.app.hexToInt(conveyorData.length)*2, 1, penColor);
+        }
+
+        // rope
+        if ('rope' in this.roomData) {
+          var color = this.app.platform.penColorByAttr(this.app.hexToInt(this.roomData.rope.attribute));
+          var x = this.roomData.rope.init.x;
+          var y = this.roomData.rope.init.y;
+          var ptr = this.roomData.rope.init.frame;
+          for (var r = 0; r <= this.roomData.rope.length; r++) {
+            if (r%4 == 0) {
+              this.app.layout.paintRect(this.drawingCache[0].ctx, Math.floor(x/4), Math.floor(y/4), 1, 1, color);
+            }
+            x += this.ropeRelativeCoordinates[0][ptr];
+            y += this.ropeRelativeCoordinates[1][ptr];
+            ptr++;
+          }
+        }
 
         // gurdians
         if ('guardians' in this.roomData) {
@@ -200,6 +222,41 @@ export class RoomMapEntity extends AbstractEntity {
                   }
                 });
               });
+            }
+          });
+        }
+
+        // items
+        var itemColor = 3;
+        this.app.items[this.roomNumber].forEach((item) => {
+          this.app.layout.paintRect(this.drawingCache[0].ctx, item.x*2, item.y*2, 1, 1, this.app.platform.color(itemColor));
+          this.app.layout.paintRect(this.drawingCache[0].ctx, item.x*2+1, item.y*2+1, 1, 1, this.app.platform.color(itemColor));
+          if (!('matchColorsOfItems' in this.roomData) && (!this.roomData.matchColorsOfItems)) {
+            itemColor = this.app.rotateInc(itemColor, 3, 6);
+          }
+        });
+
+        // decorations
+        if ('decorations' in this.roomData) {
+          this.roomData.decorations.forEach((decoration) => {
+            var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(decoration.attribute));
+            if ('mapSprite' in decoration) {
+              for (var r = 0; r < decoration.mapSprite.length; r++) {
+                for (var c = 0; c < decoration.mapSprite[r].length; c++) {
+                  if (decoration.mapSprite[r][c] == '#') {
+                    this.app.layout.paintRect(this.drawingCache[0].ctx, Math.floor(decoration.x*2)+c, Math.floor(decoration.y*2)+r, 1, 1, penColor);
+                  }
+                }
+              }
+            } else {
+              this.app.layout.paintRect(
+                this.drawingCache[0].ctx,
+                Math.floor(decoration.x*2),
+                Math.floor(decoration.y*2),
+                Math.floor(decoration.width/4),
+                Math.floor(decoration.height/4),
+                penColor
+              );
             }
           });
         }

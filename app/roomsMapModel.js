@@ -29,6 +29,9 @@ export class RoomsMapModel extends AbstractModel {
     this.adjustSelectionX = 0;
     this.adjustSelectionY = 0;
 
+    this.wheelDeltaX = 0;
+    this.wheelDeltaY = 0;
+
     this.prevTimestamp = false;
     
     this.roomsOpened = 81; // temporary
@@ -153,7 +156,22 @@ export class RoomsMapModel extends AbstractModel {
               return true;
           }
         }
-        break;        
+        break;
+
+      case 'mouseWheel':
+        this.wheelDeltaX += event.deltaX;
+        this.wheelDeltaY += event.deltaY;
+        if (Math.abs(this.wheelDeltaX) > 120) {
+          this.sendEvent(0, {id: 'keyPress', key: (this.wheelDeltaX > 0) ? 'ArrowLeft' : 'ArrowRight'});
+          this.wheelDeltaX = 0;
+          this.wheelDeltaY = 0;
+        }
+        if (Math.abs(this.wheelDeltaY) > 120) {
+          this.sendEvent(0, {id: 'keyPress', key: (this.wheelDeltaY > 0) ? 'ArrowUp' : 'ArrowDown'});
+          this.wheelDeltaX = 0;
+          this.wheelDeltaY = 0;
+        }
+        return true;
     }
     
     return false;

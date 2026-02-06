@@ -23,6 +23,7 @@ window.addEventListener('contextmenu', (event) => gameApp.inputEventsManager.eve
 window.addEventListener('mousedown', (event) => gameApp.inputEventsManager.eventMouseDown(event));
 window.addEventListener('mouseup', (event) => gameApp.inputEventsManager.eventMouseUp(event));
 window.addEventListener('mousemove', (event) => gameApp.inputEventsManager.eventMouseMove(event));
+window.addEventListener('wheel', (event) => gameApp.inputEventsManager.eventWheel(event));
 window.addEventListener('touchstart', (event) => gameApp.inputEventsManager.eventTouchStart(event));
 window.addEventListener('touchend', (event) => gameApp.inputEventsManager.eventTouchEnd(event));
 window.addEventListener('touchcancel', (event) => gameApp.inputEventsManager.eventTouchEnd(event));

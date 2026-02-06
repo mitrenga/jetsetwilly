@@ -1,6 +1,6 @@
 {
    "name":"The Security Guard",
-   "shortName":"The Security Guard",
+   "shortName":"Security Guard",
    "bkColor":"00",
    "borderColor":"01",
    "layout":[
@@ -156,6 +156,12 @@
                   "-#---#-#-----#-",
                   "---###-###---#-"
                ]
+            ],
+            "mapSprite": [
+               "###-",
+               "-#-#",
+               "####",
+               "#-#-"
             ]
          }
       ]

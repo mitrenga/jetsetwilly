@@ -1,6 +1,6 @@
 {
   "name": "The Wine Cellar",
-  "shortName": "The Wine Cellar",
+  "shortName": "Wine Cellar",
   "bkColor": "00",
   "borderColor": "04",
   "layout": [
@@ -217,6 +217,12 @@
                 "------###-#-",
                 "-#--#####-#-"
               ]
+            ],
+            "mapSprite": [
+               "#--",
+               "#--",
+               "##-",
+               "##-"
             ]
          },
          {
@@ -417,6 +423,12 @@
                   "--#---##---",
                   "-----###---"
                ]
+            ],
+            "mapSprite": [
+               "-##",
+               "-#-",
+               "###",
+               "-#-"
             ]
          }
       ]
