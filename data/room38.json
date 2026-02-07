@@ -26,6 +26,14 @@
     "wall": "2A2211448822114488",
     "item": "BFBFBBB1BBBBBFBF"
   },
+   "willy":{
+      "init":{
+         "x":62,
+         "y":104,
+         "direction":0,
+         "frame":3
+      }
+   },  
   "adjoiningRoom": {
     "left": "27",
     "right": false,

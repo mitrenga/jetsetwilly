@@ -52,9 +52,9 @@
    },
    "willy":{
       "init":{
-         "x":160,
+         "x":240,
          "y":104,
-         "direction":0,
+         "direction":1,
          "frame":0
       },
       "width":10,

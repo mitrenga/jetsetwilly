@@ -26,6 +26,14 @@
     "wall": "63BBBB38BBBBBB83BB",
     "nasty": "32BF5C583028584830"
   },
+   "willy":{
+      "init":{
+         "x":30,
+         "y":0,
+         "direction":1,
+         "frame":3
+      }
+   },
   "adjoiningRoom": {
     "left": false,
     "right": false,

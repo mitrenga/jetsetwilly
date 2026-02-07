@@ -28,7 +28,7 @@ export class MainModel extends AbstractModel {
     this.mainImageEntity = null;
     this.blackBoxEntity = null;
     this.slidingText = 
-      '+++++ Press ENTER to Start +++++' +
+      '+++++ PRESS ENTER TO START +++++' +
       '  ' +
       'JET-SET WILLY by Matthew Smith' +
       '  ' +
@@ -122,7 +122,7 @@ export class MainModel extends AbstractModel {
           switch (key) {
             case 'Enter':
             case 'GamepadOK':
-              this.app.startRoom(false, true, true);
+              this.app.startRoom(false, true, true, this.app.globalData.initRoom);
               return true;
             case ' ':
             case 'GamepadDown':
@@ -171,7 +171,7 @@ export class MainModel extends AbstractModel {
               }
             }
             if (this.app.inputEventsManager.keysMap.Mouse1 === this.borderEntity) {
-              this.app.startRoom(false, true, true);
+              this.app.startRoom(false, true, true, this.app.globalData.initRoom);
               return true;
             }
             break;
@@ -183,7 +183,7 @@ export class MainModel extends AbstractModel {
               }
             }
             if (this.app.inputEventsManager.touchesMap[event.identifier] === this.borderEntity) {
-              this.app.startRoom(false, true, true);
+              this.app.startRoom(false, true, true, this.app.globalData.initRoom);
               return true;
             }
             break;
@@ -191,7 +191,7 @@ export class MainModel extends AbstractModel {
         break;
 
       case 'newDemoRoom':
-        this.app.startRoom(true, true, true);
+        this.app.startRoom(true, true, true, this.app.globalData.initRoom);
         return true;
 
       case 'errorAudioChannel':

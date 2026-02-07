@@ -146,8 +146,7 @@ export class RoomsMapModel extends AbstractModel {
             case 'Enter':
             case 'GamepadOK':
               if (this.adjustX == 0 && this.adjustY == 0 && this.adjustSelectionX == 0 && this.adjustSelectionY == 0) {
-                this.app.roomNumber = this.app.globalData.roomsMap.positions[this.selectionY][this.selectionX];
-                this.app.startRoom(false, true, false);
+                this.app.startRoom(false, true, true, this.app.globalData.roomsMap.positions[this.selectionY][this.selectionX]);
               }
               return true;
             case 'Escape':

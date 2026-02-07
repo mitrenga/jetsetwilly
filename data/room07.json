@@ -33,6 +33,14 @@
        "length": "02"
     }
   },
+   "willy":{
+      "init":{
+         "x":6,
+         "y":88,
+         "direction":0,
+         "frame":3
+      }
+   },
   "adjoiningRoom": {
     "left": "08",
     "right": false,
@@ -46,7 +54,7 @@
                {
                   "attribute":"05",
                   "limits":{
-                     "left":96,
+                     "left":94,
                      "right":150
                   },
                   "speed":0,

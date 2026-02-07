@@ -25,7 +25,15 @@
     "floor": "055BA4A4550A000000",
     "wall": "26592526D929D65496"
   },
-  "adjoiningRoom": {
+  "willy":{
+      "init":{
+         "x":32,
+         "y":104,
+         "direction":0,
+         "frame":0
+      }
+    },
+    "adjoiningRoom": {
     "left": false,
     "right": false,
     "above": "20",

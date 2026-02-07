@@ -36,6 +36,14 @@
          "moving":"left"
       }
    },
+   "willy":{
+      "init":{
+         "x":6,
+         "y":96,
+         "direction":0,
+         "frame":3
+      }
+   },
    "adjoiningRoom":{
       "left":"1C",
       "right":false,

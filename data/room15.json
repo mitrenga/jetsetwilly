@@ -27,6 +27,14 @@
     "nasty": "4C5155545515554555",
     "item": "1824182C5E5EE766"
   },
+   "willy":{
+      "init":{
+         "x":6,
+         "y":56,
+         "direction":0,
+         "frame":3
+      }
+   },
   "adjoiningRoom": {
     "left": "10",
     "right": "0E",

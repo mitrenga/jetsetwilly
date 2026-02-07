@@ -170,10 +170,20 @@ export class RoomModel extends AbstractModel {
   } // newBorderEntity
 
   setData(data) {
-    this.adjoiningRoom = data.data.adjoiningRoom;
     if (!('willy' in data.data)) {
-      data.data.willy = this.app.globalData.willy;
+      data.data.willy = {...this.app.globalData.willy};
+    } else {
+      data.data.willy = {...this.app.globalData.willy, ...data.data.willy};
     }
+    if (this.app.willyRoomsCache.init) {
+      this.app.willyRoomsCache.init = false;
+      this.app.willyRoomsCache.x = data.data.willy.init.x;
+      this.app.willyRoomsCache.y = data.data.willy.init.y;
+      this.app.willyRoomsCache.frame = data.data.willy.init.frame;
+      this.app.willyRoomsCache.direction = data.data.willy.init.direction;
+    }
+
+    this.adjoiningRoom = data.data.adjoiningRoom;
 
     this.gameInfoEntity.roomNameEntity.setText(data.data.name);
     this.app.roomName = data.data.name;
@@ -267,7 +277,6 @@ export class RoomModel extends AbstractModel {
 
           case 'Touch.right':
             this.app.inputEventsManager.touchesMap[event.identifier] = this.borderEntity.rightControlEntity;
-            console.log(event.identifier);
             this.postWorkerMessage({id: 'controls', action: 'right', value: true});
             return true;
 
@@ -423,9 +432,11 @@ export class RoomModel extends AbstractModel {
         return true;
 
       case 'changeRoom':
+        console.log("Room: "+event.adjoiningRoom);
+        console.log('   "willy":{\n      "init":{\n         "x":'+event.willyData.x+',\n         "y":'+event.willyData.y+',\n         "direction":'+event.willyData.direction+',\n         "frame":'+event.willyData.frame+'\n      }\n   },\n');
         this.app.roomNumber = event.adjoiningRoom;
         this.app.willyRoomsCache = event.willyData;
-        this.app.startRoom(false, false, false);
+        this.app.startRoom(false, false, false, false, false);
         break;
 
       case 'crash':
@@ -480,7 +491,7 @@ export class RoomModel extends AbstractModel {
             this.animationType = false;
             if (this.app.lives > 0) {
               this.app.lives--;
-              this.app.startRoom(false, false, false);
+              this.app.startRoom(false, false, false, false);
             } else {
               this.app.setModel('GameOverModel');
             }

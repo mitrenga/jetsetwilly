@@ -177,7 +177,7 @@ export class GameApp extends AbstractApp {
     }
   } // setModel
   
-  startRoom(demo, newGame, setInitRoom) {
+  startRoom(demo, newGame, setInitRoom, roomNumber) {
     if (newGame) {
       this.itemsCollected = {};
       this.timeCounter = 0;
@@ -186,18 +186,15 @@ export class GameApp extends AbstractApp {
       this.restartInGameMelody = true;
       if (setInitRoom) {
         this.willyRoomsCache = {
-          x: this.globalData.willy.init.x,
-          y: this.globalData.willy.init.y,
+          init: true,
           width: this.globalData.willy.width,
           height: this.globalData.willy.height,
           paintCorrections: this.globalData.willy.paintCorrections,
           touchCorrections: this.globalData.willy.touchCorrections,
-          frame: this.globalData.willy.init.frame,
           frames: this.globalData.willy.frames,
-          direction: this.globalData.willy.init.direction,
           directions: this.globalData.willy.directions
         };
-        this.roomNumber = this.globalData.initRoom;
+        this.roomNumber = roomNumber;
         this.inputEventsManager.touchesControls.left = {};
         this.inputEventsManager.touchesControls.right = {};
         this.inputEventsManager.touchesControls.jump = {};

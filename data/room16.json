@@ -36,6 +36,14 @@
          "length":"01"
       }
    },
+   "willy":{
+      "init":{
+         "x":6,
+         "y":56,
+         "direction":0,
+         "frame":3
+      }
+   },
    "adjoiningRoom":{
       "left":"11",
       "right":"0F",
