@@ -25,15 +25,17 @@
       "floor":"04FFAA55805D945D80",
       "wall":"0E2255005588550022",
       "nasty":"D67E81A59999A5817E",
-      "ramp":{
-         "data":"0703030C0C3030C0C0",
-         "gradient":"right",
-         "location":{
-            "x":9,
-            "y":14
-         },
-         "length":"0F"
-      }
+      "ramps":[
+         {
+            "data":"0703030C0C3030C0C0",
+            "gradient":"right",
+            "location":{
+               "x":9,
+               "y":14
+            },
+            "length":15
+         }
+      ]
    },
    "willy":{
       "init":{
@@ -42,12 +44,6 @@
          "direction":1,
          "frame":3
       }
-   },
-   "adjoiningRoom":{
-      "left":"1D",
-      "right":"1B",
-      "above":"22",
-      "below":"16"
    },
    "guardians":{
       "horizontal":[
@@ -222,7 +218,7 @@
                   "-----###---"
                ]
             ],
-            "mapSprite": [
+            "mapSprite":[
                "-##",
                "-#-",
                "###",

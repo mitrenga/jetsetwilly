@@ -21,6 +21,10 @@ export class GameAreaEntity extends AbstractEntity {
     this.initData = initData;
     this.demo = demo;
     this.roomData = null;
+    this.layoutExtends = {ramps:[]};
+    this.staticKinds = ['floor', 'wall', 'nasty'];
+    this.layoutObjects = [false, 'floor', 'wall', 'nasty'];
+
     this.bkColorForRestore = false;
     this.monochromeColor = false;
 
@@ -29,18 +33,13 @@ export class GameAreaEntity extends AbstractEntity {
     this.app.layout.newDrawingCache(this, 2); 
     this.app.layout.newDrawingCache(this, 3); 
     this.graphicCache = {};
-    this.staticKinds = ['floor', 'wall', 'nasty'];
-    this.layoutObjects = [false, 'floor', 'wall', 'nasty'];
 
     this.spriteEntities = {conveyors: [], ropes: [], guardians: [], items: [], decorations: [], willy: [], ramps: []};
-    this.ropeRelativeCoordinates = [
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1,1,2,1,1,2,2,3,2,3,2,3,3,3,3,3,3],
-      [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,2,3,2,3,2,3,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
-    ];
   } // constructor
 
   drawEntity() {
     if (this.roomData) {
+      var graphicData = this.roomData.graphicData;
       var roomBkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(this.roomData.bkColor), 56, 8);
 
       this.app.layout.paint(this, 0, 0, this.width, this.height, this.bkColor);
@@ -53,7 +52,7 @@ export class GameAreaEntity extends AbstractEntity {
               var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
               var idItem = this.layoutObjects[item];
               if (idItem !== false) {
-                var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
+                var attr = this.app.hexToInt(graphicData[idItem].substring(0, 2));
                 if (this.staticKinds.includes(idItem)) {
                   var penColor = this.penColorByAttr(attr);
                   var bkColor = this.bkColorByAttr(attr);
@@ -70,6 +69,28 @@ export class GameAreaEntity extends AbstractEntity {
               }
             }
           });
+
+          // floors - bkColor
+          if ('floors' in graphicData) {
+            graphicData.floors.forEach((floorData) => {
+              var attr = this.app.hexToInt(floorData.data.substring(0, 2));
+              var penColor = this.penColorByAttr(attr);
+              var bkColor = this.bkColorByAttr(attr);
+              if (bkColor == roomBkColor) {
+                bkColor = false;
+              }
+              if (f == 1 && (attr&128) == 128) {
+                bkColor = penColor;
+              }
+              for (var w = 0; w < floorData.width; w++) {
+                for (var h = 0; h < floorData.height; h++) {
+                  if (bkColor != false) {
+                    this.app.layout.paintRect(this.drawingCache[f].ctx, (floorData.location.x+w)*8, (floorData.location.y+h)*8, 8, 8, bkColor);
+                  }
+                }
+              }
+            });
+          }
         }
       }
 
@@ -92,9 +113,10 @@ export class GameAreaEntity extends AbstractEntity {
               var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
               var idItem = this.layoutObjects[item];
               if (idItem !== false) {
-                var attr = this.roomData.graphicData[idItem].substring(0, 2);
+                var itemData = graphicData[idItem];
+                var attr = itemData.substring(0, 2);
                 if (this.staticKinds.includes(idItem)) {
-                  if (this.graphicCache[idItem].needToRefresh(this, 8, 8)) {
+                  if (this.graphicCache[itemData].needToRefresh(this, 8, 8)) {
                     var penColor = this.penColorByAttr(this.app.hexToInt(attr));
                     var bkColor = this.bkColorByAttr(this.app.hexToInt(attr));
                     if (bkColor == roomBkColor) {
@@ -104,29 +126,66 @@ export class GameAreaEntity extends AbstractEntity {
                       penColor = bkColor;
                     }
                     for (var y = 0; y < 8; y++) {
-                      var spriteLine = this.app.hexToBin(this.roomData.graphicData[idItem].substring((y+1)*2, (y+1)*2+2));
+                      var spriteLine = this.app.hexToBin(itemData.substring((y+1)*2, (y+1)*2+2));
                       for (var x = 0; x < 8; x++) {
                         if (spriteLine[x] == '1') {
-                          this.app.layout.paintRect(this.graphicCache[idItem].ctx, x, y, 1, 1, penColor);
+                          this.app.layout.paintRect(this.graphicCache[itemData].ctx, x, y, 1, 1, penColor);
                         }
                       }
                     }
                   }
                 }
-                this.drawingCache[f].ctx.drawImage(this.graphicCache[idItem].canvas, column*8*this.app.layout.ratio, r*8*this.app.layout.ratio);
+                this.drawingCache[f].ctx.drawImage(this.graphicCache[itemData].canvas, column*8*this.app.layout.ratio, r*8*this.app.layout.ratio);
               }
             }
           });
         }
 
-        // ramp
-        if ('ramp' in this.roomData.graphicData) {
-          var rampData = this.roomData.graphicData.ramp;
+        // floors - penColor
+        if ('floors' in graphicData) {
+          graphicData.floors.forEach((floorData) => {
+            if (this.graphicCache[floorData.data].needToRefresh(this, 8, 8)) {
+              var attr = floorData.data.substring(0, 2);
+              var penColor = this.penColorByAttr(this.app.hexToInt(attr));
+              var bkColor = this.bkColorByAttr(this.app.hexToInt(attr));
+              if (bkColor == roomBkColor) {
+                bkColor = false;
+              }
+              if (f == 3) {
+                penColor = bkColor;
+              }
+              for (var y = 0; y < 8; y++) {
+                var spriteLine = this.app.hexToBin(floorData.data.substring((y+1)*2, (y+1)*2+2));
+                for (var x = 0; x < 8; x++) {
+                  if (spriteLine[x] == '1') {
+                    this.app.layout.paintRect(this.graphicCache[floorData.data].ctx, x, y, 1, 1, penColor);
+                  }
+                }
+              }
+            }
+            var locations = false;
+            if ('locations' in floorData) {
+              locations = floorData.locations;
+            } else {
+              locations = [floorData.location];
+            }
+            locations.forEach((location) => {
+              for (var w = 0; w < floorData.width; w++) {
+                for (var h = 0; h < floorData.height; h++) {
+                  this.drawingCache[f].ctx.drawImage(this.graphicCache[floorData.data].canvas, (location.x+w)*8*this.app.layout.ratio, (location.y+h)*8*this.app.layout.ratio);
+                }
+              }
+            });
+          });
+        }
+
+        // ramps
+        this.layoutExtends.ramps.forEach((rampData) => {
           var gradient = 1;
           if (rampData.gradient == 'left') {
               gradient = -1;
           }
-          if (this.graphicCache['ramp'].needToRefresh(this, 8, 8)) {
+          if (this.graphicCache[rampData.data].needToRefresh(this, 8, 8)) {
             var attr = rampData.data.substring(0, 2);
             var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(attr));
             if (this.monochromeColor !== false) {
@@ -137,27 +196,35 @@ export class GameAreaEntity extends AbstractEntity {
               bkColor = false;
             }
             if (bkColor != false) {
-              this.app.layout.paintRect(this.graphicCache['ramp'].ctx, 0, 0, 8, 8, bkColor);
+              this.app.layout.paintRect(this.graphicCache[rampData.data].ctx, 0, 0, 8, 8, bkColor);
             }
             for (var y = 0; y < 8; y++) {
               var spriteLine = this.app.hexToBin(rampData.data.substring((y+1)*2, (y+1)*2+2));
               for (var x = 0; x < 8; x++) {
                 if (spriteLine[x] == '1') {
-                  this.app.layout.paintRect(this.graphicCache['ramp'].ctx, x, y, 1, 1, penColor);
+                  this.app.layout.paintRect(this.graphicCache[rampData.data].ctx, x, y, 1, 1, penColor);
                 }
               }
             }
           }
-          for (var pos = 0; pos < this.app.hexToInt(rampData.length); pos++) {
-            this.drawingCache[f].ctx.drawImage(this.graphicCache['ramp'].canvas, (rampData.location.x+pos*gradient)*8*this.app.layout.ratio, (rampData.location.y-pos)*8*this.app.layout.ratio);
+          var locations = false;
+          if ('locations' in rampData) {
+            locations = rampData.locations;
+          } else {
+            locations = [rampData.location];
           }
-        }
+          locations.forEach((location) => {
+            for (var pos = 0; pos < rampData.length; pos++) {
+              this.drawingCache[f].ctx.drawImage(this.graphicCache[rampData.data].canvas, (location.x+pos*gradient)*8*this.app.layout.ratio, (location.y-pos)*8*this.app.layout.ratio);
+            }
+          });
+        });
 
         this.layoutObjects.forEach((idItem) => {
-          if (idItem !== false && idItem in this.roomData.graphicData) {            
-            var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
+          if (idItem !== false && idItem in graphicData) {            
+            var attr = this.app.hexToInt(graphicData[idItem].substring(0, 2));
             if ((attr&128) == 128) {
-              this.graphicCache[idItem].cleanCache();
+              this.graphicCache[graphicData[idItem]].cleanCache();
             }
           }
         });
@@ -204,7 +271,43 @@ export class GameAreaEntity extends AbstractEntity {
   setData(data) {
     this.roomData = data;
 
-    this.bkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(this.roomData.bkColor), 56, 8);
+    var graphicData = data.graphicData;
+    if ('ramps' in graphicData) {
+      this.layoutExtends.ramps = [...graphicData.ramps];
+    }
+
+    if ('extends' in graphicData) {
+      data.layout.forEach((row, r) => {
+        for (var column = 0; column < 32; column++) {
+          var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
+          var idItem = this.layoutObjects[item];
+          if (idItem !== false) {
+            if (this.staticKinds.includes(idItem)) {
+              Object.keys(graphicData.extends).forEach((key) => {
+                if (key == idItem) {
+                  var objData = {
+                    data: graphicData[idItem],
+                    location: {
+                      x: column,
+                      y: r
+                    },
+                    length: 1
+                  };
+                  switch (graphicData.extends[key].objects) {
+                    case 'ramps':
+                      objData.gradient = graphicData.extends[key].gradient;
+                      break;
+                  }
+                  this.layoutExtends[graphicData.extends[key].objects].push(objData);
+                }
+              });
+            }
+          }
+        }
+      });
+    }
+
+    this.bkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(data.bkColor), 56, 8);
     this.bkColorForRestore = this.bkColor;
 
     // Willy
@@ -224,14 +327,28 @@ export class GameAreaEntity extends AbstractEntity {
     this.drawingCache[2].cleanCache();
     this.drawingCache[3].cleanCache();
     this.graphicCache = {};
-    Object.keys(data.graphicData).forEach((key) => {
+    Object.keys(graphicData).forEach((key) => {
       if (this.staticKinds.includes(key)) {
-        this.graphicCache[key] = new DrawingCache(this.app);
+        if (!(graphicData[key] in this.graphicCache)) {
+          this.graphicCache[graphicData[key]] = new DrawingCache(this.app);
+        }
       }
     });
-    // prepare drawing cache for ramp
-    if ('ramp' in data.graphicData) {
-      this.graphicCache.ramp = new DrawingCache(this.app);
+    // prepare drawing cache for ramps
+    if ('ramps' in graphicData) {
+      graphicData.ramps.forEach((rampData) => {
+        if (!(rampData.data in this.graphicCache)) {
+          this.graphicCache[rampData.data] = new DrawingCache(this.app);
+        }
+      });
+    }
+    // prepare drawing cache for floors
+    if ('floors' in graphicData) {
+      graphicData.floors.forEach((floorData) => {
+        if (!(floorData.data in this.graphicCache)) {
+          this.graphicCache[floorData.data] = new DrawingCache(this.app);
+        }
+      });
     }
 
     // layout
@@ -259,118 +376,156 @@ export class GameAreaEntity extends AbstractEntity {
       }
     });
 
-    // ramp
-    this.initData.ramps = [];
-    if ('ramp' in data.graphicData) {
-      var rampData = data.graphicData.ramp;
-      var rampLength = this.app.hexToInt(rampData.length);
-      var rampInitData = {
-        gradient: rampData.gradient,
-        width: rampLength*8,
-        height: rampLength*8,
-        frame: 0,
-        direction: 0
-      };
-      switch (rampData.gradient) {
-        case 'right':
-          rampInitData.x = rampData.location.x*8;
-          rampInitData.y = (rampData.location.y-rampLength+1)*8;
-          break;
-        case 'left':
-          rampInitData.x = (rampData.location.x-rampLength+1)*8;
-          rampInitData.y = (rampData.location.y-rampLength+1)*8;
-          break;
-      }
-      this.initData.ramps.push(rampInitData);
-    }
-
-    // conveyor
-    this.initData.conveyors = [];
-    if ('conveyor' in data.graphicData) {
-      var conveyorData = data.graphicData.conveyor;
-      var attr = this.app.hexToInt(conveyorData.data.substring(0, 2));
-      var penColor = this.app.platform.penColorByAttr(attr);
-      var bkColor = this.app.platform.bkColorByAttr(attr);
-      if (bkColor == this.bkColor) {
-        bkColor = false;
-      }
-      var entity = new SpriteEntity(this, conveyorData.location.x*8, conveyorData.location.y*8, penColor, bkColor, 0, 0);
-      entity.setFixSize(8, 8);
-      entity.setRepeatX(this.app.hexToInt(conveyorData.length));
-      var conveyorSpriteData = conveyorData.data.substring(2, 18);
-      entity.setGraphicsDataFromHexStr(conveyorSpriteData);
-      entity.cloneSprite(0);
-      var rotateDirection = 1;
-      if (conveyorData.moving == 'right') {
-        rotateDirection = -1;
-      }
-      entity.rotateSpriteRow(1, 0, -2*rotateDirection);
-      entity.rotateSpriteRow(1, 2, 2*rotateDirection);
-      entity.cloneSprite(1);
-      entity.rotateSpriteRow(2, 0, -2*rotateDirection);
-      entity.rotateSpriteRow(2, 2, 2*rotateDirection);
-      entity.cloneSprite(2);
-      entity.rotateSpriteRow(3, 0, -2*rotateDirection);
-      entity.rotateSpriteRow(3, 2, 2*rotateDirection);
-      var conveyorInitData = {
-        x: conveyorData.location.x*8,
-        y: conveyorData.location.y*8,
-        width: this.app.hexToInt(conveyorData.length)*8,
-        height: 8,
-        frame: 0,
-        direction: 0,
-        moving: conveyorData.moving
-      };
-      if ((attr & 128) == 128) {
-        var reverseSpriteData = '';
-        for (var s = 0; s < 8; s++) {
-          var hexStr = this.app.intToHex((this.app.hexToInt(conveyorSpriteData.substring(s*2, s*2+2))^255));
-          hexStr.padStart(2, '0');
-          reverseSpriteData = reverseSpriteData+hexStr;
+    // floors
+    if ('floors' in graphicData) {
+      graphicData.floors.forEach((floorData) => {
+        var locations = false;
+        if ('locations' in floorData) {
+          locations = floorData.locations;
+        } else {
+          locations = [floorData.location];
         }
-        entity.addGraphicsDataFromHexStr(reverseSpriteData);
-        entity.cloneSprite(4);
-        entity.rotateSpriteRow(5, 0, -2*rotateDirection);
-        entity.rotateSpriteRow(5, 2, 2*rotateDirection);
-        entity.cloneSprite(5);
-        entity.rotateSpriteRow(6, 0, -2*rotateDirection);
-        entity.rotateSpriteRow(6, 2, 2*rotateDirection);
-        entity.cloneSprite(6);
-        entity.rotateSpriteRow(7, 0, -2*rotateDirection);
-        entity.rotateSpriteRow(7, 2, 2*rotateDirection);
-        conveyorInitData.flashShiftFrames = 4;
-      }
-      this.addEntity(entity);
-      this.spriteEntities.conveyors.push(entity);
-      this.initData.conveyors.push(conveyorInitData);
+        locations.forEach((location) => {
+          for (var w = 0; w < floorData.width; w++) {
+            for (var h = 0; h < floorData.height; h++) {
+              var floorInitData = {x: (location.x+w)*8, y: (location.y+h)*8, width: 8, height: 8};
+              if ('moving' in floorData) {
+                floorInitData.moving = floorData.moving;
+              }
+              this.initData.floors.push(floorInitData);
+            }
+          }
+        });
+      });
     }
 
-    // rope
-    this.initData.ropes = []
-    if ('rope' in data) {
-      var color = this.app.platform.penColorByAttr(this.app.hexToInt(data.rope.attribute));
-      var x = data.rope.init.x;
-      var y = data.rope.init.y;
-      var ptr = data.rope.init.frame;
-      for (var r = 0; r <= data.rope.length; r++) {
-        var entity = new RopeEntity(this, x, y, 1, 1, color);
-        this.addEntity(entity);
-        this.spriteEntities.ropes.push(entity);
-        var ropeInitData = {
-          x: x,
-          y: y
+    // ramps
+    this.initData.ramps = [];
+    this.layoutExtends.ramps.forEach((rampData) => {
+      var rampLength = rampData.length;
+      var locations = false;
+      if ('locations' in rampData) {
+        locations = rampData.locations;
+      } else {
+        locations = [rampData.location];
+      }
+      locations.forEach((location) => {
+        var rampInitData = {
+          gradient: rampData.gradient,
+          width: rampLength*8,
+          height: rampLength*8,
+          frame: 0,
+          direction: 0
         };
-        if (r == 0) {
-          ropeInitData.length =  data.rope.length;
-          ropeInitData.frame = data.rope.init.frame;
-          ropeInitData.frames = data.rope.frames;       
-          ropeInitData.direction = data.rope.init.direction;   
+        switch (rampData.gradient) {
+          case 'right':
+            rampInitData.x = location.x*8;
+            rampInitData.y = (location.y-rampLength+1)*8;
+            break;
+          case 'left':
+            rampInitData.x = (location.x-rampLength+1)*8;
+            rampInitData.y = (location.y-rampLength+1)*8;
+            break;
+        }
+        if ('moving' in rampData) {
+          rampInitData.moving = rampData.moving;
+        }
+        this.initData.ramps.push(rampInitData);
+      });
+    });
+
+    // conveyors
+    this.initData.conveyors = [];
+    if ('conveyors' in graphicData) {
+      graphicData.conveyors.forEach((conveyorData) => {
+        var attr = this.app.hexToInt(conveyorData.data.substring(0, 2));
+        var penColor = this.app.platform.penColorByAttr(attr);
+        var bkColor = this.app.platform.bkColorByAttr(attr);
+        if (bkColor == this.bkColor) {
+          bkColor = false;
+        }
+        var entity = new SpriteEntity(this, conveyorData.location.x*8, conveyorData.location.y*8, penColor, bkColor, 0, 0);
+        entity.setFixSize(8, 8);
+        entity.setRepeatX(this.app.hexToInt(conveyorData.length));
+        var conveyorSpriteData = conveyorData.data.substring(2, 18);
+        entity.setGraphicsDataFromHexStr(conveyorSpriteData);
+        entity.cloneSprite(0);
+        var rotateDirection = 1;
+        if (conveyorData.moving == 'right') {
+          rotateDirection = -1;
+        }
+        entity.rotateSpriteRow(1, 0, -2*rotateDirection);
+        entity.rotateSpriteRow(1, 2, 2*rotateDirection);
+        entity.cloneSprite(1);
+        entity.rotateSpriteRow(2, 0, -2*rotateDirection);
+        entity.rotateSpriteRow(2, 2, 2*rotateDirection);
+        entity.cloneSprite(2);
+        entity.rotateSpriteRow(3, 0, -2*rotateDirection);
+        entity.rotateSpriteRow(3, 2, 2*rotateDirection);
+        var conveyorInitData = {
+          x: conveyorData.location.x*8,
+          y: conveyorData.location.y*8,
+          width: conveyorData.length*8,
+          height: 8,
+          frame: 0,
+          direction: 0,
+          moving: conveyorData.moving
+        };
+        if ((attr & 128) == 128) {
+          var reverseSpriteData = '';
+          for (var s = 0; s < 8; s++) {
+            var hexStr = this.app.intToHex((this.app.hexToInt(conveyorSpriteData.substring(s*2, s*2+2))^255));
+            hexStr.padStart(2, '0');
+            reverseSpriteData = reverseSpriteData+hexStr;
+          }
+          entity.addGraphicsDataFromHexStr(reverseSpriteData);
+          entity.cloneSprite(4);
+          entity.rotateSpriteRow(5, 0, -2*rotateDirection);
+          entity.rotateSpriteRow(5, 2, 2*rotateDirection);
+          entity.cloneSprite(5);
+          entity.rotateSpriteRow(6, 0, -2*rotateDirection);
+          entity.rotateSpriteRow(6, 2, 2*rotateDirection);
+          entity.cloneSprite(6);
+          entity.rotateSpriteRow(7, 0, -2*rotateDirection);
+          entity.rotateSpriteRow(7, 2, 2*rotateDirection);
+          conveyorInitData.flashShiftFrames = 4;
+        }
+        this.addEntity(entity);
+        this.spriteEntities.conveyors.push(entity);
+        this.initData.conveyors.push(conveyorInitData);
+      });
+    }
+
+    // ropes
+    this.initData.ropes = []
+    if ('ropes' in data) {
+      data.ropes.forEach((ropeData, rope) => {
+        this.spriteEntities.ropes.push({nodes:[]});
+        var color = this.app.platform.penColorByAttr(this.app.hexToInt(ropeData.attribute));
+        var x = ropeData.init.x;
+        var y = ropeData.init.y;
+        var ptr = Math.abs(ropeData.init.frame);
+        var ropeInitData = {
+          length: ropeData.length,
+          frame: ropeData.init.frame,
+          direction: ropeData.init.direction,
+          prevDirection: ropeData.init.direction,
+          frames: ropeData.frames,
+          relativeCoordinates: ropeData.relativeCoordinates,
+          nodes: []
+        };
+
+        for (var r = 0; r <= ropeData.length; r++) {
+          var entity = new RopeEntity(this, x, y, 1, 1, color);
+          this.addEntity(entity);
+          this.spriteEntities.ropes[rope].nodes.push(entity);
+          ropeInitData.nodes.push({x: x, y: y});
+          x += ropeData.relativeCoordinates[0][ptr]*Math.sign(ropeData.init.frame);
+          y += ropeData.relativeCoordinates[1][ptr];
+          ptr++;
         }
         this.initData.ropes.push(ropeInitData);
-        x += this.ropeRelativeCoordinates[0][ptr];
-        y += this.ropeRelativeCoordinates[1][ptr];
-        ptr++;
-      }
+      });
     }
 
     // guardians
@@ -457,7 +612,7 @@ export class GameAreaEntity extends AbstractEntity {
         var entity = new SpriteEntity(this, item.x*8, item.y*8, false, false, 0, 0);
         this.addEntity(entity);
         entity.setColorsMap({1: {0: penColor0, 1: penColor1, 2: penColor2, 3: penColor3}});
-        entity.setGraphicsDataFromHexStr(data.graphicData.item);
+        entity.setGraphicsDataFromHexStr(graphicData.item);
         entity.cloneSprite(0);
         entity.cloneSprite(0);
         entity.cloneSprite(0);
@@ -484,31 +639,44 @@ export class GameAreaEntity extends AbstractEntity {
     }
   } // setData
     
-  updateData(data, objectsType) {
-    data.gameData[objectsType].forEach((object, o) => {
-      var paintCorrectionX = 0;
-      var paintCorrectionY = 0;
-      if ('paintCorrections' in object) {
-        paintCorrectionX = object.paintCorrections.x;
-        paintCorrectionY = object.paintCorrections.y;
+  updateData(gameData, objectsType, subType) {
+    gameData[objectsType].forEach((object, o) => {
+      var spriteEntity = false;
+      var subObjects = false;
+      if (subType === false) {
+        subObjects = [object];
+        spriteEntity = this.spriteEntities[objectsType][o];
+      } else {
+        subObjects = object[subType];
       }
-      this.spriteEntities[objectsType][o].x = object.x+paintCorrectionX;
-      this.spriteEntities[objectsType][o].y = object.y+paintCorrectionY;
-      var flashShiftFrames = 0;
-      if (('flashShiftFrames' in object) && this.app.stack.flashState) {
-        flashShiftFrames = object.flashShiftFrames;
-      }
-      this.spriteEntities[objectsType][o].frame = object.frame+flashShiftFrames;
-      this.spriteEntities[objectsType][o].direction = object.direction;
-      if ('width' in object) {
-        this.spriteEntities[objectsType][o].width = object.width-paintCorrectionX;
-      }
-      if ('height' in object) {
-        this.spriteEntities[objectsType][o].height = object.height-paintCorrectionY;
-      }
-      if ('hide' in object) {
-        this.spriteEntities[objectsType][o].hide = object.hide;
-      }
+      subObjects.forEach((subObj, s) => {
+        if (subType !== false) {
+          spriteEntity = this.spriteEntities[objectsType][o][subType][s];
+        }
+        var paintCorrectionX = 0;
+        var paintCorrectionY = 0;
+        if ('paintCorrections' in subObj) {
+          paintCorrectionX = subObj.paintCorrections.x;
+          paintCorrectionY = subObj.paintCorrections.y;
+        }
+        spriteEntity.x = subObj.x+paintCorrectionX;
+        spriteEntity.y = subObj.y+paintCorrectionY;
+        var flashShiftFrames = 0;
+        if (('flashShiftFrames' in subObj) && this.app.stack.flashState) {
+          flashShiftFrames = subObj.flashShiftFrames;
+        }
+        spriteEntity.frame = subObj.frame+flashShiftFrames;
+        spriteEntity.direction = subObj.direction;
+        if ('width' in subObj) {
+          spriteEntity.width = subObj.width-paintCorrectionX;
+        }
+        if ('height' in subObj) {
+          spriteEntity.height = subObj.height-paintCorrectionY;
+        }
+        if ('hide' in subObj) {
+          spriteEntity.hide = subObj.hide;
+        }
+      });
     });
   } // updateData
 
@@ -548,10 +716,22 @@ export class GameAreaEntity extends AbstractEntity {
     this.setBkColor(bkColor);
 
     Object.keys(this.spriteEntities).forEach((objectsType) => {
-      this.spriteEntities[objectsType].forEach((object) => {
-        object.bkColor = false;
-        object.setPenColor(monochromeColor);
-      });
+      switch (objectsType) {
+        case 'ropes':
+            this.spriteEntities.ropes.forEach((rope) => {
+              rope.nodes.forEach((node) => {
+                node.bkColor = false;
+                node.setPenColor(monochromeColor);
+              });
+            });
+          break;
+
+        default:
+          this.spriteEntities[objectsType].forEach((object) => {
+            object.bkColor = false;
+            object.setPenColor(monochromeColor);
+          });
+      }
     });
   } // setMonochromeColors
 

@@ -1,9 +1,9 @@
 {
-  "name": "Back Door",
-  "shortName": "Back Door",
-  "bkColor": "00",
-  "borderColor": "01",
-  "layout": [
+  "name":"Back Door",
+  "shortName":"Back Door",
+  "bkColor":"00",
+  "borderColor":"01",
+  "layout":[
     "00000000A0000000",
     "00000000A0000000",
     "00000000A0000000",
@@ -21,35 +21,39 @@
     "000002AAA0000000",
     "00000AAAA0000000"
   ],
-  "graphicData": {
-    "floor": "03FFFFFFAA55AA5500",
-    "wall": "2669D2A54B962D5AB4",
-    "item": "18183C7E6262627E",
-    "ramp": {
-      "data": "0703030D0F363DDAF4",
-      "gradient": "right",
-      "location": {"x": 9, "y": 15},
-       "length": "05"
-    },
-    "conveyor": {
-      "data": "22F0F0F0F066660000",
-      "moving": "right",
-      "location": {"x": 18, "y": 15},
-       "length": "0E"
-    }
-  },
-   "willy":{
-      "init":{
-         "x":240,
-         "y":72,
-         "direction":1,
-         "frame":0
+  "graphicData":{
+    "floor":"03FFFFFFAA55AA5500",
+    "wall":"2669D2A54B962D5AB4",
+    "item":"18183C7E6262627E",
+    "ramps":[
+      {
+        "data":"0703030D0F363DDAF4",
+        "gradient":"right",
+        "location":{
+          "x":9,
+          "y":15
+        },
+        "length":5
       }
-   },  
-  "adjoiningRoom": {
-    "left": false,
-    "right": "34",
-    "above": "37",
-    "below": "33"
+    ],
+    "conveyors":[
+      {
+        "data":"22F0F0F0F066660000",
+        "moving":"right",
+        "location":{
+          "x":18,
+          "y":15
+        },
+        "length":14
+      }
+    ]
+  },
+  "willy":{
+    "init":{
+      "x":240,
+      "y":72,
+      "direction":1,
+      "frame":0
+    }
   }
 }

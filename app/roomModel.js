@@ -20,7 +20,7 @@ export class RoomModel extends AbstractModel {
     this.id = 'RoomModel';
 
     this.roomNumber = roomNumber;
-    this.adjoiningRoom = null;
+    this.adjoiningRoom = {left:0, right:0, above:0, below:0};
     this.demo = demo;
     this.bkAnimation = false;
     this.animationTime = false;
@@ -68,8 +68,8 @@ export class RoomModel extends AbstractModel {
             switch (objectsType) {
               case 'info':
                 if (event.data.gameData.info[7] !== false) {
-                  this.app.timeCounter += event.data.gameData.info[0]; 
-                  this.sendEvent(1, {id: 'changeRoom', adjoiningRoom: this.app.hexToInt(this.adjoiningRoom[event.data.gameData.info[7]]), willyData: event.data.gameData.info[8]});
+                  this.app.timeCounter += event.data.gameData.info[0];
+                  this.sendEvent(1, {id: 'changeRoom', adjoiningRoom: this.adjoiningRoom[event.data.gameData.info[7]], willyData: event.data.gameData.info[8]});
                 }
                 for (var l = 0; l < this.app.lives; l++) {
                   this.gameInfoEntity.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
@@ -107,8 +107,12 @@ export class RoomModel extends AbstractModel {
               case 'ramps':
                 break;
 
+              case 'ropes':
+                this.gameAreaEntity.updateData(event.data.gameData, 'ropes', 'nodes');
+                break;
+
               default:
-                this.gameAreaEntity.updateData(event.data, objectsType);
+                this.gameAreaEntity.updateData(event.data.gameData, objectsType, false);
             }
           });
           this.drawModel();
@@ -183,7 +187,36 @@ export class RoomModel extends AbstractModel {
       this.app.willyRoomsCache.direction = data.data.willy.init.direction;
     }
 
-    this.adjoiningRoom = data.data.adjoiningRoom;
+    if ('teleport' in data.data) {
+      if ('left' in data.data.teleport) {
+        this.adjoiningRoom.left = data.data.teleport.left;
+      }
+      if ('right' in data.data.teleport) {
+        this.adjoiningRoom.right = data.data.teleport.right;
+      }
+      if ('above' in data.data.teleport) {
+        this.adjoiningRoom.above = data.data.teleport.above;
+      }
+      if ('below' in data.data.teleport) {
+        this.adjoiningRoom.below = data.data.teleport.below;
+      }
+    }
+
+    var x = this.app.roomsMapPositions[this.roomNumber].x;
+    var y = this.app.roomsMapPositions[this.roomNumber].y;
+    var roomsMap = this.app.globalData.roomsMap.positions;
+    if (!this.adjoiningRoom.left && x > 0 && roomsMap[y][x-1] !== false) {
+      this.adjoiningRoom.left = roomsMap[y][x-1];
+    }
+    if (!this.adjoiningRoom.right && x < roomsMap[y].length-1 && roomsMap[y][x+1] !== false) {
+      this.adjoiningRoom.right = roomsMap[y][x+1];
+    }
+    if (!this.adjoiningRoom.above && y > 0 && roomsMap[y-1][x] !== false) {
+      this.adjoiningRoom.above = roomsMap[y-1][x];
+    }
+    if (!this.adjoiningRoom.below && y < roomsMap.length-1 && roomsMap[y+1][x] !== false) {
+      this.adjoiningRoom.below = roomsMap[y+1][x];
+    }
 
     this.gameInfoEntity.roomNameEntity.setText(data.data.name);
     this.app.roomName = data.data.name;
@@ -432,8 +465,6 @@ export class RoomModel extends AbstractModel {
         return true;
 
       case 'changeRoom':
-        console.log("Room: "+event.adjoiningRoom);
-        console.log('   "willy":{\n      "init":{\n         "x":'+event.willyData.x+',\n         "y":'+event.willyData.y+',\n         "direction":'+event.willyData.direction+',\n         "frame":'+event.willyData.frame+'\n      }\n   },\n');
         this.app.roomNumber = event.adjoiningRoom;
         this.app.willyRoomsCache = event.willyData;
         this.app.startRoom(false, false, false, false, false);

@@ -18,6 +18,7 @@ export class RoomMapEntity extends AbstractEntity {
     this.roomNumber = roomNumber;
     this.locked = locked;
     this.roomData = null;
+    this.layoutExtends = {ramps:[]};
     this.mapKinds = ['floor', 'wall', 'nasty'];
     this.layoutObjects = [false, 'floor', 'wall', 'nasty'];
     this.roomNameEntity = null;
@@ -25,11 +26,6 @@ export class RoomMapEntity extends AbstractEntity {
 
     this.app.layout.newDrawingCache(this, 0);
     this.app.layout.newDrawingCropCache(this);
-
-    this.ropeRelativeCoordinates = [
-      [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1,1,2,1,1,2,2,3,2,3,2,3,3,3,3,3,3],
-      [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,2,3,2,3,2,3,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
-    ];
 } // constructor
 
   init() {
@@ -53,6 +49,42 @@ export class RoomMapEntity extends AbstractEntity {
   setData(data) {
     this.roomData = data.data;
     this.roomNameEntity.setText(data.data.shortName);
+
+    var graphicData = data.data.graphicData;
+    if ('ramps' in graphicData) {
+      this.layoutExtends.ramps = [...graphicData.ramps];
+    }
+
+    if ('extends' in graphicData) {
+      data.data.layout.forEach((row, r) => {
+        for (var column = 0; column < 32; column++) {
+          var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
+          var idItem = this.layoutObjects[item];
+          if (idItem !== false) {
+            if (this.mapKinds.includes(idItem)) {
+              Object.keys(graphicData.extends).forEach((key) => {
+                if (key == idItem) {
+                  var objData = {
+                    data: graphicData[idItem],
+                    location: {
+                      x: column,
+                      y: r
+                    },
+                    length: 1
+                  };
+                  switch (graphicData.extends[key].objects) {
+                    case 'ramps':
+                      objData.gradient = graphicData.extends[key].gradient;
+                      break;
+                  }
+                  this.layoutExtends[graphicData.extends[key].objects].push(objData);
+                }
+              });
+            }
+          }
+        }
+      });
+    }
   } // setData
 
   drawEntity() {
@@ -96,23 +128,24 @@ export class RoomMapEntity extends AbstractEntity {
       if (this.drawingCache[0].needToRefresh(this, this.width, this.height)) {
 
         // layout
+        var graphicData = this.roomData.graphicData;
         this.roomData.layout.forEach((row, r) => {
           for (var column = 0; column < 32; column++) {
             var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
             var idItem = this.layoutObjects[item];
             if (idItem !== false) {
-              var attr = this.app.hexToInt(this.roomData.graphicData[idItem].substring(0, 2));
+              var attr = this.app.hexToInt(graphicData[idItem].substring(0, 2));
               if (this.mapKinds.includes(idItem)) {
                 var penColor = this.app.platform.penColorByAttr(attr);
                 var bkColor = this.app.platform.bkColorByAttr(attr);
-                if (bkColor == roomBkColor) {
-                  bkColor = false;
-                }
                 if (bkColor != false) {
                   this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 2, 2, bkColor);
                 }
                 switch (idItem) {
                   case 'floor':
+                    if (bkColor == roomBkColor) {
+                      bkColor = false;
+                    }
                     if (bkColor === false || penColor != roomBkColor) {
                       this.app.layout.paintRect(this.drawingCache[0].ctx, column*2, r*2, 2, 1, penColor);
                     }
@@ -135,9 +168,39 @@ export class RoomMapEntity extends AbstractEntity {
           }
         });
 
-        // ramp
-        if ('ramp' in this.roomData.graphicData) {
-          var rampData = this.roomData.graphicData.ramp;
+        // floors
+        if ('floors' in graphicData) {
+          graphicData.floors.forEach((floorData) => {
+            var attr = this.app.hexToInt(floorData.data.substring(0, 2));
+            var penColor = this.app.platform.penColorByAttr(attr);
+            var bkColor = this.app.platform.bkColorByAttr(attr);
+            if (bkColor == roomBkColor) {
+              bkColor = false;
+            }
+            var locations = false;
+            if ('locations' in floorData) {
+              locations = floorData.locations;
+            } else {
+              locations = [floorData.location];
+            }
+            locations.forEach((location) => {
+              for (var w = 0; w < floorData.width; w++) {
+                for (var h = 0; h < floorData.height; h++) {
+                  if (bkColor != false) {
+                    this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2, (location.y+h)*2, 2, 2, bkColor);
+                  }
+                  if (bkColor === false || penColor != roomBkColor) {
+                    this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2, (location.y+h)*2, 2, 1, penColor);
+                  }
+                  this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
+                }
+              }
+            });
+          });
+        }
+
+        // ramps
+        this.layoutExtends.ramps.forEach((rampData) => {
           var gradient = 1;
           var corrX = 1;
           if (rampData.gradient == 'left') {
@@ -147,47 +210,48 @@ export class RoomMapEntity extends AbstractEntity {
           var attr = rampData.data.substring(0, 2);
           var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(attr));
           var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(attr)&63);
-          if (bkColor == roomBkColor) {
-            bkColor = false;
+          var locations = false;
+          if ('locations' in rampData) {
+            locations = rampData.locations;
+          } else {
+            locations = [rampData.location];
           }
-          for (var pos = 0; pos < this.app.hexToInt(rampData.length); pos++) {
-            if (bkColor != false) {
-              this.app.layout.paintRect(this.drawingCache[0].ctx, (rampData.location.x+pos*gradient)*2, (rampData.location.y-pos)*2, 2, 2, bkColor);
+          locations.forEach((location) => {
+            for (var pos = 0; pos < rampData.length; pos++) {
+              this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+pos*gradient)*2, (location.y-pos)*2, 2, 2, bkColor);
+              this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+pos*gradient)*2+corrX, (location.y-pos)*2, 1, 1, penColor);
+              this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+pos*gradient)*2-gradient+corrX, (location.y-pos)*2+1, 1, 1, penColor);
             }
-            this.app.layout.paintRect(this.drawingCache[0].ctx, (rampData.location.x+pos*gradient)*2+corrX, (rampData.location.y-pos)*2, 1, 1, penColor);
-            this.app.layout.paintRect(this.drawingCache[0].ctx, (rampData.location.x+pos*gradient)*2-gradient+corrX, (rampData.location.y-pos)*2+1, 1, 1, penColor);
-          }
+          });
+        });
+
+        // conveyors
+        if ('conveyors' in graphicData) {
+          graphicData.conveyors.forEach((conveyorData) => {
+            var attr = this.app.hexToInt(conveyorData.data.substring(0, 2));
+            var penColor = this.app.platform.penColorByAttr(attr);
+            var bkColor = this.app.platform.bkColorByAttr(attr);
+            this.app.layout.paintRect(this.drawingCache[0].ctx, conveyorData.location.x*2, conveyorData.location.y*2, conveyorData.length*2, 2, bkColor);
+            this.app.layout.paintRect(this.drawingCache[0].ctx, conveyorData.location.x*2, conveyorData.location.y*2, conveyorData.length*2, 1, penColor);
+          });
         }
 
-        // conveyor
-        if ('conveyor' in this.roomData.graphicData) {
-          var conveyorData = this.roomData.graphicData.conveyor;
-          var attr = this.app.hexToInt(conveyorData.data.substring(0, 2));
-          var penColor = this.app.platform.penColorByAttr(attr);
-          var bkColor = this.app.platform.bkColorByAttr(attr);
-          if (bkColor == roomBkColor) {
-            bkColor = false;
-          }
-          if (bkColor != false) {
-            this.app.layout.paintRect(this.drawingCache[0].ctx, conveyorData.location.x*2, conveyorData.location.y*2, this.app.hexToInt(conveyorData.length)*2, 2, bkColor);
-          }
-          this.app.layout.paintRect(this.drawingCache[0].ctx, conveyorData.location.x*2, conveyorData.location.y*2, this.app.hexToInt(conveyorData.length)*2, 1, penColor);
-        }
-
-        // rope
-        if ('rope' in this.roomData) {
-          var color = this.app.platform.penColorByAttr(this.app.hexToInt(this.roomData.rope.attribute));
-          var x = this.roomData.rope.init.x;
-          var y = this.roomData.rope.init.y;
-          var ptr = this.roomData.rope.init.frame;
-          for (var r = 0; r <= this.roomData.rope.length; r++) {
-            if (r%4 == 0) {
-              this.app.layout.paintRect(this.drawingCache[0].ctx, Math.floor(x/4), Math.floor(y/4), 1, 1, color);
+        // ropes
+        if ('ropes' in this.roomData) {
+          this.roomData.ropes.forEach((ropeData) => {
+            var color = this.app.platform.penColorByAttr(this.app.hexToInt(ropeData.attribute));
+            var x = ropeData.init.x;
+            var y = ropeData.init.y;
+            var ptr = Math.abs(ropeData.init.frame);
+            for (var r = 0; r <= ropeData.length; r++) {
+              if (r%4 == 0) {
+                this.app.layout.paintRect(this.drawingCache[0].ctx, Math.floor(x/4), Math.floor(y/4), 1, 1, color);
+              }
+              x += ropeData.relativeCoordinates[0][ptr]*Math.sign(ropeData.init.frame);
+              y += ropeData.relativeCoordinates[1][ptr];
+              ptr++;
             }
-            x += this.ropeRelativeCoordinates[0][ptr];
-            y += this.ropeRelativeCoordinates[1][ptr];
-            ptr++;
-          }
+          });
         }
 
         // gurdians

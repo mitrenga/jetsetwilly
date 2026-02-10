@@ -1,9 +1,9 @@
 {
-  "name": "The Front Door",
-  "shortName": "Front Door",
-  "bkColor": "28",
-  "borderColor": "02",
-  "layout": [
+  "name":"The Front Door",
+  "shortName":"Front Door",
+  "bkColor":"28",
+  "borderColor":"02",
+  "layout":[
     "0000000000000000",
     "0000000000000000",
     "0000000000000000",
@@ -21,29 +21,28 @@
     "4000000000000000",
     "A000000000000000"
   ],
-  "graphicData": {
-    "floor": "47FFAA77AA77AA55AA",
-    "wall": "3A20100EC13009C620",
-    "item": "0C1C1C1E1B3F78FF",
-    "ramp": {
-      "data": "2FC040B050AC54AB55",
-      "gradient": "left",
-      "location": {"x": 2, "y": 15},
-       "length": "02"
-    }
-  },
-   "willy":{
-      "init":{
-         "x":6,
-         "y":96,
-         "direction":0,
-         "frame":3
+  "graphicData":{
+    "floor":"47FFAA77AA77AA55AA",
+    "wall":"3A20100EC13009C620",
+    "item":"0C1C1C1E1B3F78FF",
+    "ramps":[
+      {
+        "data":"2FC040B050AC54AB55",
+        "gradient":"left",
+        "location":{
+          "x":2,
+          "y":15
+        },
+        "length":2
       }
-   },
-  "adjoiningRoom": {
-    "left": "0B",
-    "right": false,
-    "above": false,
-    "below": "05"
+    ]
+  },
+  "willy":{
+    "init":{
+      "x":6,
+      "y":96,
+      "direction":0,
+      "frame":3
+    }
   }
 }

@@ -10,10 +10,6 @@ var counter2 = 0;
 var counter4 = 0;
 var counter6 = 0;
 var gameData = null;
-var ropeRelativeCoordinates = [
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,2,2,1,1,2,1,1,2,2,3,2,3,2,3,3,3,3,3,3],
-  [3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,2,3,3,2,3,2,3,2,3,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2]
-];
 var controls = {left: false, right: false, jump: false};
 var jumpCounter = 0;
 var jumpDirection = 0;
@@ -23,8 +19,9 @@ var fallingDirection = 0;
 var mustMovingDirection = 0;
 var canMovingDirection = 0;
 var previousDirection = 0;
-var ropePosition = 0;
-var ropeProhibited = 0;
+var caughtRope = 0;
+var caughtNode = 0;
+var ropeProhibited = {rope: 0, counter: 0};
 var operation = 'walking';
 var pause = false;
 
@@ -76,45 +73,34 @@ function conveyors() {
 } // conveyors
 
 function ropes() {
-  if (gameData.ropes.length > 0) {
-    var firstElement = gameData.ropes[0];
-    switch (firstElement.direction) {
-      case 0:
-        if (firstElement.frame == firstElement.frames-1) {
-          firstElement.direction = 1;
-        } else {
-          firstElement.frame += 2;
-          if (firstElement.frame > -20 && firstElement.frame < 20) {
-            firstElement.frame += 2;
-          }
-        }
-        break;
-      case 1:
-        if (firstElement.frame == 1-firstElement.frames) {
-          firstElement.direction = 0;
-        } else {
-          firstElement.frame -= 2;
-          if (firstElement.frame > -20 && firstElement.frame < 20) {
-            firstElement.frame -= 2;
-          }
-        }
-        break;
-    }
-    var x = firstElement.x;
-    var y = firstElement.y;
-    var ptr = Math.abs(firstElement.frame);
-    for (var r = 1; r < gameData.ropes.length; r++) {
-      if (firstElement.frame < 0) {
-        x -= ropeRelativeCoordinates[0][ptr];
-      } else {
-        x += ropeRelativeCoordinates[0][ptr];
+  gameData.ropes.forEach((rope, r) => {
+
+    // update frame & direction
+    var direction = -(rope.direction*2-1);
+    if (Math.abs(rope.frame) >= rope.frames-1 && rope.prevDirection == rope.direction) {
+      rope.prevDirection = rope.direction;
+      rope.direction = Math.abs(rope.direction-1);
+      direction *= -1;
+    } else {
+      rope.prevDirection = rope.direction;
+      rope.frame += 2*Math.sign(direction);
+      if (Math.abs(rope.frame) < 20) {
+        rope.frame += 2*Math.sign(direction);
       }
-      y += ropeRelativeCoordinates[1][ptr];
-      gameData.ropes[r].x = x;
-      gameData.ropes[r].y = y;
+    }
+
+    // calc nodes coordinates
+    var x = rope.nodes[0].x;
+    var y = rope.nodes[0].y;
+    var ptr = Math.abs(rope.frame);
+    for (var node = 1; node < rope.nodes.length; node++) {
+      x += rope.relativeCoordinates[0][ptr]*Math.sign(rope.frame);
+      y += rope.relativeCoordinates[1][ptr];
+      rope.nodes[node].x = x;
+      rope.nodes[node].y = y;
       ptr++;
     }
-  }
+  });
 } // ropes
 
 function willy() {
@@ -122,7 +108,7 @@ function willy() {
     case 'walking':
       willyWalking();
       break;
-    case 'rope':
+    case 'onRope':
       willyOnRope();
       break;
   }
@@ -333,22 +319,27 @@ function willyWalking() {
     jumpDirection = 0;
   }
 
-  if ('ropes' in gameData && !ropeProhibited) {
-    var r = gameData.ropes.length-1;
-    while (r > 2) {
-      var rope = gameData.ropes[r];
-      if (!(rope.x+1 < willy.x+2 || rope.x > willy.x+6 || rope.y+1 < willy.y+6 || rope.y > willy.y+10)) {
-        operation = 'rope';
-        ropePosition = r;
-        jumpCounter = 0;
-        fallingCounter = 0;
-        postMessage({id: 'stopAudioChannel', channel: 'sounds'});
+  if ('ropes' in gameData && operation != 'onRope') {
+    gameData.ropes.forEach((rope, r) => {
+      if (!ropeProhibited.counter || ropeProhibited.rope != r) {
+        var n = rope.nodes.length-1;
+        while (n > 2) {
+          var node = rope.nodes[n];
+          if (!(node.x+1 < willy.x+2 || node.x > willy.x+6 || node.y+1 < willy.y+6 || node.y > willy.y+10)) {
+            operation = 'onRope';
+            caughtRope = r;
+            caughtNode = n;
+            jumpCounter = 0;
+            fallingCounter = 0;
+            postMessage({id: 'stopAudioChannel', channel: 'sounds'});
+          }
+          n--;
+        }
       }
-      r--;
-    }
+    });
   }
-  if (ropeProhibited > 0) {
-    ropeProhibited--;
+  if (ropeProhibited.counter > 0) {
+    ropeProhibited.counter--;
   }
 } // willyWalking
 
@@ -365,7 +356,8 @@ function willyOnRope() {
         jumpDirection = -1;
         break;
     }
-    ropeProhibited = 4;
+    ropeProhibited.rope = caughtRope;
+    ropeProhibited.counter = 4;
     willy.x = willy.x-willy.x%2+4*jumpDirection;
     willy.y = willy.y+willy.x%2-2;
     willy.frame = Math.floor(willy.x%8/2);
@@ -375,12 +367,12 @@ function willyOnRope() {
       if (willy.direction == 1) {
         willy.direction = 0;
       } else {
-        switch (gameData.ropes[0].direction) {
+        switch (gameData.ropes[caughtRope].direction) {
           case 0:
-            ropePosition++;
+            caughtNode++;
             break;
           case 1:
-            ropePosition--;
+            caughtNode--;
             break;
         }
       }
@@ -389,28 +381,28 @@ function willyOnRope() {
       if (willy.direction == 0) {
         willy.direction = 1;
       } else {
-        switch (gameData.ropes[0].direction) {
+        switch (gameData.ropes[caughtRope].direction) {
           case 0:
-            ropePosition--;
+            caughtNode--;
             break;
           case 1:
-            ropePosition++;
+            caughtNode++;
             break;
         }
       }
     }
-    if (ropePosition < 3) {
-      ropePosition = 3;
+    if (caughtNode < 3) {
+      caughtNode = 3;
     }
-    if (ropePosition > gameData.ropes[0].length) {
+    if (caughtNode > gameData.ropes[caughtRope].length) {
       operation = 'walking';
       fallingCounter = 1;
       willy.x = willy.x-willy.x%2;
       willy.y = willy.y+willy.x%2;
       postMessage({id: 'playSound', channel: 'sounds', sound: 'fallingSound'});
     } else {
-      willy.x = gameData.ropes[ropePosition].x-4;
-      willy.y = gameData.ropes[ropePosition].y-6;
+      willy.x = gameData.ropes[caughtRope].nodes[caughtNode].x-4;
+      willy.y = gameData.ropes[caughtRope].nodes[caughtNode].y-6;
     }
     willy.frame = Math.floor(willy.x%8/2);
   }

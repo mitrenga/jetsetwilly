@@ -84,24 +84,27 @@ export class RoomsMapModel extends AbstractModel {
           if (key.length == 1) {
             key = key.toUpperCase();
           }
+          var roomData = this.roomsMapEntities[this.selectionY][this.selectionX].roomData;
           switch (key) {        
             case 'ArrowUp':
             case 'GamepadUp':
-              if (this.adjustX == 0 && this.adjustY == 0 && this.adjustSelectionX == 0 && this.adjustSelectionY == 0) {
+              if ('teleport' in roomData && 'above' in roomData.teleport) {
+                this.selectAdjoiningRoom(roomData.teleport.above);
+              } else {
                 if (this.selectionY > 0 && this.app.globalData.roomsMap.positions[this.selectionY-1][this.selectionX] !== false) {
                   this.selectionY--;
                   this.adjustSelectionY -= 38;
                   if (this.roomSelectionEntity.y+this.adjustSelectionY < 0) {
                     this.adjustY += 38;
                   }
-                } else {
-                  this.selectAdjoiningRoom(this.roomsMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.above);
                 }
               }
               return true;
             case 'ArrowDown':
             case 'GamepadDown':
-              if (this.adjustX == 0 && this.adjustY == 0 && this.adjustSelectionX == 0 && this.adjustSelectionY == 0) {
+              if ('teleport' in roomData && 'below' in roomData.teleport) {
+                this.selectAdjoiningRoom(roomData.teleport.below);
+              } else {
                 var roomsMapPositions = this.app.globalData.roomsMap.positions;
                 if (this.selectionY < roomsMapPositions.length-1 && roomsMapPositions[this.selectionY+1][this.selectionX] !== false) {
                   this.selectionY++;
@@ -109,28 +112,28 @@ export class RoomsMapModel extends AbstractModel {
                   if (this.roomSelectionEntity.y+this.adjustSelectionY > 189-38) {
                     this.adjustY -= 38;
                   }
-                } else {
-                  this.selectAdjoiningRoom(this.roomsMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.below);
                 }
               }
               return true;
             case 'ArrowLeft':
             case 'GamepadLeft':
-              if (this.adjustX == 0 && this.adjustY == 0 && this.adjustSelectionX == 0 && this.adjustSelectionY == 0) {
+              if ('teleport' in roomData && 'left' in roomData.teleport) {
+                this.selectAdjoiningRoom(roomData.teleport.left);
+              } else {
                 if (this.selectionX > 0 && this.app.globalData.roomsMap.positions[this.selectionY][this.selectionX-1] !== false) {
                   this.selectionX--;
                   this.adjustSelectionX -= 64;
                   if (this.roomSelectionEntity.x+this.adjustSelectionX < 0) {
                     this.adjustX += 64;
                   }
-                } else {
-                  this.selectAdjoiningRoom(this.roomsMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.left);
                 }
               }
               return true;
             case 'ArrowRight':
             case 'GamepadRight':
-              if (this.adjustX == 0 && this.adjustY == 0 && this.adjustSelectionX == 0 && this.adjustSelectionY == 0) {
+              if ('teleport' in roomData && 'right' in roomData.teleport) {
+                this.selectAdjoiningRoom(roomData.teleport.right);
+              } else {
                 var roomsMapRowPositions = this.app.globalData.roomsMap.positions[this.selectionY];
                 if (this.selectionX < roomsMapRowPositions.length-1 && roomsMapRowPositions[this.selectionX+1] !== false) {
                   this.selectionX++;
@@ -138,8 +141,6 @@ export class RoomsMapModel extends AbstractModel {
                   if (this.roomSelectionEntity.x+this.adjustSelectionX > 255-64) {
                     this.adjustX -= 64;
                   }
-                } else {
-                  this.selectAdjoiningRoom(this.roomsMapEntities[this.selectionY][this.selectionX].roomData.adjoiningRoom.right);
                 }
               }
               return true;
@@ -178,36 +179,31 @@ export class RoomsMapModel extends AbstractModel {
 
   selectAdjoiningRoom(adjoiningRoom) {
     if (adjoiningRoom !== false) {
-      for (var y = 0; y < this.app.globalData.roomsMap.positions.length; y++) {
-        for (var x = 0; x < this.app.globalData.roomsMap.positions[y].length; x++) {
-          if (this.app.globalData.roomsMap.positions[y][x] === this.app.hexToInt(adjoiningRoom)) {
-            var deltaX = x - this.selectionX;
-            var deltaY = y - this.selectionY;
-            this.selectionX = x;
-            this.selectionY = y;
-            this.adjustSelectionX += deltaX*64;
-            this.adjustSelectionY += deltaY*38;
+      var x = this.app.roomsMapPositions[adjoiningRoom].x;
+      var y = this.app.roomsMapPositions[adjoiningRoom].y;
+      var deltaX = x - this.selectionX;
+      var deltaY = y - this.selectionY;
+      this.selectionX = x;
+      this.selectionY = y;
+      this.adjustSelectionX += deltaX*64;
+      this.adjustSelectionY += deltaY*38;
 
-            while (this.roomSelectionEntity.x+this.adjustX+this.adjustSelectionX < 0) {
-              this.adjustX += 64;
-            }
-            while (this.roomSelectionEntity.x+this.adjustX+this.adjustSelectionX > 255-64) {
-              this.adjustX -= 64;
-            }
-            while (this.roomSelectionEntity.y+this.adjustY+this.adjustSelectionY < 0) {
-              this.adjustY += 38;
-            }
-            while (this.roomSelectionEntity.y+this.adjustY+this.adjustSelectionY > 189-38) {
-              this.adjustY -= 38;
-            }
-            
-            if (false) {
-              this.adjustX -= deltaX*64;
-              this.adjustY -= deltaY*38;
-            }
-            return;
-          }
-        }
+      while (this.roomSelectionEntity.x+this.adjustX+this.adjustSelectionX < 0) {
+        this.adjustX += 64;
+      }
+      while (this.roomSelectionEntity.x+this.adjustX+this.adjustSelectionX > 255-64) {
+        this.adjustX -= 64;
+      }
+      while (this.roomSelectionEntity.y+this.adjustY+this.adjustSelectionY < 0) {
+        this.adjustY += 38;
+      }
+      while (this.roomSelectionEntity.y+this.adjustY+this.adjustSelectionY > 189-38) {
+        this.adjustY -= 38;
+      }
+      
+      if (false) {
+        this.adjustX -= deltaX*64;
+        this.adjustY -= deltaY*38;
       }
     }
   } // selectAdjoiningRoom

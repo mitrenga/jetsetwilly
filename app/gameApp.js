@@ -34,7 +34,7 @@ export class GameApp extends AbstractApp {
   constructor(platform, importPath, wsURL) {
     super(platform, 'bodyApp',  importPath, wsURL);
 
-    this.version = '2026.01.14';
+    this.version = '2026.02.08';
     this.copyright = '© 2026 GNU General Public Licence';
     
     this.audioManager = new AudioManager(this);
@@ -70,6 +70,7 @@ export class GameApp extends AbstractApp {
     this.itemsCollected = {};
     this.willyRoomsCache = {willy: false};
     this.globalData = false;
+    this.roomsMapPositions = {};
     this.setModel('LoadingModel');
   } // constructor
 
@@ -206,6 +207,15 @@ export class GameApp extends AbstractApp {
   
   setGlobalData(data) {
     this.globalData = data.data.global;
+
+    var roomsMap = this.globalData.roomsMap.positions;
+    for (var y = 0; y < roomsMap.length; y++) {
+      for (var x = 0; x < roomsMap[y].length; x++) {
+        if (roomsMap[y][x] !== false) {
+          this.roomsMapPositions[roomsMap[y][x]] = {x: x, y: y};
+        }
+      }
+    }
 
     this.items = [];
     var id = 0;
