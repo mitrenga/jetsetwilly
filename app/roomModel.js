@@ -30,17 +30,18 @@ export class RoomModel extends AbstractModel {
 
     this.initData = {
       info: [
-        0, // counter
-        0, // counter2
-        0, // counter4
-        0, // counter6
-        demo,
-        false, // crash
-        this.app.itemsCollected,
-        false, // adjoining room
-        false, // Willy data
-        this.app.gameState,
-        Object.keys(this.app.globalData.items).length // total items
+        0, // counter   [0]
+        0, // counter2  [1]
+        0, // counter4  [2]
+        0, // counter6  [3]
+        demo, //        [4]
+        false, // crash [5]
+        this.app.itemsCollected, // [6]
+        false, // adjoining room    [7]
+        false, // Willy data        [8]
+        this.app.gameState, //      [9] 
+        Object.keys(this.app.globalData.items).length, // total items [10]
+        0 // prevDirection [11]
       ]
     };
 
@@ -72,7 +73,7 @@ export class RoomModel extends AbstractModel {
                 this.app.gameState = event.data.gameData.info[9];
                 if (event.data.gameData.info[7] !== false) {
                   this.app.timeCounter += event.data.gameData.info[0];
-                  this.sendEvent(1, {id: 'changeRoom', adjoiningRoom: this.adjoiningRoom[event.data.gameData.info[7]], willyData: event.data.gameData.info[8]});
+                  this.sendEvent(1, {id: 'changeRoom', adjoiningRoom: this.adjoiningRoom[event.data.gameData.info[7]], willyData: event.data.gameData.info[8], previousDirection: event.data.gameData.info[11]});
                 }
                 for (var l = 0; l < this.app.lives; l++) {
                   this.gameInfoEntity.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
@@ -228,8 +229,8 @@ export class RoomModel extends AbstractModel {
       this.gameInfoEntity.liveEntities[l].setGraphicsData(data.data.willy);
     }
     super.setData(data.data);
-    this.postWorkerMessage({id: 'init', initData: this.initData});
     this.app.inputEventsManager.sendEventsActiveKeys('Press');
+    this.postWorkerMessage({id: 'init', initData: this.initData, previousDirection: this.app.previousDirection});
   } // setData
 
   handleEvent(event) {
@@ -470,6 +471,7 @@ export class RoomModel extends AbstractModel {
       case 'changeRoom':
         this.app.roomNumber = event.adjoiningRoom;
         this.app.willyRoomsCache = event.willyData;
+        this.app.previousDirection = event.previousDirection;
         this.app.startRoom(false, false, false, false, false);
         break;
 

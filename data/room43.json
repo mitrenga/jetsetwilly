@@ -69,7 +69,7 @@
             },
             "speed":0,
             "init":{
-              "x":160,
+              "x":166,
               "y":88,
               "direction":1,
               "frame":0

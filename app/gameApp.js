@@ -70,6 +70,7 @@ export class GameApp extends AbstractApp {
     this.totalItems = 0;
     this.itemsCollected = {};
     this.willyRoomsCache = {willy: false};
+    this.previousDirection = 0;
     this.globalData = false;
     this.roomsMapPositions = {};
     this.setModel('LoadingModel');

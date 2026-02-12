@@ -71,7 +71,7 @@ function gameLoop() {
         checkTouchSwitches();
       }
     }
-  
+    gameData.info[11] = previousDirection;
     postMessage({id: 'update', gameData: gameData});
   }
 } // gameLoop
@@ -767,6 +767,7 @@ onmessage = (event) => {
           });
         } else {
           gameData.info = [...event.data.initData.info];
+          previousDirection = event.data.previousDirection;
         }
       });
       gameLoop();
