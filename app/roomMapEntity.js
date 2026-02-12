@@ -168,36 +168,46 @@ export class RoomMapEntity extends AbstractEntity {
           }
         });
 
-        // floors
-        if ('floors' in graphicData) {
-          graphicData.floors.forEach((floorData) => {
-            var attr = this.app.hexToInt(floorData.data.substring(0, 2));
-            var penColor = this.app.platform.penColorByAttr(attr);
-            var bkColor = this.app.platform.bkColorByAttr(attr);
-            if (bkColor == roomBkColor) {
-              bkColor = false;
-            }
-            var locations = false;
-            if ('locations' in floorData) {
-              locations = floorData.locations;
-            } else {
-              locations = [floorData.location];
-            }
-            locations.forEach((location) => {
-              for (var w = 0; w < floorData.width; w++) {
-                for (var h = 0; h < floorData.height; h++) {
-                  if (bkColor != false) {
-                    this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2, (location.y+h)*2, 2, 2, bkColor);
-                  }
-                  if (bkColor === false || penColor != roomBkColor) {
-                    this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2, (location.y+h)*2, 2, 1, penColor);
-                  }
-                  this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
-                }
+        // walls & floors
+        ['walls', 'floors'].forEach((objectType) => {
+          if (objectType in graphicData) {
+            graphicData[objectType].forEach((objData) => {
+              var attr = this.app.hexToInt(objData.data.substring(0, 2));
+              var penColor = this.app.platform.penColorByAttr(attr);
+              var bkColor = this.app.platform.bkColorByAttr(attr);
+              if (bkColor == roomBkColor) {
+                bkColor = false;
               }
+              var locations = false;
+              if ('locations' in objData) {
+                locations = objData.locations;
+              } else {
+                locations = [objData.location];
+              }
+              locations.forEach((location) => {
+                for (var w = 0; w < objData.width; w++) {
+                  for (var h = 0; h < objData.height; h++) {
+                    if (bkColor != false) {
+                      this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2, (location.y+h)*2, 2, 2, bkColor);
+                    }
+                    switch (objectType) {
+                      case 'floors':
+                        if (bkColor === false || penColor != roomBkColor) {
+                          this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2, (location.y+h)*2, 2, 1, penColor);
+                        }
+                        this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
+                        break;
+                      case 'walls':
+                        this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2, (location.y+h)*2, 1, 1, penColor);
+                        this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
+                        break;
+                    }
+                  }
+                }
+              });
             });
-          });
-        }
+          }
+        });
 
         // ramps
         this.layoutExtends.ramps.forEach((rampData) => {

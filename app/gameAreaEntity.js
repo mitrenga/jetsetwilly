@@ -70,27 +70,37 @@ export class GameAreaEntity extends AbstractEntity {
             }
           });
 
-          // floors - bkColor
-          if ('floors' in graphicData) {
-            graphicData.floors.forEach((floorData) => {
-              var attr = this.app.hexToInt(floorData.data.substring(0, 2));
-              var penColor = this.penColorByAttr(attr);
-              var bkColor = this.bkColorByAttr(attr);
-              if (bkColor == roomBkColor) {
-                bkColor = false;
-              }
-              if (f == 1 && (attr&128) == 128) {
-                bkColor = penColor;
-              }
-              for (var w = 0; w < floorData.width; w++) {
-                for (var h = 0; h < floorData.height; h++) {
-                  if (bkColor != false) {
-                    this.app.layout.paintRect(this.drawingCache[f].ctx, (floorData.location.x+w)*8, (floorData.location.y+h)*8, 8, 8, bkColor);
-                  }
+          // walls & floors - bkColor
+          ['walls', 'floors'].forEach((objectType) => {
+            if (objectType in graphicData) {
+              graphicData[objectType].forEach((objData) => {
+                var attr = this.app.hexToInt(objData.data.substring(0, 2));
+                var penColor = this.penColorByAttr(attr);
+                var bkColor = this.bkColorByAttr(attr);
+                if (bkColor == roomBkColor) {
+                  bkColor = false;
                 }
-              }
-            });
-          }
+                if (f == 1 && (attr&128) == 128) {
+                  bkColor = penColor;
+                }
+                var locations = false;
+                if ('locations' in objData) {
+                  locations = objData.locations;
+                } else {
+                  locations = [objData.location];
+                }
+                locations.forEach((location) => {
+                  for (var w = 0; w < objData.width; w++) {
+                    for (var h = 0; h < objData.height; h++) {
+                      if (bkColor != false) {
+                        this.app.layout.paintRect(this.drawingCache[f].ctx, (location.x+w)*8, (location.y+h)*8, 8, 8, bkColor);
+                      }
+                    }
+                  }
+                });
+              });
+            }
+          });
         }
       }
 
@@ -141,43 +151,45 @@ export class GameAreaEntity extends AbstractEntity {
           });
         }
 
-        // floors - penColor
-        if ('floors' in graphicData) {
-          graphicData.floors.forEach((floorData) => {
-            if (this.graphicCache[floorData.data].needToRefresh(this, 8, 8)) {
-              var attr = floorData.data.substring(0, 2);
-              var penColor = this.penColorByAttr(this.app.hexToInt(attr));
-              var bkColor = this.bkColorByAttr(this.app.hexToInt(attr));
-              if (bkColor == roomBkColor) {
-                bkColor = false;
-              }
-              if (f == 3) {
-                penColor = bkColor;
-              }
-              for (var y = 0; y < 8; y++) {
-                var spriteLine = this.app.hexToBin(floorData.data.substring((y+1)*2, (y+1)*2+2));
-                for (var x = 0; x < 8; x++) {
-                  if (spriteLine[x] == '1') {
-                    this.app.layout.paintRect(this.graphicCache[floorData.data].ctx, x, y, 1, 1, penColor);
+        // walls & floors - penColor
+        ['walls', 'floors'].forEach((objectType) => {
+          if (objectType in graphicData) {
+            graphicData[objectType].forEach((objData) => {
+              if (this.graphicCache[objData.data].needToRefresh(this, 8, 8)) {
+                var attr = objData.data.substring(0, 2);
+                var penColor = this.penColorByAttr(this.app.hexToInt(attr));
+                var bkColor = this.bkColorByAttr(this.app.hexToInt(attr));
+                if (bkColor == roomBkColor) {
+                  bkColor = false;
+                }
+                if (f == 3) {
+                  penColor = bkColor;
+                }
+                for (var y = 0; y < 8; y++) {
+                  var spriteLine = this.app.hexToBin(objData.data.substring((y+1)*2, (y+1)*2+2));
+                  for (var x = 0; x < 8; x++) {
+                    if (spriteLine[x] == '1') {
+                      this.app.layout.paintRect(this.graphicCache[objData.data].ctx, x, y, 1, 1, penColor);
+                    }
                   }
                 }
               }
-            }
-            var locations = false;
-            if ('locations' in floorData) {
-              locations = floorData.locations;
-            } else {
-              locations = [floorData.location];
-            }
-            locations.forEach((location) => {
-              for (var w = 0; w < floorData.width; w++) {
-                for (var h = 0; h < floorData.height; h++) {
-                  this.drawingCache[f].ctx.drawImage(this.graphicCache[floorData.data].canvas, (location.x+w)*8*this.app.layout.ratio, (location.y+h)*8*this.app.layout.ratio);
-                }
+              var locations = false;
+              if ('locations' in objData) {
+                locations = objData.locations;
+              } else {
+                locations = [objData.location];
               }
+              locations.forEach((location) => {
+                for (var w = 0; w < objData.width; w++) {
+                  for (var h = 0; h < objData.height; h++) {
+                    this.drawingCache[f].ctx.drawImage(this.graphicCache[objData.data].canvas, (location.x+w)*8*this.app.layout.ratio, (location.y+h)*8*this.app.layout.ratio);
+                  }
+                }
+              });
             });
-          });
-        }
+          }
+        });
 
         // ramps
         this.layoutExtends.ramps.forEach((rampData) => {
@@ -334,22 +346,15 @@ export class GameAreaEntity extends AbstractEntity {
         }
       }
     });
-    // prepare drawing cache for ramps
-    if ('ramps' in graphicData) {
-      graphicData.ramps.forEach((rampData) => {
-        if (!(rampData.data in this.graphicCache)) {
-          this.graphicCache[rampData.data] = new DrawingCache(this.app);
-        }
-      });
-    }
-    // prepare drawing cache for floors
-    if ('floors' in graphicData) {
-      graphicData.floors.forEach((floorData) => {
-        if (!(floorData.data in this.graphicCache)) {
-          this.graphicCache[floorData.data] = new DrawingCache(this.app);
-        }
-      });
-    }
+    ['ramps', 'walls', 'floors'].forEach((objectType) => {
+      if (objectType in graphicData) {
+        graphicData[objectType].forEach((objData) => {
+          if (!(objData.data in this.graphicCache)) {
+            this.graphicCache[objData.data] = new DrawingCache(this.app);
+          }
+        });
+      }
+    });
 
     // layout
     this.initData.floors = [];
@@ -376,28 +381,30 @@ export class GameAreaEntity extends AbstractEntity {
       }
     });
 
-    // floors
-    if ('floors' in graphicData) {
-      graphicData.floors.forEach((floorData) => {
-        var locations = false;
-        if ('locations' in floorData) {
-          locations = floorData.locations;
-        } else {
-          locations = [floorData.location];
-        }
-        locations.forEach((location) => {
-          for (var w = 0; w < floorData.width; w++) {
-            for (var h = 0; h < floorData.height; h++) {
-              var floorInitData = {x: (location.x+w)*8, y: (location.y+h)*8, width: 8, height: 8};
-              if ('moving' in floorData) {
-                floorInitData.moving = floorData.moving;
-              }
-              this.initData.floors.push(floorInitData);
-            }
+    // walls & floors
+    ['walls', 'floors'].forEach((objectType) => {
+      if (objectType in graphicData) {
+        graphicData[objectType].forEach((objData) => {
+          var locations = false;
+          if ('locations' in objData) {
+            locations = objData.locations;
+          } else {
+            locations = [objData.location];
           }
+          locations.forEach((location) => {
+            for (var w = 0; w < objData.width; w++) {
+              for (var h = 0; h < objData.height; h++) {
+                var objInitData = {x: (location.x+w)*8, y: (location.y+h)*8, width: 8, height: 8};
+                if ('moving' in objData) {
+                  objInitData.moving = objData.moving;
+                }
+                this.initData[objectType].push(objInitData);
+              }
+            }
+          });
         });
-      });
-    }
+      }
+    });
 
     // ramps
     this.initData.ramps = [];
