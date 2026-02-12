@@ -64,6 +64,7 @@ export class GameApp extends AbstractApp {
     this.demo = false;
     this.demoRooms = [];
     this.lives = 7;
+    this.gameState = 1;
     this.playerName = this.readCookie('playerName', '');
     this.items = [];
     this.totalItems = 0;
@@ -180,6 +181,7 @@ export class GameApp extends AbstractApp {
   
   startRoom(demo, newGame, setInitRoom, roomNumber) {
     if (newGame) {
+      this.gameState = 0;
       this.itemsCollected = {};
       this.timeCounter = 0;
       this.timeStr = ' 7:00am';

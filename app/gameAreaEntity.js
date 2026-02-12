@@ -34,7 +34,7 @@ export class GameAreaEntity extends AbstractEntity {
     this.app.layout.newDrawingCache(this, 3); 
     this.graphicCache = {};
 
-    this.spriteEntities = {conveyors: [], ropes: [], guardians: [], items: [], decorations: [], willy: [], ramps: []};
+    this.spriteEntities = {conveyors: [], ropes: [], guardians: [], items: [], switches: [], willy: [], ramps: []};
   } // constructor
 
   drawEntity() {
@@ -537,59 +537,61 @@ export class GameAreaEntity extends AbstractEntity {
           var guardianTypeData = data.guardians[guardianType];
           guardianTypeData.forEach((guardianDefs) => {
             guardianDefs.figures.forEach((guardian) => {
-              var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(guardian.attribute));
-              var paintCorrectionsX = 0;
-              var paintCorrectionsY = 0;
-              if ('paintCorrections' in guardianDefs) {
-                paintCorrectionsX = guardianDefs.paintCorrections.x;
-                paintCorrectionsY = guardianDefs.paintCorrections.y;
+              if (!('forGameState' in guardianDefs) || guardianDefs.forGameState == this.app.gameState) {
+                var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(guardian.attribute));
+                var paintCorrectionsX = 0;
+                var paintCorrectionsY = 0;
+                if ('paintCorrections' in guardianDefs) {
+                  paintCorrectionsX = guardianDefs.paintCorrections.x;
+                  paintCorrectionsY = guardianDefs.paintCorrections.y;
+                }
+                var entity = new SpriteEntity(this, guardian.init.x+paintCorrectionsX, guardian.init.y+paintCorrectionsY, penColor, false, guardian.init.frame, guardian.init.direction);
+                if ('hide' in guardian.init) {
+                  entity.hide = guardian.init.hide;
+                }
+                entity.setGraphicsData(guardianDefs);
+                this.addEntity(entity);
+                this.spriteEntities.guardians.push(entity);
+                var guardianInitData = {
+                  type: guardianType,
+                  speed: guardian.speed,
+                  x: guardian.init.x,
+                  y: guardian.init.y,
+                  width: guardianDefs.width,
+                  height: guardianDefs.height,
+                  frame: guardian.init.frame,
+                  frames: guardianDefs.frames,
+                  direction: guardian.init.direction,
+                  directions: guardianDefs.directions
+                };
+                if ('paintCorrections' in guardianDefs) {
+                  guardianInitData.paintCorrections = guardianDefs.paintCorrections;
+                }
+                if ('touchCorrections' in guardianDefs) {
+                  guardianInitData.touchCorrections = guardianDefs.touchCorrections;
+                }
+                switch (guardianType) {
+                  case 'horizontal':
+                    guardianInitData.limitLeft = guardian.limits.left;
+                    guardianInitData.limitRight = guardian.limits.right;
+                    break;
+                  case 'vertical':
+                    guardianInitData.limitUp = guardian.limits.up;
+                    guardianInitData.limitDown = guardian.limits.down;
+                    break;
+                  case 'arrow':
+                    guardianInitData.hide = guardian.init.hide;
+                    guardianInitData.counter = guardian.init.counter;
+                    guardianInitData.minCounter = guardian.minCounter;
+                    guardianInitData.maxCounter = guardian.maxCounter;
+                    guardianInitData.soundWhenCounter = guardian.soundWhenCounter;
+                    break;
+                  case 'maria':
+                    guardianInitData.hide = guardian.init.hide;
+                    break;
+                }
+                this.initData.guardians.push(guardianInitData);
               }
-              var entity = new SpriteEntity(this, guardian.init.x+paintCorrectionsX, guardian.init.y+paintCorrectionsY, penColor, false, guardian.init.frame, guardian.init.direction);
-              if ('hide' in guardian.init) {
-                entity.hide = guardian.init.hide;
-              }
-              entity.setGraphicsData(guardianDefs);
-              this.addEntity(entity);
-              this.spriteEntities.guardians.push(entity);
-              var guardianInitData = {
-                type: guardianType,
-                speed: guardian.speed,
-                x: guardian.init.x,
-                y: guardian.init.y,
-                width: guardianDefs.width,
-                height: guardianDefs.height,
-                frame: guardian.init.frame,
-                frames: guardianDefs.frames,
-                direction: guardian.init.direction,
-                directions: guardianDefs.directions
-              };
-              if ('paintCorrections' in guardianDefs) {
-                guardianInitData.paintCorrections = guardianDefs.paintCorrections;
-              }
-              if ('touchCorrections' in guardianDefs) {
-                guardianInitData.touchCorrections = guardianDefs.touchCorrections;
-              }
-              switch (guardianType) {
-                case 'horizontal':
-                  guardianInitData.limitLeft = guardian.limits.left;
-                  guardianInitData.limitRight = guardian.limits.right;
-                  break;
-                case 'vertical':
-                  guardianInitData.limitUp = guardian.limits.up;
-                  guardianInitData.limitDown = guardian.limits.down;
-                  break;
-                case 'arrow':
-                  guardianInitData.hide = guardian.init.hide;
-                  guardianInitData.counter = guardian.init.counter;
-                  guardianInitData.minCounter = guardian.minCounter;
-                  guardianInitData.maxCounter = guardian.maxCounter;
-                  guardianInitData.soundWhenCounter = guardian.soundWhenCounter;
-                  break;
-                case 'maria':
-                  guardianInitData.hide = guardian.init.hide;
-                  break;
-              }
-              this.initData.guardians.push(guardianInitData);
             });
           });
         }
@@ -625,16 +627,27 @@ export class GameAreaEntity extends AbstractEntity {
     });
 
 
-    // decorations
-    this.initData.decorations = [];
-    if ('decorations' in data) {
-      data.decorations.forEach((decoration) => {
-        var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(decoration.attribute));
-        var entity = new SpriteEntity(this, decoration.x*8, decoration.y*8, penColor, false, 0, 0);
+    // switches
+    this.initData.switches = [];
+    if ('switches' in data) {
+      data.switches.forEach((switche) => {
+        var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(switche.attribute));
+        var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(switche.attribute));
+        if (bkColor == this.bkColor) {
+          bkColor = false;
+        }
+        var entity = new SpriteEntity(this, switche.x*8, switche.y*8, penColor, bkColor, 0, 0);
         this.addEntity(entity);
-        entity.setGraphicsData(decoration);
-        this.spriteEntities.decorations.push(entity);
-        this.initData.decorations.push({hide: false, kind: decoration.kind, x: decoration.x*8, y: decoration.y*8, frame: 0, direction: 0});
+        entity.setGraphicsData(switche);
+        this.spriteEntities.switches.push(entity);
+        this.initData.switches.push({
+          hide: false,
+          x: switche.x*8, y: switche.y*8,
+          width: switche.width, height: switche.height,
+          frame: switche.frame, direction: switche.direction,
+          frames: switche.frames, directions: switche.directions,
+          actions: switche.actions
+        });
       });
     }
   } // setData

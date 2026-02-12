@@ -300,25 +300,27 @@ export class RoomMapEntity extends AbstractEntity {
           }
         });
 
-        // decorations
-        if ('decorations' in this.roomData) {
-          this.roomData.decorations.forEach((decoration) => {
-            var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(decoration.attribute));
-            if ('mapSprite' in decoration) {
-              for (var r = 0; r < decoration.mapSprite.length; r++) {
-                for (var c = 0; c < decoration.mapSprite[r].length; c++) {
-                  if (decoration.mapSprite[r][c] == '#') {
-                    this.app.layout.paintRect(this.drawingCache[0].ctx, Math.floor(decoration.x*2)+c, Math.floor(decoration.y*2)+r, 1, 1, penColor);
+        // switches
+        if ('switches' in this.roomData) {
+          this.roomData.switches.forEach((switche) => {
+            var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(switche.attribute));
+            var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(switche.attribute));
+            if ('mapSprite' in switche) {
+              this.app.layout.paintRect(this.drawingCache[0].ctx, Math.floor(switche.x*2), Math.floor(switche.y*2), switche.width/4, switche.height/4, bkColor);
+              for (var r = 0; r < switche.mapSprite.length; r++) {
+                for (var c = 0; c < switche.mapSprite[r].length; c++) {
+                  if (switche.mapSprite[r][c] == '#') {
+                    this.app.layout.paintRect(this.drawingCache[0].ctx, Math.floor(switche.x*2)+c, Math.floor(switche.y*2)+r, 1, 1, penColor);
                   }
                 }
               }
             } else {
               this.app.layout.paintRect(
                 this.drawingCache[0].ctx,
-                Math.floor(decoration.x*2),
-                Math.floor(decoration.y*2),
-                Math.floor(decoration.width/4),
-                Math.floor(decoration.height/4),
+                Math.floor(switche.x*2),
+                Math.floor(switche.y*2),
+                Math.floor(switche.width/4),
+                Math.floor(switche.height/4),
                 penColor
               );
             }

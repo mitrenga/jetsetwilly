@@ -38,7 +38,9 @@ export class RoomModel extends AbstractModel {
         false, // crash
         this.app.itemsCollected,
         false, // adjoining room
-        false // Willy data
+        false, // Willy data
+        this.app.gameState,
+        Object.keys(this.app.globalData.items).length // total items
       ]
     };
 
@@ -67,6 +69,7 @@ export class RoomModel extends AbstractModel {
           Object.keys(event.data.gameData).forEach((objectsType) => {
             switch (objectsType) {
               case 'info':
+                this.app.gameState = event.data.gameData.info[9];
                 if (event.data.gameData.info[7] !== false) {
                   this.app.timeCounter += event.data.gameData.info[0];
                   this.sendEvent(1, {id: 'changeRoom', adjoiningRoom: this.adjoiningRoom[event.data.gameData.info[7]], willyData: event.data.gameData.info[8]});

@@ -5,6 +5,7 @@
 /**/
 // begin code
 
+var accelerator = 0;
 var counter = 0;
 var counter2 = 0;
 var counter4 = 0;
@@ -27,35 +28,48 @@ var pause = false;
 
 function gameLoop() {
   if (!pause) {
-    setTimeout(gameLoop, 77);
+    var delay = 77;
+    if (gameData.info[9] == 2) {
+      delay = 38;
+    }
+    setTimeout(gameLoop, delay);
   }
 
   if (gameData != null) {
-    counter++;
-    gameData.info[0] = counter;
-    if (!(counter%2)) {
-      counter2++;
+    accelerator++;
+    if (accelerator == 2) {
+      accelerator = 0;
     }
-    gameData.info[1] = counter2;
-    if (!(counter%4)) {
-      counter4++;
+    if (gameData.info[9] != 2 || accelerator == 1) {
+      counter++;
+      gameData.info[0] = counter;
+      if (!(counter%2)) {
+        counter2++;
+      }
+      gameData.info[1] = counter2;
+      if (!(counter%4)) {
+        counter4++;
+      }
+      gameData.info[2] = counter4;
+      if (!(counter%6)) {
+        counter6++;
+      }
+      gameData.info[3] = counter6;
+      conveyors();
+      ropes();
     }
-    gameData.info[2] = counter4;
-    if (!(counter%6)) {
-      counter6++;
-    }
-    gameData.info[3] = counter6;
-    conveyors();
-    ropes();
     if (!gameData.info[4]) { // if not demo
       willy();
     }
-    guardians();
-    items();
-    decorations();
-    if (!gameData.info[4]) { // if not demo
-      checkTouchItems();
-      checkCrash();
+    if (gameData.info[9] != 2 || accelerator == 1) {
+      guardians();
+      items();
+      switches();
+      if (!gameData.info[4]) { // if not demo
+        checkTouchItems();
+        checkCrash();
+        checkTouchSwitches();
+      }
     }
   
     postMessage({id: 'update', gameData: gameData});
@@ -231,7 +245,7 @@ function willyWalking() {
   }
 
   var newDirection = 0;
-  if ((controls.right && !controls.left && !jumpCounter && !fallingCounter && !mustMovingDirection && (!canMovingDirection || (canMovingDirection == -1 && previousDirection == 1))) ||
+  if (((gameData.info[9] == 2 || gameData.info[9] < 2 && controls.right && !controls.left ) && !jumpCounter && !fallingCounter && !mustMovingDirection && (!canMovingDirection || (canMovingDirection == -1 && previousDirection == 1))) ||
       (jumpCounter && jumpDirection == 1) ||
       (mustMovingDirection == 1)) {
 
@@ -265,7 +279,7 @@ function willyWalking() {
     }
   }
 
-  if ((controls.left && !controls.right && !jumpCounter && !fallingCounter && !mustMovingDirection && (!canMovingDirection || (canMovingDirection == 1 && previousDirection == -1))) ||
+  if ((gameData.info[9] < 2 && controls.left && !controls.right && !jumpCounter && !fallingCounter && !mustMovingDirection && (!canMovingDirection || (canMovingDirection == 1 && previousDirection == -1))) ||
       (jumpCounter && jumpDirection == -1) ||
       (mustMovingDirection == -1)) {
 
@@ -301,7 +315,7 @@ function willyWalking() {
 
   previousDirection = newDirection;
 
-  if (!jumpCounter && !fallingCounter && controls.jump) {
+  if (!jumpCounter && !fallingCounter && controls.jump && gameData.info[9] < 2) {
     if (canMove(0, jumpMap[jumpCounter])) {
       if (willy.y+jumpMap[jumpCounter] < 0) {
         willy.y = 104;
@@ -557,15 +571,14 @@ function items() {
   });
 } // items
 
-function decorations() {
-  gameData.decorations.forEach((decoration) => {
-    if (decoration.frame == 1) {
-      decoration.frame = 0;
-    } else {
-      decoration.frame++;
+function switches() {
+  gameData.switches.forEach((switche) => {
+    switche.frame++;
+    if (switche.frame == switche.frames) {
+      switche.frame = 0;
     }
   });    
-} // decorations
+} // switches
 
 function checkTouchWithObjectsArray(x, y, width, height, objectsArray) {
   for (var a = 0; a < objectsArray.length; a++) {
@@ -680,6 +693,9 @@ function checkTouchItems() {
   if (touchId) {
     gameData.items[touchId-1].hide = true;
     gameData.info[6][gameData.items[touchId-1].id] = true;
+    if (Object.keys(gameData.info[6]).length == gameData.info[10]) {
+      gameData.info[9] = 1;
+    }
     postMessage({id: 'playSound', channel: 'extra', sound: 'itemSound'});
   }
 } // checkTouchItems
@@ -719,6 +735,25 @@ function rampMovement(move, x, y, width, height) {
   }
   return 0;
 } // rampMovement
+
+function checkTouchSwitches() {
+  var touchId = checkTouchWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.switches]);
+  if (touchId) {
+    var actions = gameData.switches[touchId-1].actions;
+    actions.forEach((action) => {
+      if (!('forGameState' in action) || action.forGameState == gameData.info[9]) {
+        switch(action.type) {
+          case 'setValue':
+            gameData[action.objectsArray][action.index][action.variable] = action.value;
+            break;
+          case 'setGameState':
+            gameData.info[9] = action.value;
+            break;
+        }
+      }
+    });
+  }
+} // checkTouchSwitches
 
 onmessage = (event) => {
   switch (event.data.id) {

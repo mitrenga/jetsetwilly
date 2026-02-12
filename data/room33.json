@@ -184,14 +184,15 @@
       }
     ]
   },
-  "decorations":[
+  "switches":[
     {
-      "kind":"toilet",
       "x":28,
       "y":13,
       "width":16,
       "height":16,
       "attribute":"07",
+      "frame":0,
+      "direction":0,
       "frames":2,
       "directions":2,
       "sprite":[
@@ -273,6 +274,29 @@
         "--##",
         "####",
         "-###"
+      ],
+      "actions":[
+        {
+          "type":"setValue",
+          "objectsArray":"switches",
+          "index":0,
+          "variable":"direction",
+          "value":1,
+          "forGameState":2
+        },
+        {
+          "type":"setValue",
+          "objectsArray":"willy",
+          "index":0,
+          "variable":"hide",
+          "value":true,
+          "forGameState":2
+        },
+        {
+          "type":"setGameState",
+          "value":3,
+          "forGameState":2
+        }
       ]
     }
   ]
