@@ -384,7 +384,11 @@ export class RoomMapEntity extends AbstractEntity {
           case 'Mouse1':
             if (this.pointOnEntity(event)) {
               if (this.app.inputEventsManager.keysMap.Mouse1 === this) {
-                this.app.startRoom(false, true, true, this.roomNumber);
+                var extraGame = true;
+                if (this.roomNumber == this.app.globalData.initRoom) {
+                  extraGame = false;
+                }
+                this.app.startRoom(false, true, true, extraGame, this.roomNumber);
                 return true;
               }
             }
@@ -392,7 +396,11 @@ export class RoomMapEntity extends AbstractEntity {
           case 'Touch':
             if (this.pointOnEntity(event)) {
               if (this.app.inputEventsManager.touchesMap[event.identifier] === this) {
-                this.app.startRoom(false, true, true, this.roomNumber);
+                var extraGame = true;
+                if (this.roomNumber == this.app.globalData.initRoom) {
+                  extraGame = false;
+                }
+                this.app.startRoom(false, true, true, extraGame, this.roomNumber);
                 return true;
               }
             }

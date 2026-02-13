@@ -94,7 +94,7 @@ export class GameOverModel extends AbstractModel {
     }
 
     var score = Object.keys(this.app.itemsCollected).length;
-    if (score) {
+    if (score && !this.app.extraGame) {
       this.fetchData('saveGame.db', false, {name: this.app.playerName, score: score});
     }
   } // init
@@ -113,7 +113,7 @@ export class GameOverModel extends AbstractModel {
     switch (event.id) {
       case 'restartRoom':
         this.app.lives = 7;
-        this.app.startRoom(false, false, false, false);
+        this.app.startRoom(false, false, false, true, false);
         return true;
       case 'MainModel':
         this.app.setModel('MainModel');

@@ -101,7 +101,11 @@ export class RoomModel extends AbstractModel {
                 }
                 if (this.app.itemsCollected != event.data.gameData.info[6]) {
                   this.app.itemsCollected = event.data.gameData.info[6];
-                  this.gameInfoEntity.itemsCollectedEntity.setText(Object.keys(this.app.itemsCollected).length.toString().padStart(3, '0'));
+                  if (this.app.extraGame) {
+                    this.gameInfoEntity.itemsCollectedEntity.setText((this.app.totalItems-Object.keys(this.app.itemsCollected).length).toString().padStart(3, '0'));
+                  } else {
+                    this.gameInfoEntity.itemsCollectedEntity.setText(Object.keys(this.app.itemsCollected).length.toString().padStart(3, '0'));
+                  }
                 }
                 break;
                 
@@ -462,7 +466,7 @@ export class RoomModel extends AbstractModel {
           this.app.roomNumber = this.app.demoRooms[0];
           this.app.demoRooms.splice(0, 1);
           this.app.demo = true;
-          this.app.startRoom(true, false, false);
+          this.app.startRoom(true, false, false, false, false);
           return true;
         }
         this.app.setModel('MainModel');
@@ -472,7 +476,7 @@ export class RoomModel extends AbstractModel {
         this.app.roomNumber = event.adjoiningRoom;
         this.app.willyRoomsCache = event.willyData;
         this.app.previousDirection = event.previousDirection;
-        this.app.startRoom(false, false, false, false, false);
+        this.app.startRoom(false, false, false, this.app.extraGame, false);
         break;
 
       case 'crash':
@@ -527,7 +531,7 @@ export class RoomModel extends AbstractModel {
             this.animationType = false;
             if (this.app.lives > 0) {
               this.app.lives--;
-              this.app.startRoom(false, false, false, false);
+              this.app.startRoom(false, false, false, this.app.extraGame, false);
             } else {
               this.app.setModel('GameOverModel');
             }

@@ -31,8 +31,14 @@ export class GameInfoEntity extends AbstractEntity {
     for (var c = 0; c < 7; c++) {
       colorsMap[c] = this.app.platform.color(c+1);
     }
-    this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 1*8, 2*8, 13*8, 8, 'Items collected', false, false, {penColorsMap: colorsMap}));
-    this.itemsCollectedEntity = new TextEntity(this, this.app.fonts.zxFonts8x8Mono, 15*8, 2*8, 3*8, 8, Object.keys(this.app.itemsCollected).length.toString().padStart(3, '0'), this.app.platform.colorByName('white'), false, {});
+    var itemsLabel = 'Items collected';
+    var itemsCounter = Object.keys(this.app.itemsCollected).length;
+    if (this.app.extraGame) {
+      itemsLabel = 'Items remaining';
+      itemsCounter = this.app.totalItems-itemsCounter;
+    }
+    this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 1*8, 2*8, 13*8, 8, itemsLabel, false, false, {penColorsMap: colorsMap}));
+    this.itemsCollectedEntity = new TextEntity(this, this.app.fonts.zxFonts8x8Mono, 15*8, 2*8, 3*8, 8, itemsCounter.toString().padStart(3, '0'), this.app.platform.colorByName('white'), false, {});
     this.addEntity(this.itemsCollectedEntity);
     this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 20*8, 2*8, 4*8, 8, 'Time', this.app.platform.colorByName('white'), false, {}));
     colorsMap = {};

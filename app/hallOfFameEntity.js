@@ -1,10 +1,12 @@
 /**/
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
+const { SlidingTextEntity } = await import('./svision/js/platform/canvas2D/slidingTextEntity.js?ver='+window.srcVersion);
 const { ButtonEntity } = await import('./svision/js/platform/canvas2D/buttonEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractEntity from './svision/js//abstractEntity.js';
 import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
+import SlidingTextEntity from './svision/js/platform/canvas2D/slidingTextEntity.js';
 import ButtonEntity from './svision/js/platform/canvas2D/buttonEntity.js';
 /**/
 // begin code
@@ -14,6 +16,8 @@ export class HallOfFameEntity extends AbstractEntity {
   constructor(parentEntity, x, y, width, height) {
     super(parentEntity, x, y, width, height, false, false);
     this.id = 'HallOfFameEntity';
+
+    this.noteEntity = null;
   } // constructor
 
   init() {
@@ -22,7 +26,8 @@ export class HallOfFameEntity extends AbstractEntity {
     this.addEntity(new AbstractEntity(this, 0, 6, this.width, this.height-6, false, this.app.platform.colorByName('black')));
     this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, 64, 7, 'HALL OF FAME', this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('black'), {topMargin: 1, leftMargin: 2}));
     this.addEntity(new AbstractEntity(this, 1, 7, this.width-2, this.height-8, false, this.app.platform.colorByName('brightWhite')));
-    
+    this.noteEntity = new SlidingTextEntity(this, this.app.fonts.fonts5x5, 8, this.height-12, this.width-55, 5, "                                                    THE RESULTS OF A STANDARD GAME STARTING IN THE BATHROOM AND WITHOUT ANY POSSIBLE ADDITIONAL CONTINUATIONS ARE RECORDED                                                    ", this.app.platform.colorByName('brightRed'), false, {animation: 'loopLeft'});
+    this.addEntity(this.noteEntity);
     this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', {id: 'closeHallOfFame'}, ['Enter', 'Escape', ' ', 'GamepadOK', 'GamepadExit'], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlue'), {align: 'center', margin: 4}));
 
     this.fetchData('hallOfFame.db', {key: 'hallOfFame', when: 'offline'}, {});
@@ -59,6 +64,10 @@ export class HallOfFameEntity extends AbstractEntity {
 
     return false;
   } // handleEvent
+
+  loopEntity(timestamp) {
+    this.noteEntity.loopEntity(timestamp);
+  }
 
 } // HallOfFameEntity
 

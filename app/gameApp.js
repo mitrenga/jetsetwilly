@@ -64,6 +64,7 @@ export class GameApp extends AbstractApp {
     this.demo = false;
     this.demoRooms = [];
     this.lives = 7;
+    this.extraGame = false;
     this.gameState = 1;
     this.playerName = this.readCookie('playerName', '');
     this.items = [];
@@ -180,7 +181,7 @@ export class GameApp extends AbstractApp {
     }
   } // setModel
   
-  startRoom(demo, newGame, setInitRoom, roomNumber) {
+  startRoom(demo, newGame, setInitRoom, extraGame, roomNumber) {
     if (newGame) {
       this.gameState = 0;
       this.itemsCollected = {};
@@ -203,8 +204,9 @@ export class GameApp extends AbstractApp {
         this.inputEventsManager.touchesControls.right = {};
         this.inputEventsManager.touchesControls.jump = {};
       }
-    }
+    } 
     this.demo = demo;
+    this.extraGame = extraGame;
     this.setModel('RoomModel');
   } // startRoom
   
