@@ -518,6 +518,7 @@ export class GameAreaEntity extends AbstractEntity {
           direction: ropeData.init.direction,
           prevDirection: ropeData.init.direction,
           frames: ropeData.frames,
+          climbBlock: ropeData.climbBlock,
           relativeCoordinates: ropeData.relativeCoordinates,
           nodes: []
         };

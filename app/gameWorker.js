@@ -406,19 +406,26 @@ function willyOnRope() {
       }
     }
     if (caughtNode < 3) {
-      caughtNode = 3;
-    }
-    if (caughtNode > gameData.ropes[caughtRope].length) {
-      operation = 'walking';
-      fallingCounter = 1;
       willy.x = willy.x-willy.x%2;
-      willy.y = willy.y+willy.x%2;
-      postMessage({id: 'playSound', channel: 'sounds', sound: 'fallingSound'});
+      willy.y = 104;
+      gameData.info[7] = 'above';
+      gameData.info[8] = willy;
     } else {
-      willy.x = gameData.ropes[caughtRope].nodes[caughtNode].x-4;
-      willy.y = gameData.ropes[caughtRope].nodes[caughtNode].y-6;
+      if (gameData.ropes[caughtRope].climbBlock !== false && caughtNode < gameData.ropes[caughtRope].climbBlock-1) {
+        caughtNode = gameData.ropes[caughtRope].climbBlock-1;
+      }
+      if (caughtNode > gameData.ropes[caughtRope].length) {
+        operation = 'walking';
+        fallingCounter = 1;
+        willy.x = willy.x-willy.x%2;
+        willy.y = willy.y+willy.x%2;
+        postMessage({id: 'playSound', channel: 'sounds', sound: 'fallingSound'});
+      } else {
+        willy.x = gameData.ropes[caughtRope].nodes[caughtNode].x-4;
+        willy.y = gameData.ropes[caughtRope].nodes[caughtNode].y-6;
+      }
+      willy.frame = Math.floor(willy.x%8/2);
     }
-    willy.frame = Math.floor(willy.x%8/2);
   }
 } // willyOnRope
 
