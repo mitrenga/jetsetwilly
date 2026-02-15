@@ -15,7 +15,7 @@ Supported:
 - PWA application
 
 
-## Application website
+## Game website
 https://jetsetwilly.free
 
 
