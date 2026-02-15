@@ -34,7 +34,7 @@ export class AboutEntity extends AbstractEntity {
                     'SLEEPLESS NIGHTS WERE SPENT WITH FRIENDS TRYING TO GET THROUGH ' +
                     'ROOMS LIKE THE BANYAN TREE OR CONSERVATORY ROOF.';
     this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 1, 7, this.width-2, 120, aboutText, this.app.platform.colorByName('black'), false, {align: 'justify', textWrap: true, margin: 2, member: 'aboutText'}));
-    this.addEntity(new TextEntity(this, this.app.fonts.fonts3x3, 3, this.height-7, this.width-41, 3, 'github:mitrenga/jetsetwilly', '#777777', false, {}));
+    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts3x3, 1, this.height-8, 103, 7, 'github:mitrenga/jetsetwilly', {id: 'openGithub'}, [], '#777777', false, {margin:2, hoverColor: '#e6e6e6', clickColor: '#bebebe'}));
 
     this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', {id: 'closeAbout'}, ['Enter', 'Escape', ' ', 'GamepadOK', 'GamepadExit'], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('blue'), {align: 'center', margin: 4}));
   } // init
@@ -72,6 +72,11 @@ export class AboutEntity extends AbstractEntity {
           this.sysInfoCounter++;
         }
         return true;
+
+      case 'openGithub':
+        window.open('https://github.com/mitrenga/jetsetwilly', '_blank');
+        return true;
+
       case 'resizeModel':
         if (this.sysInfoCounter == 4) {
           this.updateSysInfo();
