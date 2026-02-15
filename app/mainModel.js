@@ -171,7 +171,7 @@ export class MainModel extends AbstractModel {
               }
             }
             if (this.app.inputEventsManager.keysMap.Mouse1 === this.borderEntity) {
-              this.app.startRoom(false, true, true, true, this.app.globalData.initRoom);
+              this.app.startRoom(false, true, true, false, this.app.globalData.initRoom);
               return true;
             }
             break;
