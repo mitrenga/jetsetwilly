@@ -152,7 +152,7 @@ export class RoomsMapModel extends AbstractModel {
                 if (roomNumber == this.app.globalData.initRoom) {
                   extraGame = false;
                 }
-                this.app.startRoom(false, true, true, extraGame, roomNumber);
+                this.app.startRoom(false, true, false, true, extraGame, roomNumber);
               }
               return true;
             case 'Escape':

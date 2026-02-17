@@ -27,6 +27,7 @@ export class RoomModel extends AbstractModel {
     this.animationType = false;
     this.autorepeatKeys = false;
     this.needDraw = true;
+    this.safeInitPosition = false;
 
     this.initData = {
       info: [
@@ -41,7 +42,8 @@ export class RoomModel extends AbstractModel {
         false, // Willy data        [8]
         this.app.gameState, //      [9] 
         Object.keys(this.app.globalData.items).length, // total items [10]
-        0 // prevDirection [11]
+        0, // prevDirection         [11]
+        false // safe init position [12]
       ]
     };
 
@@ -71,6 +73,11 @@ export class RoomModel extends AbstractModel {
             switch (objectsType) {
               case 'info':
                 this.app.gameState = event.data.gameData.info[9];
+                if (!this.safeInitPosition && event.data.gameData.info[12]) {
+                  this.safeInitPosition = true;
+                  this.app.willySafeInitPositionCache = {...this.app.willyRoomsCache};
+                  this.app.willySafeInitPositionCache.roomNumber = this.roomNumber;
+                }
                 if (event.data.gameData.info[7] !== false) {
                   this.app.timeCounter += event.data.gameData.info[0];
                   this.sendEvent(1, {id: 'changeRoom', adjoiningRoom: this.adjoiningRoom[event.data.gameData.info[7]], willyData: event.data.gameData.info[8], previousDirection: event.data.gameData.info[11]});
@@ -466,7 +473,7 @@ export class RoomModel extends AbstractModel {
           this.app.roomNumber = this.app.demoRooms[0];
           this.app.demoRooms.splice(0, 1);
           this.app.demo = true;
-          this.app.startRoom(true, false, false, false, false);
+          this.app.startRoom(true, false, false, false, false, false);
           return true;
         }
         this.app.setModel('MainModel');
@@ -476,7 +483,7 @@ export class RoomModel extends AbstractModel {
         this.app.roomNumber = event.adjoiningRoom;
         this.app.willyRoomsCache = event.willyData;
         this.app.previousDirection = event.previousDirection;
-        this.app.startRoom(false, false, false, this.app.extraGame, false);
+        this.app.startRoom(false, false, false, false, this.app.extraGame, false);
         break;
 
       case 'crash':
@@ -531,7 +538,7 @@ export class RoomModel extends AbstractModel {
             this.animationType = false;
             if (this.app.lives > 0) {
               this.app.lives--;
-              this.app.startRoom(false, false, false, this.app.extraGame, false);
+              this.app.startRoom(false, false, true, false, this.app.extraGame, false);
             } else {
               this.app.setModel('GameOverModel');
             }

@@ -195,6 +195,10 @@ function willyWalking() {
       postMessage({id: 'playSound', channel: 'sounds', sound: 'fallingSound'});
     }
   }
+  
+  if (standingOn.length && !gameData.info[5]) {
+    gameData.info[12] = true;
+  }
 
   if (jumpCounter && jumpMap[jumpCounter] > 1) {
     if (standingOn.length) {
@@ -340,6 +344,7 @@ function willyWalking() {
         while (n > 2) {
           var node = rope.nodes[n];
           if (!(node.x+1 < willy.x+2 || node.x > willy.x+6 || node.y+1 < willy.y+6 || node.y > willy.y+10)) {
+            gameData.info[12] = true;
             operation = 'onRope';
             caughtRope = r;
             caughtNode = n;

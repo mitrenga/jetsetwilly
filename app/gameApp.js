@@ -71,6 +71,7 @@ export class GameApp extends AbstractApp {
     this.totalItems = 0;
     this.itemsCollected = {};
     this.willyRoomsCache = {willy: false};
+    this.willySafeInitPositionCache = {willy: false};
     this.previousDirection = 0;
     this.globalData = false;
     this.roomsMapPositions = {};
@@ -181,7 +182,7 @@ export class GameApp extends AbstractApp {
     }
   } // setModel
   
-  startRoom(demo, newGame, setInitRoom, extraGame, roomNumber) {
+  startRoom(demo, newGame, crash, setInitRoom, extraGame, roomNumber) {
     if (newGame) {
       this.gameState = 0;
       this.itemsCollected = {};
@@ -204,7 +205,12 @@ export class GameApp extends AbstractApp {
         this.inputEventsManager.touchesControls.right = {};
         this.inputEventsManager.touchesControls.jump = {};
       }
-    } 
+    } else {
+      if (crash && this.willySafeInitPositionCache.willy !== false) {
+        this.willyRoomsCache = {...this.willySafeInitPositionCache};
+        this.roomNumber = this.willySafeInitPositionCache.roomNumber;
+      }
+    }
     this.demo = demo;
     this.extraGame = extraGame;
     this.setModel('RoomModel');

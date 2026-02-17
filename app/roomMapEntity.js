@@ -388,7 +388,7 @@ export class RoomMapEntity extends AbstractEntity {
                 if (this.roomNumber == this.app.globalData.initRoom) {
                   extraGame = false;
                 }
-                this.app.startRoom(false, true, true, extraGame, this.roomNumber);
+                this.app.startRoom(false, true, false, true, extraGame, this.roomNumber);
                 return true;
               }
             }
@@ -400,7 +400,7 @@ export class RoomMapEntity extends AbstractEntity {
                 if (this.roomNumber == this.app.globalData.initRoom) {
                   extraGame = false;
                 }
-                this.app.startRoom(false, true, true, extraGame, this.roomNumber);
+                this.app.startRoom(false, true, false, true, extraGame, this.roomNumber);
                 return true;
               }
             }
