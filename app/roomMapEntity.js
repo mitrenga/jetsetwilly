@@ -127,8 +127,54 @@ export class RoomMapEntity extends AbstractEntity {
 
       if (this.drawingCache[0].needToRefresh(this, this.width, this.height)) {
 
-        // layout
         var graphicData = this.roomData.graphicData;
+
+        // walls & floors & nasties
+        ['walls', 'floors', 'nasties'].forEach((objectType) => {
+          if (objectType in graphicData) {
+            graphicData[objectType].forEach((objData) => {
+              var attr = this.app.hexToInt(objData.data.substring(0, 2));
+              var penColor = this.app.platform.penColorByAttr(attr);
+              var bkColor = this.app.platform.bkColorByAttr(attr);
+              if (bkColor == roomBkColor) {
+                bkColor = false;
+              }
+              var locations = false;
+              if ('locations' in objData) {
+                locations = objData.locations;
+              } else {
+                locations = [objData.location];
+              }
+              locations.forEach((location) => {
+                for (var w = 0; w < objData.width; w++) {
+                  for (var h = 0; h < objData.height; h++) {
+                    if (bkColor != false) {
+                      this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2, (location.y+h)*2, 2, 2, bkColor);
+                    }
+                    switch (objectType) {
+                      case 'floors':
+                        if (bkColor === false || penColor != roomBkColor) {
+                          this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2, (location.y+h)*2, 2, 1, penColor);
+                        }
+                        this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
+                        break;
+                      case 'walls':
+                        this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2, (location.y+h)*2, 1, 1, penColor);
+                        this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
+                        break;
+                      case 'nasties':
+                        this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2, (location.y+h)*2, 2, 1, penColor);
+                        this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
+                        break;
+                    }
+                  }
+                }
+              });
+            });
+          }
+        });
+
+        // layout
         this.roomData.layout.forEach((row, r) => {
           for (var column = 0; column < 32; column++) {
             var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
@@ -165,47 +211,6 @@ export class RoomMapEntity extends AbstractEntity {
                 }
               }
             }
-          }
-        });
-
-        // walls & floors
-        ['walls', 'floors'].forEach((objectType) => {
-          if (objectType in graphicData) {
-            graphicData[objectType].forEach((objData) => {
-              var attr = this.app.hexToInt(objData.data.substring(0, 2));
-              var penColor = this.app.platform.penColorByAttr(attr);
-              var bkColor = this.app.platform.bkColorByAttr(attr);
-              if (bkColor == roomBkColor) {
-                bkColor = false;
-              }
-              var locations = false;
-              if ('locations' in objData) {
-                locations = objData.locations;
-              } else {
-                locations = [objData.location];
-              }
-              locations.forEach((location) => {
-                for (var w = 0; w < objData.width; w++) {
-                  for (var h = 0; h < objData.height; h++) {
-                    if (bkColor != false) {
-                      this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2, (location.y+h)*2, 2, 2, bkColor);
-                    }
-                    switch (objectType) {
-                      case 'floors':
-                        if (bkColor === false || penColor != roomBkColor) {
-                          this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2, (location.y+h)*2, 2, 1, penColor);
-                        }
-                        this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
-                        break;
-                      case 'walls':
-                        this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2, (location.y+h)*2, 1, 1, penColor);
-                        this.app.layout.paintRect(this.drawingCache[0].ctx, (location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
-                        break;
-                    }
-                  }
-                }
-              });
-            });
           }
         });
 

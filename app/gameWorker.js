@@ -12,6 +12,7 @@ var counter4 = 0;
 var counter6 = 0;
 var gameData = null;
 var controls = {left: false, right: false, jump: false};
+var standing = [];
 var jumpCounter = 0;
 var jumpDirection = 0;
 var jumpMap = [-4, -4, -3, -3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4];
@@ -71,6 +72,11 @@ function gameLoop() {
         checkTouchSwitches();
       }
     }
+
+    if (!mustMovingDirection && standing.length && !gameData.info[5]) {
+      gameData.info[12] = true;
+    }
+
     gameData.info[11] = previousDirection;
     postMessage({id: 'update', gameData: gameData});
   }
@@ -140,9 +146,9 @@ function willyWalking() {
 
   canMovingDirection = 0;
 
-  var standingOn = checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors], false);
+  standing = checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors], false);
 
-  standingOn.forEach((object) => {
+  standing.forEach((object) => {
     if ('moving' in object) {
       switch (object.moving) {
         case 'right':
@@ -160,7 +166,7 @@ function willyWalking() {
   }
 
   if (fallingCounter) {
-    if (standingOn.length) {
+    if (standing.length) {
       if (fallingCounter > 9) {
         gameData.info[5] = true;
       }
@@ -189,19 +195,15 @@ function willyWalking() {
       fallingCounter++;
     }
   } else {
-    if (!jumpCounter && !standingOn.length) {
+    if (!jumpCounter && !standing.length) {
       fallingCounter = 1;
       fallingDirection = 0;
       postMessage({id: 'playSound', channel: 'sounds', sound: 'fallingSound'});
     }
   }
   
-  if (standingOn.length && !gameData.info[5]) {
-    gameData.info[12] = true;
-  }
-
   if (jumpCounter && jumpMap[jumpCounter] > 1) {
-    if (standingOn.length) {
+    if (standing.length) {
       jumpCounter = 0;
       if (canMovingDirection == jumpDirection) {
         mustMovingDirection = canMovingDirection;
@@ -357,6 +359,7 @@ function willyWalking() {
       }
     });
   }
+
   if (ropeProhibited.counter > 0) {
     ropeProhibited.counter--;
   }

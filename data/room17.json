@@ -32,6 +32,17 @@
         "gradient":"left"
       }
     },
+    "nasties":[
+      {
+        "data":"0E007F7F636B637F7F",
+        "location":{
+            "x":0,
+            "y":15
+        },
+        "width":32,
+        "height":1
+      }
+    ],
     "conveyors":[
       {
         "data":"4228AA0A00555555FF",

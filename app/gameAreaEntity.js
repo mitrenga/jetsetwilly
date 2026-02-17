@@ -70,8 +70,8 @@ export class GameAreaEntity extends AbstractEntity {
             }
           });
 
-          // walls & floors - bkColor
-          ['walls', 'floors'].forEach((objectType) => {
+          // walls & floors & nasties - bkColor
+          ['walls', 'floors', 'nasties'].forEach((objectType) => {
             if (objectType in graphicData) {
               graphicData[objectType].forEach((objData) => {
                 var attr = this.app.hexToInt(objData.data.substring(0, 2));
@@ -151,8 +151,8 @@ export class GameAreaEntity extends AbstractEntity {
           });
         }
 
-        // walls & floors - penColor
-        ['walls', 'floors'].forEach((objectType) => {
+        // walls & floors & nasties - penColor
+        ['walls', 'floors', 'nasties'].forEach((objectType) => {
           if (objectType in graphicData) {
             graphicData[objectType].forEach((objData) => {
               if (this.graphicCache[objData.data].needToRefresh(this, 8, 8)) {
@@ -346,7 +346,7 @@ export class GameAreaEntity extends AbstractEntity {
         }
       }
     });
-    ['ramps', 'walls', 'floors'].forEach((objectType) => {
+    ['ramps', 'walls', 'floors', 'nasties'].forEach((objectType) => {
       if (objectType in graphicData) {
         graphicData[objectType].forEach((objData) => {
           if (!(objData.data in this.graphicCache)) {
@@ -381,8 +381,8 @@ export class GameAreaEntity extends AbstractEntity {
       }
     });
 
-    // walls & floors
-    ['walls', 'floors'].forEach((objectType) => {
+    // walls & floors & nasties
+    ['walls', 'floors', 'nasties'].forEach((objectType) => {
       if (objectType in graphicData) {
         graphicData[objectType].forEach((objData) => {
           var locations = false;
