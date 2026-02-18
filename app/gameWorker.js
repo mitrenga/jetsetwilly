@@ -19,7 +19,7 @@ var jumpMap = [-4, -4, -3, -3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4];
 var fallingCounter = 0;
 var fallingDirection = 0;
 var mustMovingDirection = 0;
-var canMovingDirection = 0;
+var shouldMovingDirection = 0;
 var previousDirection = 0;
 var caughtRope = 0;
 var caughtNode = 0;
@@ -73,7 +73,7 @@ function gameLoop() {
       }
     }
 
-    if (!mustMovingDirection && standing.length && !gameData.info[5]) {
+    if (!shouldMovingDirection && standing.length && !gameData.info[5]) {
       gameData.info[12] = true;
     }
 
@@ -144,7 +144,7 @@ function willyWalking() {
     fallingCounter = 5;
   }      
 
-  canMovingDirection = 0;
+  shouldMovingDirection = 0;
 
   standing = checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors], false);
 
@@ -152,16 +152,16 @@ function willyWalking() {
     if ('moving' in object) {
       switch (object.moving) {
         case 'right':
-          canMovingDirection = 1;
+          shouldMovingDirection = 1;
           break;
         case 'left':
-          canMovingDirection = -1;
+          shouldMovingDirection = -1;
           break;
       }
     }
   });
   
-  if (!canMovingDirection) {
+  if (!shouldMovingDirection) {
     mustMovingDirection = 0;
   }
 
@@ -171,8 +171,8 @@ function willyWalking() {
         gameData.info[5] = true;
       }
       fallingCounter = 0;
-      if (canMovingDirection == fallingDirection) {
-        mustMovingDirection = canMovingDirection;
+      if (shouldMovingDirection == fallingDirection) {
+        mustMovingDirection = shouldMovingDirection;
       }
       fallingDirection = 0;
       postMessage({id: 'stopAudioChannel', channel: 'sounds'});
@@ -205,8 +205,8 @@ function willyWalking() {
   if (jumpCounter && jumpMap[jumpCounter] > 1) {
     if (standing.length) {
       jumpCounter = 0;
-      if (canMovingDirection == jumpDirection) {
-        mustMovingDirection = canMovingDirection;
+      if (shouldMovingDirection == jumpDirection) {
+        mustMovingDirection = shouldMovingDirection;
       }
       jumpDirection = 0;
       postMessage({id: 'stopAudioChannel', channel: 'sounds'});
@@ -243,15 +243,15 @@ function willyWalking() {
     }
   }
 
-  if (canMovingDirection == 1 && !controls.left) {
+  if (shouldMovingDirection == 1 && !controls.left) {
     mustMovingDirection = 1;
   }
-  if (canMovingDirection == -1 && !controls.right) {
+  if (shouldMovingDirection == -1 && !controls.right) {
     mustMovingDirection = -1;
   }
 
   var newDirection = 0;
-  if (((gameData.info[9] == 2 || gameData.info[9] < 2 && controls.right && !controls.left ) && !jumpCounter && !fallingCounter && !mustMovingDirection && (!canMovingDirection || (canMovingDirection == -1 && previousDirection == 1))) ||
+  if (((gameData.info[9] == 2 || gameData.info[9] < 2 && controls.right && !controls.left ) && !jumpCounter && !fallingCounter && !mustMovingDirection && (!shouldMovingDirection || (shouldMovingDirection == -1 && previousDirection == 1))) ||
       (jumpCounter && jumpDirection == 1) ||
       (mustMovingDirection == 1)) {
 
@@ -285,7 +285,7 @@ function willyWalking() {
     }
   }
 
-  if ((gameData.info[9] < 2 && controls.left && !controls.right && !jumpCounter && !fallingCounter && !mustMovingDirection && (!canMovingDirection || (canMovingDirection == 1 && previousDirection == -1))) ||
+  if ((gameData.info[9] < 2 && controls.left && !controls.right && !jumpCounter && !fallingCounter && !mustMovingDirection && (!shouldMovingDirection || (shouldMovingDirection == 1 && previousDirection == -1))) ||
       (jumpCounter && jumpDirection == -1) ||
       (mustMovingDirection == -1)) {
 
