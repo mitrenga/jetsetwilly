@@ -72,7 +72,6 @@ export class GameApp extends AbstractApp {
     this.itemsCollected = {};
     this.willyRoomsCache = {willy: false};
     this.willySafeInitPositionCache = {willy: false};
-    this.previousDirection = 0;
     this.globalData = false;
     this.roomsMapPositions = {};
     this.setModel('LoadingModel');
@@ -198,7 +197,13 @@ export class GameApp extends AbstractApp {
           paintCorrections: this.globalData.willy.paintCorrections,
           touchCorrections: this.globalData.willy.touchCorrections,
           frames: this.globalData.willy.frames,
-          directions: this.globalData.willy.directions
+          directions: this.globalData.willy.directions,
+          roomNumber: roomNumber,
+          previousDirection: 0,
+          jumpCounter: 0,
+          jumpDirection: 0,
+          fallingCounter: 0,
+          fallingDirection: 0
         };
         this.roomNumber = roomNumber;
         this.inputEventsManager.touchesControls.left = {};

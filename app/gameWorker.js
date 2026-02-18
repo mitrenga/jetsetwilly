@@ -26,6 +26,7 @@ var caughtNode = 0;
 var ropeProhibited = {rope: 0, counter: 0};
 var operation = 'walking';
 var pause = false;
+var firstLoop = true;
 
 function gameLoop() {
   if (!pause) {
@@ -34,6 +35,12 @@ function gameLoop() {
       delay = 38;
     }
     setTimeout(gameLoop, delay);
+  }
+
+  // delay the first loop when switching between rooms
+  if (firstLoop) {
+    firstLoop = false;
+    return;
   }
 
   if (gameData != null) {
@@ -77,7 +84,15 @@ function gameLoop() {
       gameData.info[12] = true;
     }
 
+    if (gameData.info[7] == 'above') {
+      jumpCounter = 0;
+      jumpDirection = 0;
+    }
     gameData.info[11] = previousDirection;
+    gameData.info[13] = jumpCounter;
+    gameData.info[14] = jumpDirection;
+    gameData.info[15] = fallingCounter;
+    gameData.info[16] = fallingDirection;
     postMessage({id: 'update', gameData: gameData});
   }
 } // gameLoop
@@ -141,7 +156,7 @@ function willyWalking() {
     jumpCounter = 0;
     fallingDirection = jumpDirection;
     jumpDirection = 0;
-    fallingCounter = 5;
+    fallingCounter = 8;
   }      
 
   shouldMovingDirection = 0;
@@ -167,7 +182,7 @@ function willyWalking() {
 
   if (fallingCounter) {
     if (standing.length) {
-      if (fallingCounter > 9) {
+      if (fallingCounter > 10) {
         gameData.info[5] = true;
       }
       fallingCounter = 0;
@@ -782,7 +797,14 @@ onmessage = (event) => {
           });
         } else {
           gameData.info = [...event.data.initData.info];
-          previousDirection = event.data.previousDirection;
+          previousDirection = event.data.initData.willy[0].previousDirection;
+          jumpCounter = event.data.initData.willy[0].jumpCounter;
+          jumpDirection = event.data.initData.willy[0].jumpDirection;
+          fallingCounter = event.data.initData.willy[0].fallingCounter;
+          if (fallingCounter > 2) {
+            fallingCounter -= 2;
+          }
+          fallingDirection = event.data.initData.willy[0].fallingDirection;
         }
       });
       gameLoop();

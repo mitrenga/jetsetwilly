@@ -42,8 +42,12 @@ export class RoomModel extends AbstractModel {
         false, // Willy data        [8]
         this.app.gameState, //      [9] 
         Object.keys(this.app.globalData.items).length, // total items [10]
-        0, // prevDirection         [11]
-        false // safe init position [12]
+        0, // prevDirection          [11]
+        false, // safe init position [12]
+        0, // jumpCounter            [13]
+        0, // jumpDirection          [14]
+        0, // fallingCounter         [15]
+        0  // fallingDirection       [16]
       ]
     };
 
@@ -80,7 +84,19 @@ export class RoomModel extends AbstractModel {
                 }
                 if (event.data.gameData.info[7] !== false) {
                   this.app.timeCounter += event.data.gameData.info[0];
-                  this.sendEvent(1, {id: 'changeRoom', adjoiningRoom: this.adjoiningRoom[event.data.gameData.info[7]], willyData: event.data.gameData.info[8], previousDirection: event.data.gameData.info[11]});
+                  this.sendEvent(
+                    1,
+                    {
+                      id: 'changeRoom',
+                      adjoiningRoom: this.adjoiningRoom[event.data.gameData.info[7]],
+                      willyData: event.data.gameData.info[8],
+                      previousDirection: event.data.gameData.info[11],
+                      jumpCounter: event.data.gameData.info[13],
+                      jumpDirection: event.data.gameData.info[14],
+                      fallingCounter: event.data.gameData.info[15],
+                      fallingDirection: event.data.gameData.info[16]
+                    }
+                  );
                 }
                 for (var l = 0; l < this.app.lives; l++) {
                   this.gameInfoEntity.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
@@ -241,7 +257,7 @@ export class RoomModel extends AbstractModel {
     }
     super.setData(data.data);
     this.app.inputEventsManager.sendEventsActiveKeys('Press');
-    this.postWorkerMessage({id: 'init', initData: this.initData, previousDirection: this.app.previousDirection});
+    this.postWorkerMessage({id: 'init', initData: this.initData});
   } // setData
 
   handleEvent(event) {
@@ -482,7 +498,11 @@ export class RoomModel extends AbstractModel {
       case 'changeRoom':
         this.app.roomNumber = event.adjoiningRoom;
         this.app.willyRoomsCache = event.willyData;
-        this.app.previousDirection = event.previousDirection;
+        this.app.willyRoomsCache.previousDirection = event.previousDirection;
+        this.app.willyRoomsCache.jumpCounter = event.jumpCounter;
+        this.app.willyRoomsCache.jumpDirection = event.jumpDirection;
+        this.app.willyRoomsCache.fallingCounter = event.fallingCounter;
+        this.app.willyRoomsCache.fallingDirection = event.fallingDirection;
         this.app.startRoom(false, false, false, false, this.app.extraGame, false);
         break;
 

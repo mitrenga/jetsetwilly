@@ -113,7 +113,7 @@ export class GameOverModel extends AbstractModel {
     switch (event.id) {
       case 'restartRoom':
         this.app.lives = 7;
-        this.app.startRoom(false, false, false, false, true, false);
+        this.app.startRoom(false, false, true, false, true, false);
         return true;
       case 'MainModel':
         this.app.setModel('MainModel');
