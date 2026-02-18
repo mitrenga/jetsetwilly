@@ -34,7 +34,7 @@ export class GameApp extends AbstractApp {
   constructor(platform, importPath, wsURL) {
     super(platform, 'bodyApp',  importPath, wsURL);
 
-    this.version = '2026.02.15';
+    this.version = '2026.02.18';
     this.copyright = '© 2026 GNU General Public Licence';
     
     this.audioManager = new AudioManager(this);
