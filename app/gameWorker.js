@@ -156,7 +156,7 @@ function willyWalking() {
     jumpCounter = 0;
     fallingDirection = jumpDirection;
     jumpDirection = 0;
-    fallingCounter = 8;
+    fallingCounter = 5;
   }      
 
   shouldMovingDirection = 0;
@@ -213,7 +213,7 @@ function willyWalking() {
     if (!jumpCounter && !standing.length) {
       fallingCounter = 1;
       fallingDirection = 0;
-      postMessage({id: 'playSound', channel: 'sounds', sound: 'fallingSound'});
+      postMessage({id: 'playSound', channel: 'sounds', sound: 'fallingSound', options: {next: 'longFallingSound', repeat: true}});
     }
   }
   
@@ -254,7 +254,7 @@ function willyWalking() {
       jumpDirection = 0;
       fallingCounter = 1;
       fallingDirection = 0;
-      postMessage({id: 'playSound', channel: 'sounds', sound: 'fallingSound'});
+      postMessage({id: 'playSound', channel: 'sounds', sound: 'fallingSound', options: {next: 'longFallingSound', repeat: true}});
     }
   }
 
@@ -345,7 +345,7 @@ function willyWalking() {
       } else {
         jumpCounter = 1;
         willy.y += jumpMap[jumpCounter-1];
-        postMessage({id: 'playSound', channel: 'sounds', sound: 'jumpSound'});
+        postMessage({id: 'playSound', channel: 'sounds', sound: 'jumpSound', options: {next: 'longFallingSound', repeat: true}});
       }
     }
   }
@@ -398,7 +398,7 @@ function willyOnRope() {
     willy.x = willy.x-willy.x%2+4*jumpDirection;
     willy.y = willy.y+willy.x%2-2;
     willy.frame = Math.floor(willy.x%8/2);
-    postMessage({id: 'playSound', channel: 'sounds', sound: 'jumpSound'});
+    postMessage({id: 'playSound', channel: 'sounds', sound: 'jumpSound', options: {next: 'longFallingSound', repeat: true}});
   } else {
     if (controls.right && !controls.left) {
       if (willy.direction == 1) {
@@ -442,7 +442,7 @@ function willyOnRope() {
         fallingCounter = 1;
         willy.x = willy.x-willy.x%2;
         willy.y = willy.y+willy.x%2;
-        postMessage({id: 'playSound', channel: 'sounds', sound: 'fallingSound'});
+        postMessage({id: 'playSound', channel: 'sounds', sound: 'fallingSound', options: {next: 'longFallingSound', repeat: true}});
       } else {
         willy.x = gameData.ropes[caughtRope].nodes[caughtNode].x-4;
         willy.y = gameData.ropes[caughtRope].nodes[caughtNode].y-6;
@@ -554,7 +554,7 @@ function guardians() {
             break;
         }
         if (guardian.counter == guardian.soundWhenCounter) {
-          postMessage({id: 'playSound', channel: 'extra', sound: 'arrowSound'});
+          postMessage({id: 'playSound', channel: 'extra', sound: 'arrowSound', options: false});
         }
         var x = guardian.counter*guardian.speed;
         if (x > 255) {
@@ -726,7 +726,7 @@ function checkTouchItems() {
     if (Object.keys(gameData.info[6]).length == gameData.info[10]) {
       gameData.info[9] = 1;
     }
-    postMessage({id: 'playSound', channel: 'extra', sound: 'itemSound'});
+    postMessage({id: 'playSound', channel: 'extra', sound: 'itemSound', options: false});
   }
 } // checkTouchItems
 

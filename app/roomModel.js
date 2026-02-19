@@ -151,7 +151,7 @@ export class RoomModel extends AbstractModel {
           break;
 
         case 'playSound':
-          this.sendEvent(0, {id: 'playSound', channel: event.data.channel, sound: event.data.sound, options: false});
+          this.sendEvent(0, {id: 'playSound', channel: event.data.channel, sound: event.data.sound, options: event.data.options});
           break;
 
         case 'stopAudioChannel':
@@ -196,7 +196,6 @@ export class RoomModel extends AbstractModel {
       this.worker.terminate();
       this.worker = null;
     }
-    this.app.audioManager.stopChannel('sounds');
     this.app.audioManager.stopChannel('extra');
   } // shutdown
 

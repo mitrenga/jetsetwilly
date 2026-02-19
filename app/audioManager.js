@@ -21,7 +21,7 @@ export class AudioManager extends AbstractAudioManager {
     this.volume.music = Math.min(10, Math.max(0, Math.round(Number(this.app.readCookie('audioChannelMusic', 2)))));
   } // constructor
 
-createAudioHandler(channel, options) {
+  createAudioHandler(channel, options) {
     var audioHandler = false;
 
     var volume = 0.0;
@@ -73,7 +73,8 @@ createAudioHandler(channel, options) {
       case 'exampleInGameMelody': return this.inGameMelody(sampleRate, 7, true);
       case 'jumpSound': return this.jumpSound(sampleRate, false);
       case 'exampleJumpSound': return this.jumpSound(sampleRate, true);
-      case 'fallingSound': return this.fallingSound(sampleRate);
+      case 'fallingSound': return this.fallingSound(sampleRate, 0, 11);
+      case 'longFallingSound': return this.fallingSound(sampleRate, 12, 15);
       case 'crashSound': return this.crashSound(sampleRate);
       case 'itemSound': return this.itemSound(sampleRate);
       case 'arrowSound': return this.arrowSound(sampleRate);
@@ -297,29 +298,7 @@ createAudioHandler(channel, options) {
     }
 
     if (!example) {
-      k = Math.round(sampleRate/441)/100;
-      
-      var p = 4;
-      for (var x = 0; x < 27; x++) {
-        var d = Math.round(7+2.2*p*k);
-        p++;
-        if (p == 16) {
-          p = 12;
-        }
-        fragments.push(d);
-        for (var o = 0; o < 31; o++) {
-          if (pulsesCounter == pulses.length) {
-            pulses = this.extendArray(pulses, 100);
-          }
-          pulses[pulsesCounter] = fragments.length-1;
-          pulsesCounter++;
-        }
-        if (pulsesCounter == pulses.length) {
-          pulses = this.extendArray(pulses, 100);
-        }
-        pulses[pulsesCounter] = 0;
-        pulsesCounter++;
-      }
+      pulsesCounter = this.partFallingSound(sampleRate, 4, 11, fragments, pulses, pulsesCounter);
     }
 
     pulses = this.resizeArray(pulses, pulsesCounter);
@@ -333,21 +312,24 @@ createAudioHandler(channel, options) {
   } // jumpSound
 
 
-  fallingSound(sampleRate) {
+  fallingSound(sampleRate, fromValue, toValue) {
     var fragments = [];
     var pulses = new Uint8Array(32*27);
     var pulsesCounter = 0;
     
-    var k = Math.round(sampleRate/441)/100;
     fragments.push(Math.round(sampleRate/12.6));
-    
-    var p = 0;
-    for (var x = 0; x < 27; x++) {
-      var d = Math.round(7+2.2*p*k);
-      p++;
-      if (p == 16) {
-        p = 12;
-      }
+
+    pulsesCounter = this.partFallingSound(sampleRate, fromValue, toValue, fragments, pulses, pulsesCounter);
+
+    pulses = this.resizeArray(pulses, pulsesCounter);
+    this.audioDataCache.sounds['fallingSound-'+fromValue+'-'+toValue] = {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
+    return this.audioDataCache.sounds['fallingSound-'+fromValue+'-'+toValue];
+  } // fallingSound
+
+  partFallingSound(sampleRate, fromValue, toValue, fragments, pulses, pulsesCounter) {
+    var k = Math.round(sampleRate/441)/100;
+    for (var x = fromValue; x <= toValue; x++) {
+      var d = Math.round(7+2.2*x*k);
       fragments.push(d);
       for (var o = 0; o < 31; o++) {
         if (pulsesCounter == pulses.length) {
@@ -362,11 +344,8 @@ createAudioHandler(channel, options) {
       pulses[pulsesCounter] = 0;
       pulsesCounter++;
     }
-
-    pulses = this.resizeArray(pulses, pulsesCounter);
-    this.audioDataCache.sounds.fallingSound = {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
-    return this.audioDataCache.sounds.fallingSound;
-  } // fallingSound
+    return pulsesCounter;
+  } // partFallingSound
 
   crashSound(sampleRate) {
     var fragments = [];
