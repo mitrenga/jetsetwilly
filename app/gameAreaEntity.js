@@ -658,8 +658,64 @@ export class GameAreaEntity extends AbstractEntity {
         });
       });
     }
+
+    // optimization when Willy is below on the ramp
+    if (!this.demo) {
+      if (this.isStandingAtBottomOfRamp()) {
+        this.app.willyRoomsCache.y = 110;
+        this.spriteEntities.willy[0].y = 110;
+        this.initData.willy[0].y = 110;
+      }
+    }
   } // setData
-    
+
+  isStandingAtBottomOfRamp() {
+    var willy = this.initData.willy[0];
+    var objectsArray = [this.initData.walls, this.initData.floors, this.initData.conveyors];
+
+    if (willy.y != 104) {
+      return false;
+    }
+
+    if (willy.jumpCounter) {
+      return false;
+    }
+
+    for (var a = 0; a < objectsArray.length; a++) {
+      var objects = objectsArray[a];
+      for (var o = 0; o < objects.length; o++) {
+        var obj = objects[o];
+        if (!('hide' in obj) || !obj.hide) {
+          if (!(willy.x+10 <= obj.x || willy.x >= obj.x+obj.width) && willy.y+16 == obj.y) {
+            return false;
+          }
+        }
+      }
+    }
+
+    for (var o = 0; o < this.initData.ramps.length; o++) {
+      var obj = this.initData.ramps[o];
+      switch (obj.gradient) {
+        case 'right':
+          if (willy.y+willy.height >= obj.y && willy.y+willy.height < obj.y+obj.height) {
+            if (willy.y+6+16 == obj.y+obj.height-willy.x-10+obj.x) {
+              return true;
+            }
+          }
+          break;
+        case 'left':
+          if (willy.y+willy.height >= obj.y && willy.y+willy.height < obj.y+obj.height) {
+            if (willy.y+6+16 == obj.y+obj.height+willy.x-obj.x-obj.width) {
+              return true;
+            }
+          }
+          break;
+      }
+    }
+
+    return false;
+  } // isStandingAtBottomOfRamp
+      
   updateData(gameData, objectsType, subType) {
     gameData[objectsType].forEach((object, o) => {
       var spriteEntity = false;
