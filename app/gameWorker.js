@@ -87,6 +87,7 @@ function gameLoop() {
     if (gameData.info[7] == 'above') {
       jumpCounter = 0;
       jumpDirection = 0;
+      postMessage({id: 'stopAudioChannel', channel: 'sounds'});
     }
     gameData.info[11] = previousDirection;
     gameData.info[13] = jumpCounter;
@@ -245,6 +246,7 @@ function willyWalking() {
           willy.y = 104;
           gameData.info[7] = 'above';
           gameData.info[8] = willy;
+          postMessage({id: 'stopAudioChannel', channel: 'sounds'});
         } else {
           willy.y += jumpMap[jumpCounter-1];
         }
@@ -292,6 +294,7 @@ function willyWalking() {
             willy.y = 104;
             gameData.info[7] = 'above';
             gameData.info[8] = willy;
+            postMessage({id: 'stopAudioChannel', channel: 'sounds'});
           } else {
             willy.y += moveY;
           }
@@ -326,6 +329,7 @@ function willyWalking() {
             willy.y = 104;
             gameData.info[7] = 'above';
             gameData.info[8] = willy;
+            postMessage({id: 'stopAudioChannel', channel: 'sounds'});
           } else {
             willy.y += moveY;
           }
@@ -342,6 +346,7 @@ function willyWalking() {
         willy.y = 104;
         gameData.info[7] = 'above';
         gameData.info[8] = willy;
+        postMessage({id: 'stopAudioChannel', channel: 'sounds'});
       } else {
         jumpCounter = 1;
         willy.y += jumpMap[jumpCounter-1];
@@ -433,6 +438,7 @@ function willyOnRope() {
       willy.y = 104;
       gameData.info[7] = 'above';
       gameData.info[8] = willy;
+      postMessage({id: 'stopAudioChannel', channel: 'sounds'});
     } else {
       if (gameData.ropes[caughtRope].climbBlock !== false && caughtNode < gameData.ropes[caughtRope].climbBlock-1) {
         caughtNode = gameData.ropes[caughtRope].climbBlock-1;
