@@ -74,9 +74,9 @@ function gameLoop() {
       items();
       switches();
       if (!gameData.info[4]) { // if not demo
-        checkTouchItems();
-        checkCrash();
-        checkTouchSwitches();
+        isTouchingItem();
+        isColliding();
+        isTouchingSwitch();
       }
     }
 
@@ -162,7 +162,7 @@ function willyWalking() {
 
   shouldMovingDirection = 0;
 
-  standing = checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors], false);
+  standing = isStandingOn(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors], false);
 
   standing.forEach((object) => {
     if ('moving' in object) {
@@ -203,7 +203,7 @@ function willyWalking() {
         } else {
           willy.y += 1;
           fall--;
-          if (checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors], false).length) {
+          if (isStandingOn(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors], false).length) {
             fall = 0;
           }
         }
@@ -237,7 +237,7 @@ function willyWalking() {
         do {
           willy.y += 1;
           fall--;
-          if (checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors], false).length) {
+          if (isStandingOn(willy.x, willy.y, 10, 16, [gameData.walls, gameData.floors, gameData.conveyors], false).length) {
             fall = 0;
           }
         } while (fall > 0)
@@ -616,7 +616,7 @@ function switches() {
   });    
 } // switches
 
-function checkTouchWithObjectsArray(x, y, width, height, objectsArray) {
+function isTouching(x, y, width, height, objectsArray) {
   for (var a = 0; a < objectsArray.length; a++) {
     var objects = objectsArray[a];
     for (var o = 0; o < objects.length; o++) {
@@ -652,10 +652,10 @@ function checkTouchWithObjectsArray(x, y, width, height, objectsArray) {
     }
   }
   return 0;
-} // checkTouchWithObjectsArray
+} // isTouching
 
 /*
-function checkInsideWithObjectsArray(x, y, width, height, objectsArray) {
+function isInside(x, y, width, height, objectsArray) {
   for (var a = 0; a < objectsArray.length; a++) {
     var objects = objectsArray[a];
     for (var o = 0; o < objects.length; o++) {
@@ -668,10 +668,10 @@ function checkInsideWithObjectsArray(x, y, width, height, objectsArray) {
     }
   }
   return 0;
-} // checkInsideWithObjectsArray
+} // isInside
 */
 
-function checkStandingWithObjectsArray(x, y, width, height, objectsArray, ignoreRamps) {
+function isStandingOn(x, y, width, height, objectsArray, ignoreRamps) {
   var result = [];
 
   if (jumpCounter && jumpMap[jumpCounter] < 0) {
@@ -692,10 +692,10 @@ function checkStandingWithObjectsArray(x, y, width, height, objectsArray, ignore
   if (ignoreRamps) {
     return result;
   }
-  return checkStandingOnRamps(result, x, y, width, height);
-} // checkStandingWithObjectsArray
+  return isStandingOnRamp(result, x, y, width, height);
+} // isStandingOn
 
-function checkStandingOnRamps(result, x, y, width, height) {
+function isStandingOnRamp(result, x, y, width, height) {
   if (!jumpCounter || !jumpDirection) {
     for (var o = 0; o < gameData.ramps.length; o++) {
       var obj = gameData.ramps[o];
@@ -718,14 +718,14 @@ function checkStandingOnRamps(result, x, y, width, height) {
     }
   }
   return result;
-} // checkStandingOnRamps
+} // isStandingOnRamp
 
 function canMove(moveX, moveY) {
-  return !checkTouchWithObjectsArray(gameData.willy[0].x+moveX, gameData.willy[0].y+moveY, 10, 16, [gameData.walls]);
+  return !isTouching(gameData.willy[0].x+moveX, gameData.willy[0].y+moveY, 10, 16, [gameData.walls]);
 } // canMove
 
-function checkTouchItems() {
-  var touchId = checkTouchWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.items]);
+function isTouchingItem() {
+  var touchId = isTouching(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.items]);
   if (touchId) {
     gameData.items[touchId-1].hide = true;
     gameData.info[6][gameData.items[touchId-1].id] = true;
@@ -734,21 +734,21 @@ function checkTouchItems() {
     }
     postMessage({id: 'playSound', channel: 'extra', sound: 'itemSound', options: false});
   }
-} // checkTouchItems
+} // isTouchingItem
 
-function checkCrash() {
+function isColliding() {
   var willy = gameData.willy[0];
   var f = willy.frame+willy.direction*willy.frames;
-  if (checkTouchWithObjectsArray(willy.x+willy.touchCorrections[f].x1, willy.y, willy.touchCorrections[f].x2-willy.touchCorrections[f].x1, 16, [gameData.guardians])) {
+  if (isTouching(willy.x+willy.touchCorrections[f].x1, willy.y, willy.touchCorrections[f].x2-willy.touchCorrections[f].x1, 16, [gameData.guardians])) {
     gameData.info[5] = true;
   }
-  if (checkTouchWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.nasties])) {
+  if (isTouching(willy.x, willy.y, 10, 16, [gameData.nasties])) {
     gameData.info[5] = true;
   }
-  if (checkStandingWithObjectsArray(willy.x, willy.y, 10, 16, [gameData.nasties], true).length) {
+  if (isStandingOn(willy.x, willy.y, 10, 16, [gameData.nasties], true).length) {
     gameData.info[5] = true;
   }
-} // checkCrash
+} // isColliding
 
 function rampMovement(move, x, y, width, height) {
   if (!jumpCounter && !controls.jump) {
@@ -757,12 +757,12 @@ function rampMovement(move, x, y, width, height) {
       var obj = gameData.ramps[o];
       switch (obj.gradient) {
         case 'right':
-          if ((checkTouchWithObjectsArray(x+move, y-move, width+absMove, height+absMove, [[obj]])) && (y+height == obj.y+obj.height-x-width+obj.x)) {
+          if ((isTouching(x+move, y-move, width+absMove, height+absMove, [[obj]])) && (y+height == obj.y+obj.height-x-width+obj.x)) {
             return -move;
           }
           break;
         case 'left':
-          if ((checkTouchWithObjectsArray(x+move-absMove, y+move, width+absMove, height+absMove, [[obj]])) && (y+height == obj.y+obj.height+x-obj.x-obj.width)) {
+          if ((isTouching(x+move-absMove, y+move, width+absMove, height+absMove, [[obj]])) && (y+height == obj.y+obj.height+x-obj.x-obj.width)) {
             return move;
           }
           break;
@@ -772,8 +772,8 @@ function rampMovement(move, x, y, width, height) {
   return 0;
 } // rampMovement
 
-function checkTouchSwitches() {
-  var touchId = checkTouchWithObjectsArray(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.switches]);
+function isTouchingSwitch() {
+  var touchId = isTouching(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.switches]);
   if (touchId) {
     var actions = gameData.switches[touchId-1].actions;
     actions.forEach((action) => {
@@ -789,7 +789,7 @@ function checkTouchSwitches() {
       }
     });
   }
-} // checkTouchSwitches
+} // isTouchingSwitch
 
 onmessage = (event) => {
   switch (event.data.id) {
