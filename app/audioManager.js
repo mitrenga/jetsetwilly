@@ -56,6 +56,10 @@ export class AudioManager extends AbstractAudioManager {
         break;
     }
 
+    if (channel in this.restartSounds) {
+      this.app.model.sendEvent(1, {id: 'playSound', channel: channel, sound: this.restartSounds[channel].sound, options: this.restartSounds[channel].options});
+    }
+
     return audioHandler;
   } // createAudioHandler
 
