@@ -2,10 +2,10 @@
 
 JET SET WILLY
 =====================
-The legendary JET SET WILLY game in retro style for all modern web browsers.
+The legendary 8-bit classic, reborn for modern web browsers.
 
 ## About
-Originally written in 1984 by Matthew Smith. This port isn't emulator or binary copy, but it is based on the original ZX Spectrum version.
+Originally written in 1984 by Matthew Smith. This is a faithful remake based on the original ZX Spectrum version — not an emulator or a binary copy.
 
 Supported:
 - keyboard
