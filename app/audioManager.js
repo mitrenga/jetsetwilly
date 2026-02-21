@@ -53,6 +53,7 @@ export class AudioManager extends AbstractAudioManager {
         break;
       case 'AudioScriptProcessorHandler':
         this.app.writeCookie('unsupportedAudioChannel', 'AudioScriptProcessorHandler');
+        audioHandler = new AudioDisableHandler(this.app);
         break;
     }
 
