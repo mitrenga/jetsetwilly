@@ -803,14 +803,16 @@ onmessage = (event) => {
           });
         } else {
           gameData.info = [...event.data.initData.info];
-          previousDirection = event.data.initData.willy[0].previousDirection;
-          jumpCounter = event.data.initData.willy[0].jumpCounter;
-          jumpDirection = event.data.initData.willy[0].jumpDirection;
-          fallingCounter = event.data.initData.willy[0].fallingCounter;
-          if (fallingCounter > 2) {
-            fallingCounter -= 2;
+          if (event.data.initData.willy.length) {
+            previousDirection = event.data.initData.willy[0].previousDirection;
+            jumpCounter = event.data.initData.willy[0].jumpCounter;
+            jumpDirection = event.data.initData.willy[0].jumpDirection;
+            fallingCounter = event.data.initData.willy[0].fallingCounter;
+            if (fallingCounter > 2) {
+              fallingCounter -= 2;
+            }
+            fallingDirection = event.data.initData.willy[0].fallingDirection;
           }
-          fallingDirection = event.data.initData.willy[0].fallingDirection;
         }
       });
       gameLoop();
