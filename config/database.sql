@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS rg_jsw_hallOfFame (
   `ndx` BIGINT(20) NOT NULL AUTO_INCREMENT,
   `name` CHAR(64) NOT NULL,
   `score` BIGINT(20) NOT NULL,
+  `completed` INT(11) NOT NULL,
   PRIMARY KEY (`ndx`),
   INDEX (`score`)
 );

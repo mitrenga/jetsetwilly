@@ -70,6 +70,7 @@ export class GameApp extends AbstractApp {
     this.items = [];
     this.totalItems = 0;
     this.itemsCollected = {};
+    this.gameCompleted = 0;
     this.willyRoomsCache = {willy: false};
     this.willySafeInitPositionCache = {willy: false};
     this.globalData = false;
@@ -185,6 +186,7 @@ export class GameApp extends AbstractApp {
     if (newGame) {
       this.gameState = 0;
       this.itemsCollected = {};
+      this.gameCompleted = 0;
       this.timeCounter = 0;
       this.timeStr = ' 7:00am';
       this.lives = 7;

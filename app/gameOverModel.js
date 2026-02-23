@@ -94,8 +94,8 @@ export class GameOverModel extends AbstractModel {
     }
 
     var score = Object.keys(this.app.itemsCollected).length;
-    if (score && !this.app.extraGame) {
-      this.fetchData('saveGame.db', false, {name: this.app.playerName, score: score});
+    if (score && !this.app.extraGame && !this.app.gameCompleted) {
+      this.fetchData('saveGame.db', false, {name: this.app.playerName, score: score, completed: 0});
     }
   } // init
 

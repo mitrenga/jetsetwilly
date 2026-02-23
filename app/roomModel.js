@@ -77,6 +77,10 @@ export class RoomModel extends AbstractModel {
             switch (objectsType) {
               case 'info':
                 this.app.gameState = event.data.gameData.info[9];
+                if (this.app.gameState == 2 && !this.app.extraGame && !this.app.gameCompleted) {
+                  this.app.gameCompleted = 1;
+                  this.fetchData('saveGame.db', false, {name: this.app.playerName, score: Object.keys(this.app.itemsCollected).length, completed: 1});
+                }
                 if (!this.safeInitPosition && event.data.gameData.info[12]) {
                   this.safeInitPosition = true;
                   this.app.willySafeInitPositionCache = {...this.app.willyRoomsCache};
@@ -204,6 +208,10 @@ export class RoomModel extends AbstractModel {
   } // newBorderEntity
 
   setData(data) {
+    if (data.url == 'saveGame.db') {
+      return;
+    }
+    
     if (!('willy' in data.data)) {
       data.data.willy = {...this.app.globalData.willy};
     } else {

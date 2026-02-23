@@ -42,11 +42,14 @@ export class HallOfFameEntity extends AbstractEntity {
       var y = 12+i*10;
       this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 2, y, 18, 8, (i+1)+'.', this.app.platform.colorByName('black'), false, {align: 'right'}));
       this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 24, y, 120, 8, data.data[i].name, this.app.platform.colorByName('black'), false, {}));
-      var scoreColor = this.app.platform.colorByName('black');
-      var scoreText = data.data[i].score+'/'+this.app.globalData.items.length;
-      if (Number(data.data[i].score) > this.app.globalData.items.length) {
+      var scoreColor = false;
+      var scoreText = '';
+      if (Number(data.data[i].completed) != 0) {
         scoreColor = this.app.platform.colorByName('green');
         scoreText = 'COMPLETED';
+      } else {
+        scoreColor = this.app.platform.colorByName('black');
+        scoreText = data.data[i].score+'/'+this.app.globalData.items.length;
       }
       this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, this.width-58, y+3, 51, 5, scoreText, scoreColor, false, {align: 'right'}));
     }
