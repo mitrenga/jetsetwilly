@@ -213,7 +213,7 @@ export class MenuModel extends AbstractModel {
         return true;
 
       case 'setControls':
-        this.desktopEntity.addModalEntity(new ZXControlsEntity(this.desktopEntity, 27, 24, 202, 134));
+        this.desktopEntity.addModalEntity(new ZXControlsEntity(this.desktopEntity, 27, 24, 202, 134, this.app.controlsOptions));
         return true;
 
       case 'startTapeLoading':
