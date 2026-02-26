@@ -546,7 +546,7 @@ export class RoomModel extends AbstractModel {
         this.postWorkerMessage({id: 'controls', action: ts.action, value: true});
         break;
       case 'joystick':
-        this.tsJoysticks[event.identifier] = {center: {x: event.x, y: event.y}, control: ts.control, actions: ts.actions};
+        this.tsJoysticks[event.identifier] = {center: {x: event.x, y: event.y}, action: false, control: ts.control, actions: ts.actions};
         break;
     }
   } // touchStart
@@ -555,11 +555,12 @@ export class RoomModel extends AbstractModel {
     var ts = this.app.controlsOptions.touchscreen.types[this.app.controls.touchscreen.type][side];
     switch (ts.type) {
       case 'button':
-        if (Object.keys(this.app.inputEventsManager.touchesControls[side]).length == 1) {
-          this.postWorkerMessage({id: 'controls', action: ts.action, value: false});
-        }
+        this.postWorkerMessage({id: 'controls', action: ts.action, value: false});
         break;
       case 'joystick':
+        if (this.tsJoysticks[event.identifier].action !== false) {
+          this.postWorkerMessage({id: 'controls', action: this.tsJoysticks[event.identifier].action, value: false});
+        }
         delete this.tsJoysticks[event.identifier];
         break;
     }
@@ -567,7 +568,30 @@ export class RoomModel extends AbstractModel {
 
   touchMove(event) {
     if (event.identifier in this.tsJoysticks) {
-      console.log(event.x-this.tsJoysticks[event.identifier].center.x);
+      var action = false;
+      switch (this.tsJoysticks[event.identifier].control) {
+        case 'horizontal':
+          if (event.x-this.tsJoysticks[event.identifier].center.x < 0) {
+            action = this.tsJoysticks[event.identifier].actions[0];
+          }
+          if (event.x-this.tsJoysticks[event.identifier].center.x > 0) {
+            action = this.tsJoysticks[event.identifier].actions[1];
+          }
+          break;
+        case 'vertical':
+          if (event.y-this.tsJoysticks[event.identifier].center.y < 0) {
+            action = this.tsJoysticks[event.identifier].actions[0];
+          }
+          if (event.y-this.tsJoysticks[event.identifier].center.y > 0) {
+            action = this.tsJoysticks[event.identifier].actions[1];
+          }
+          break;
+      }
+      if (this.tsJoysticks[event.identifier].action !== action) {
+        this.postWorkerMessage({id: 'controls', action: this.tsJoysticks[event.identifier].action, value: false});
+        this.tsJoysticks[event.identifier].action = action;
+        this.postWorkerMessage({id: 'controls', action: this.tsJoysticks[event.identifier].action, value: true});
+      }
     }
   } // touchMove
 
