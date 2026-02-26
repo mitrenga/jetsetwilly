@@ -30,7 +30,6 @@ export class BorderEntity  extends AbstractEntity {
 
     this.leftControlEntity = null;
     this.rightControlEntity = null;
-    this.jumpControlEntity = null;
   } // constructor
 
   init() {
@@ -45,12 +44,10 @@ export class BorderEntity  extends AbstractEntity {
     }
 
     if (this.enableGameControls) {
-      this.leftControlEntity = new AbstractEntity(this, 0, 0, 0, 0, false, '#00000020');
+      this.leftControlEntity = new AbstractEntity(this, 0, 0, 0, 0, false, false);
       this.addEntity(this.leftControlEntity);
-      this.rightControlEntity = new AbstractEntity(this, 0, 0, 0, 0, false, '#00000020');
+      this.rightControlEntity = new AbstractEntity(this, 0, 0, 0, 0, false, false);
       this.addEntity(this.rightControlEntity);
-      this.jumpControlEntity = new AbstractEntity(this, 0, 0, 0, 0, false, '#00000020');
-      this.addEntity(this.jumpControlEntity);
     }
   } // init
 
@@ -146,23 +143,18 @@ export class BorderEntity  extends AbstractEntity {
         
         
         if (this.enableGameControls) {
-          var width = Math.round(180/this.app.layout.ratio);
-          var height = Math.round(180/this.app.layout.ratio);
+          var w = Math.floor(this.width/2);
+          var h = Math.floor(this.height/2);
 
-          this.leftControlEntity.width = width;
-          this.leftControlEntity.height = height;
-          this.leftControlEntity.x = this.width-2*this.leftControlEntity.width-2;
-          this.leftControlEntity.y = this.height-this.leftControlEntity.height;
+          this.leftControlEntity.x = 0;
+          this.leftControlEntity.y = this.height-h;
+          this.leftControlEntity.width = w;
+          this.leftControlEntity.height = h;
 
-          this.rightControlEntity.width = width;
-          this.rightControlEntity.height = height;
-          this.rightControlEntity.x = this.width-this.leftControlEntity.width;
-          this.rightControlEntity.y = this.height-this.leftControlEntity.height;
-
-          this.jumpControlEntity.width = width;
-          this.jumpControlEntity.height = height;
-          this.jumpControlEntity.x = 0;
-          this.jumpControlEntity.y = this.height-this.leftControlEntity.height;
+          this.rightControlEntity.x = this.width-w;
+          this.rightControlEntity.y = this.height-h;
+          this.rightControlEntity.width = w;
+          this.rightControlEntity.height = h;
         }
         break;
     }

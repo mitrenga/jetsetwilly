@@ -333,12 +333,6 @@ export class RoomModel extends AbstractModel {
               this.postWorkerMessage({id: 'controls', action: 'right', value: true});
               return true;
             }
-            if (this.borderEntity.jumpControlEntity.pointOnEntity(event)) {
-              this.app.inputEventsManager.touchesMap[event.identifier] = this.borderEntity.jumpControlEntity;
-              this.app.inputEventsManager.touchesControls.jump[event.identifier] = true;
-              this.postWorkerMessage({id: 'controls', action: 'jump', value: true});
-              return true;
-            }
             break;
 
           case 'Touch.left':
@@ -441,12 +435,6 @@ export class RoomModel extends AbstractModel {
             if (this.app.inputEventsManager.touchesMap[event.identifier] === this.borderEntity.rightControlEntity) {
               if (Object.keys(this.app.inputEventsManager.touchesControls.right).length == 1) {
                 this.postWorkerMessage({id: 'controls', action: 'right', value: false});
-              }
-              return true;
-            }
-            if (this.app.inputEventsManager.touchesMap[event.identifier] === this.borderEntity.jumpControlEntity) {
-              if (Object.keys(this.app.inputEventsManager.touchesControls.jump).length == 1) {
-                this.postWorkerMessage({id: 'controls', action: 'jump', value: false});
               }
               return true;
             }
