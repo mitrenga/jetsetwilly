@@ -28,7 +28,7 @@ export class RoomModel extends AbstractModel {
     this.autorepeatKeys = false;
     this.needDraw = true;
     this.safeInitPosition = false;
-    this.tsJoystick = {left: {}, right: {}};
+    this.tsJoysticks = {};
 
     this.initData = {
       info: [
@@ -325,13 +325,13 @@ export class RoomModel extends AbstractModel {
             if (this.borderEntity.leftControlEntity.pointOnEntity(event)) {
               this.app.inputEventsManager.touchesMap[event.identifier] = this.borderEntity.leftControlEntity;
               this.app.inputEventsManager.touchesControls.left[event.identifier] = true;
-              this.touchStart('left');
+              this.touchStart(event, 'left');
               return true;
             }
             if (this.borderEntity.rightControlEntity.pointOnEntity(event)) {
               this.app.inputEventsManager.touchesMap[event.identifier] = this.borderEntity.rightControlEntity;
               this.app.inputEventsManager.touchesControls.right[event.identifier] = true;
-              this.touchStart('right');
+              this.touchStart(event, 'right');
               return true;
             }
             break;
@@ -428,11 +428,11 @@ export class RoomModel extends AbstractModel {
 
           case 'Touch':
             if (this.app.inputEventsManager.touchesMap[event.identifier] === this.borderEntity.leftControlEntity) {
-              this.touchEnd('left');
+              this.touchEnd(event, 'left');
               return true;
             }
             if (this.app.inputEventsManager.touchesMap[event.identifier] === this.borderEntity.rightControlEntity) {
-              this.touchEnd('right');
+              this.touchEnd(event, 'right');
               return true;
             }
             break;
@@ -531,18 +531,19 @@ export class RoomModel extends AbstractModel {
     return false;
   } // handleEvent
 
-  touchStart(side) {
+  touchStart(event, side) {
     var ts = this.app.controlsOptions.touchscreen.types[this.app.controls.touchscreen.type][side];
     switch (ts.type) {
       case 'button':
         this.postWorkerMessage({id: 'controls', action: ts.action, value: true});
         break;
       case 'joystick':
+        this.tsJoysticks[event.identifier] = {center: {x: event.x, y: event.y}, control: ts.control, actions: ts.actions};
         break;
     }
   } // touchStart
 
-  touchEnd(side) {
+  touchEnd(event, side) {
     var ts = this.app.controlsOptions.touchscreen.types[this.app.controls.touchscreen.type][side];
     switch (ts.type) {
       case 'button':
@@ -551,9 +552,14 @@ export class RoomModel extends AbstractModel {
         }
         break;
       case 'joystick':
+        delete this.tsJoysticks[event.identifier];
         break;
     }
   } // touchEnd
+
+  touchMove(event, side) {
+    console.log(event);
+  } // touchMove
 
   loopModel(timestamp) {
     super.loopModel(timestamp);
