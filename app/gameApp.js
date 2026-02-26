@@ -84,8 +84,8 @@ export class GameApp extends AbstractApp {
         device: 'touchscreen',
         types: {
           keys: ['leftJump', 'rightJump'],
-          leftJump: {left: {type: 'touch', directions: ['up'], sprite: 'jump'}, right: {type: 'joystick', directions: ['left', 'right'], sprite: 'left-right'}},
-          rightJump: {left: {type: 'joystick', directions: ['left', 'right'], sprite: 'left-right'}, right: {type: 'touch', directions: ['up'], sprite: 'jump'}}
+          leftJump: {left: {type: 'button', action: 'jump', sprite: 'jump'}, right: {type: 'joystick', control: 'horizontal', actions: ['left', 'right'], sprite: 'left-right'}},
+          rightJump: {left: {type: 'joystick', control: 'horizontal', actions: ['left', 'right'], sprite: 'left-right'}, right: {type: 'button', action: 'jump', sprite: 'jump'}}
         },
         icons: {
           jump: {
