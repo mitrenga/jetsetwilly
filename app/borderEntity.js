@@ -144,17 +144,16 @@ export class BorderEntity  extends AbstractEntity {
         
         if (this.enableGameControls) {
           var w = Math.floor(this.width/2);
-          var h = Math.floor(this.height/2);
 
           this.leftControlEntity.x = 0;
-          this.leftControlEntity.y = this.height-h;
+          this.leftControlEntity.y = 0;
           this.leftControlEntity.width = w;
-          this.leftControlEntity.height = h;
+          this.leftControlEntity.height = this.height;
 
           this.rightControlEntity.x = this.width-w;
-          this.rightControlEntity.y = this.height-h;
+          this.rightControlEntity.y = 0;
           this.rightControlEntity.width = w;
-          this.rightControlEntity.height = h;
+          this.rightControlEntity.height = this.height;
         }
         break;
     }
