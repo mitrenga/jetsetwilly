@@ -453,7 +453,7 @@ export class GameAreaEntity extends AbstractEntity {
         }
         var entity = new SpriteEntity(this, conveyorData.location.x*8, conveyorData.location.y*8, penColor, bkColor, 0, 0);
         entity.setFixSize(8, 8);
-        entity.setRepeatX(this.app.hexToInt(conveyorData.length));
+        entity.setRepeatX(conveyorData.length);
         var conveyorSpriteData = conveyorData.data.substring(2, 18);
         entity.setGraphicsDataFromHexStr(conveyorSpriteData);
         entity.cloneSprite(0);
