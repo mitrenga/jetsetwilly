@@ -83,9 +83,42 @@ export class GameApp extends AbstractApp {
       touchscreen: {
         device: 'touchscreen',
         types: {
-          keys: ['leftJump', 'rightJump'],
-          leftJump: {left: {type: 'button', action: 'jump', sprite: 'jump'}, right: {type: 'joystick', control: 'horizontal', actions: ['left', 'right'], sprite: 'left-right'}},
-          rightJump: {left: {type: 'joystick', control: 'horizontal', actions: ['left', 'right'], sprite: 'left-right'}, right: {type: 'button', action: 'jump', sprite: 'jump'}}
+          keys: [
+            'leftJump',
+            'rightJump'
+          ],
+          leftJump: {
+            left: {
+              type: 'button',
+              control: false,
+              action: 'jump',
+              actions: false,
+              sprite: 'jump'
+            },
+            right: {
+              type: 'joystick',
+              control: 'horizontal',
+              action: false,
+              actions: ['left', 'right'],
+              sprite: 'left-right'
+            }
+          },
+          rightJump: {
+            left: {
+              type: 'joystick',
+              control: 'horizontal',
+              action: false,
+              actions: ['left', 'right'],
+              sprite: 'left-right'
+            },
+            right: {
+              type: 'button',
+              control: false,
+              action: 'jump',
+              actions: false,
+              sprite: 'jump'
+            }
+          }
         },
         icons: {
           jump: {
@@ -261,9 +294,6 @@ export class GameApp extends AbstractApp {
           fallingDirection: 0
         };
         this.roomNumber = roomNumber;
-        this.inputEventsManager.touchesControls.left = {};
-        this.inputEventsManager.touchesControls.right = {};
-        this.inputEventsManager.touchesControls.jump = {};
       }
     } else {
       if (crash && this.willySafeInitPositionCache.willy !== false) {

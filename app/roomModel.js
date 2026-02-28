@@ -323,31 +323,18 @@ export class RoomModel extends AbstractModel {
           case 'Touch':
             if (this.borderEntity.leftControlEntity.pointOnEntity(event)) {
               this.app.inputEventsManager.touchesMap[event.identifier] = this.borderEntity.leftControlEntity;
-              this.app.inputEventsManager.touchesControls.left[event.identifier] = true;
               this.touchStart(event, 'left');
               return true;
             }
             if (this.borderEntity.rightControlEntity.pointOnEntity(event)) {
               this.app.inputEventsManager.touchesMap[event.identifier] = this.borderEntity.rightControlEntity;
-              this.app.inputEventsManager.touchesControls.right[event.identifier] = true;
               this.touchStart(event, 'right');
               return true;
             }
             break;
 
-          case 'Touch.left':
-            this.app.inputEventsManager.touchesMap[event.identifier] = this.borderEntity.leftControlEntity;
-            this.postWorkerMessage({id: 'controls', action: 'left', value: true});
-            return true;
-
-          case 'Touch.right':
-            this.app.inputEventsManager.touchesMap[event.identifier] = this.borderEntity.rightControlEntity;
-            this.postWorkerMessage({id: 'controls', action: 'right', value: true});
-            return true;
-
-          case 'Touch.jump':
-            this.app.inputEventsManager.touchesMap[event.identifier] = this.borderEntity.jumpControlEntity;
-            this.postWorkerMessage({id: 'controls', action: 'jump', value: true});
+          case 'RetryTouch':
+            this.postWorkerMessage({id: 'controls', action: event.action, value: true});
             return true;
 
           case this.app.controls.keyboard.right:
@@ -426,15 +413,8 @@ export class RoomModel extends AbstractModel {
             return true;
 
           case 'Touch':
-            if (this.app.inputEventsManager.touchesMap[event.identifier] === this.borderEntity.leftControlEntity) {
-              this.touchEnd(event, 'left');
-              return true;
-            }
-            if (this.app.inputEventsManager.touchesMap[event.identifier] === this.borderEntity.rightControlEntity) {
-              this.touchEnd(event, 'right');
-              return true;
-            }
-            break;
+            this.touchEnd(event, 'left');
+            return true;
 
           case this.app.controls.keyboard.right:
           case 'GamepadRight':  
@@ -540,57 +520,52 @@ export class RoomModel extends AbstractModel {
 
   touchStart(event, side) {
     var ts = this.app.controlsOptions.touchscreen.types[this.app.controls.touchscreen.type][side];
-    switch (ts.type) {
-      case 'button':
-        this.postWorkerMessage({id: 'controls', action: ts.action, value: true});
-        break;
-      case 'joystick':
-        this.app.inputEventsManager.touchesJoysticks[event.identifier] = {center: {x: event.x, y: event.y}, action: false, control: ts.control, actions: ts.actions};
-        break;
+    if (ts.type == 'button') {
+      this.postWorkerMessage({id: 'controls', action: ts.action, value: true});
     }
+    this.app.inputEventsManager.touchesGameControls[event.identifier] = {center: {x: event.x, y: event.y}, type: ts.type, control: ts.control, action: ts.action, actions: ts.actions};
   } // touchStart
 
   touchEnd(event, side) {
     var ts = this.app.controlsOptions.touchscreen.types[this.app.controls.touchscreen.type][side];
-    switch (ts.type) {
-      case 'button':
-        this.postWorkerMessage({id: 'controls', action: ts.action, value: false});
-        break;
-      case 'joystick':
-        if (this.app.inputEventsManager.touchesJoysticks[event.identifier].action !== false) {
-          this.postWorkerMessage({id: 'controls', action: this.app.inputEventsManager.touchesJoysticks[event.identifier].action, value: false});
-        }
-        delete this.app.inputEventsManager.touchesJoysticks[event.identifier];
-        break;
+    if (this.app.inputEventsManager.touchesGameControls[event.identifier].action !== false) {
+      this.postWorkerMessage({id: 'controls', action: this.app.inputEventsManager.touchesGameControls[event.identifier].action, value: false});
     }
+    delete this.app.inputEventsManager.touchesGameControls[event.identifier];
   } // touchEnd
 
   touchMove(event) {
-    if (event.identifier in this.app.inputEventsManager.touchesJoysticks) {
-      var action = false;
-      var tsJoystick = this.app.inputEventsManager.touchesJoysticks[event.identifier];
-      switch (tsJoystick.control) {
-        case 'horizontal':
-          if (event.x-tsJoystick.center.x < 0) {
-            action = tsJoystick.actions[0];
-          }
-          if (event.x-tsJoystick.center.x > 0) {
-            action = tsJoystick.actions[1];
-          }
-          break;
-        case 'vertical':
-          if (event.y-tsJoystick.center.y < 0) {
-            action = tsJoystick.actions[0];
-          }
-          if (event.y-tsJoystick.center.y > 0) {
-            action = tsJoystick.actions[1];
-          }
-          break;
-      }
-      if (tsJoystick.action !== action) {
-        this.postWorkerMessage({id: 'controls', action: tsJoystick.action, value: false});
-        tsJoystick.action = action;
-        this.postWorkerMessage({id: 'controls', action: tsJoystick.action, value: true});
+    if (event.identifier in this.app.inputEventsManager.touchesGameControls) {
+      var touchGameControl = this.app.inputEventsManager.touchesGameControls[event.identifier];
+      var action = touchGameControl.action;
+      if (touchGameControl.type == 'joystick') {
+        switch (touchGameControl.control) {
+          case 'horizontal':
+            if (event.x-touchGameControl.center.x < -10) {
+              action = touchGameControl.actions[0];
+              touchGameControl.center.x = event.x;
+            }
+            if (event.x-touchGameControl.center.x > 10) {
+              action = touchGameControl.actions[1];
+              touchGameControl.center.x = event.x;
+            }
+            break;
+          case 'vertical':
+            if (event.y-touchGameControl.center.y < -10) {
+              action = touchGameControl.actions[0];
+              touchGameControl.center.y = event.y;
+            }
+            if (event.y-touchGameControl.center.y > 10) {
+              action = touchGameControl.actions[1];
+              touchGameControl.center.y = event.y;
+            }
+            break;
+        }
+        if (touchGameControl.action !== action) {
+          this.postWorkerMessage({id: 'controls', action: touchGameControl.action, value: false});
+          touchGameControl.action = action;
+          this.postWorkerMessage({id: 'controls', action: touchGameControl.action, value: true});
+        }
       }
     }
   } // touchMove
