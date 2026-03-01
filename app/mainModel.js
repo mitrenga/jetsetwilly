@@ -183,7 +183,7 @@ export class MainModel extends AbstractModel {
               }
             }
             if (this.app.inputEventsManager.touchesMap[event.identifier] === this.borderEntity) {
-              this.app.startRoom(false, true, false, true, true, this.app.globalData.initRoom);
+              this.app.startRoom(false, true, false, true, false, this.app.globalData.initRoom);
               return true;
             }
             break;
