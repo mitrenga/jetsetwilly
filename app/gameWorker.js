@@ -468,7 +468,7 @@ function guardians() {
             toMove = true;
             break;
           case 1:
-            if (!(this.counter%2)) {
+            if (!(counter%2)) {
               toMove = true;
             }
             break;
