@@ -26,7 +26,7 @@ export class BorderEntity  extends AbstractEntity {
     };
 
     this.escapeEntity = null;
-    this.scale = 2;
+    this.escapeScale = 2;
 
     this.leftControlEntity = null;
     this.rightControlEntity = null;
@@ -37,9 +37,9 @@ export class BorderEntity  extends AbstractEntity {
 
     if (this.enableExit) {
       if (this.app.layout.ratio > 2) {
-        this.scale = 1;
+        this.escapeScale = 1;
       }
-      this.escapeEntity = new ButtonEntity(this, this.app.fonts.zxFonts8x8Mono, 0, 0, this.scale*8, this.scale*8, 'X', {id: 'keyPress', key: 'Escape'}, [], false, false, {scale: this.scale, clickColor: '#7a7a7aff'});
+      this.escapeEntity = new ButtonEntity(this, this.app.fonts.zxFonts8x8Mono, 0, 0, this.escapeScale*8, this.escapeScale*8, 'X', {id: 'keyPress', key: 'Escape'}, [], false, false, {scale: this.escapeScale, clickColor: '#7a7a7aff'});
       this.addEntity(this.escapeEntity);
     }
 
@@ -138,8 +138,13 @@ export class BorderEntity  extends AbstractEntity {
         }
         return true;
       case 'resizeModel':
-        this.escapeEntity.x = this.model.borderWidth+this.model.desktopEntity.width-this.scale*8;
-        this.escapeEntity.y = this.model.borderHeight-this.scale*8;
+        if (this.model.borderHeight < this.escapeScale*8) {
+          this.escapeEntity.x = this.model.borderWidth+this.model.desktopEntity.width;
+          this.escapeEntity.y = this.model.borderHeight;
+        } else {
+          this.escapeEntity.x = this.model.borderWidth+this.model.desktopEntity.width-this.escapeScale*8;
+          this.escapeEntity.y = this.model.borderHeight-this.escapeScale*8;
+        }
         
         
         if (this.enableGameControls) {
