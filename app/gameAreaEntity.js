@@ -330,6 +330,8 @@ export class GameAreaEntity extends AbstractEntity {
       this.addEntity(entity);
       entity.setGraphicsData(data.willy);
       this.spriteEntities.willy.push(entity);
+      this.app.willyRoomsCache.paintCorrections = {...data.willy.paintCorrections};
+      this.app.willyRoomsCache.touchCorrections = {...data.willy.touchCorrections};
       this.initData.willy.push(this.app.willyRoomsCache);
     }
 
