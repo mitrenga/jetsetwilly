@@ -44,20 +44,28 @@ export class RoomSelectionEntity extends AbstractEntity {
     var color = this.app.platform.color(this.colorState*2+9);
 
     // top
-    if (cropY < 4) {
+    if (cropHeight < 4 && cropY == 0) {
+      this.app.layout.paint(this, cropX, cropY, cropWidth, cropHeight, color);
+    } else if (cropY < 4) {
       this.app.layout.paint(this, cropX, cropY, cropWidth, 3-cropY, color);
     }
     // bottom
-    if (this.height-cropHeight-cropY < 4) {
-      this.app.layout.paint(this, cropX, this.height-3, cropWidth, Math.min(3, 3-this.height+cropHeight+cropY), color);
+    if (this.height-cropY < 4) {
+      this.app.layout.paint(this, cropX, cropY, cropWidth, this.height-cropY, color);
+    } else if (this.height-cropHeight-cropY < 4) {
+      this.app.layout.paint(this, cropX, this.height-3, cropWidth, 3-this.height+cropHeight+cropY, color);
     }
     // left
-    if (cropX < 4) {
+    if (cropWidth < 4 && cropX == 0) {
+      this.app.layout.paint(this, cropX, cropY, cropWidth, cropHeight, color);
+    } else if (cropX < 4) {
       this.app.layout.paint(this, cropX, cropY, 3-cropX, cropHeight, color);
     }
     // right
-    if (this.width-cropWidth-cropX < 4) {
-      this.app.layout.paint(this, this.width-3, cropY, Math.min(3, 3-this.width+cropWidth+cropX), cropHeight, color);
+    if (this.width-cropX < 4) {
+      this.app.layout.paint(this, cropX, cropY, this.width-cropX, cropHeight, color);
+    } else if (this.width-cropWidth-cropX < 4) {
+      this.app.layout.paint(this, this.width-3, cropY, 3-this.width+cropWidth+cropX, cropHeight, color);
     }
   } // drawEntity
 

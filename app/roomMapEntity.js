@@ -11,12 +11,14 @@ import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
 
 export class RoomMapEntity extends AbstractEntity {
   
-  constructor(parentEntity, x, y, roomNumber, locked) {
+  constructor(parentEntity, x, y, roomNumber, locked, roomsMapX, roomsMapY) {
     super(parentEntity, x, y, 64, 38, false, false);
     this.id = 'RoomMapEntity';
 
     this.roomNumber = roomNumber;
     this.locked = locked;
+    this.roomsMapX = roomsMapX;
+    this.roomsMapY = roomsMapY;
     this.roomData = null;
     this.layoutExtends = {ramps:[]};
     this.mapKinds = ['floor', 'wall', 'nasty'];
@@ -369,25 +371,25 @@ export class RoomMapEntity extends AbstractEntity {
         switch (event.key) {            
           case 'Mouse1':
             if (!this.locked && this.pointOnEntity(event)) {
+              this.sendEvent(0, 0, {id: 'selectRoomMapEntity', roomsMapX: this.roomsMapX, roomsMapY: this.roomsMapY});
               this.app.inputEventsManager.keysMap.Mouse1 = this;
               this.clickState = true;
-              return true;
             }
-            return false;
+            break;
           case 'Touch':
             if (!this.locked && this.pointOnEntity(event)) {
+              this.sendEvent(0, 0, {id: 'selectRoomMapEntity', roomsMapX: this.roomsMapX, roomsMapY: this.roomsMapY});
               this.app.inputEventsManager.touchesMap[event.identifier] = this;
               this.clickState = true;
-              return true;
             }
-            return false;
+            break;
         }
         break;
 
       case 'keyRelease':
         switch (event.key) {
           case 'Mouse1':
-            if (this.pointOnEntity(event)) {
+            if (!this.app.model.isMouseDragging && this.pointOnEntity(event)) {
               if (this.app.inputEventsManager.keysMap.Mouse1 === this) {
                 var extraGame = true;
                 if (this.roomNumber == this.app.globalData.initRoom) {
@@ -396,10 +398,12 @@ export class RoomMapEntity extends AbstractEntity {
                 this.app.startRoom(false, true, false, true, extraGame, this.roomNumber);
                 return true;
               }
+            } else {
+              this.sendEvent(0, 0, {id: 'fixSelectionPosition'});
             }
             break;
           case 'Touch':
-            if (this.pointOnEntity(event)) {
+            if (!this.app.model.isTouchDragging() && this.pointOnEntity(event)) {
               if (this.app.inputEventsManager.touchesMap[event.identifier] === this) {
                 var extraGame = true;
                 if (this.roomNumber == this.app.globalData.initRoom) {
@@ -408,6 +412,8 @@ export class RoomMapEntity extends AbstractEntity {
                 this.app.startRoom(false, true, false, true, extraGame, this.roomNumber);
                 return true;
               }
+            } else {
+              this.sendEvent(0, 0, {id: 'fixSelectionPosition'});
             }
             break;
         }

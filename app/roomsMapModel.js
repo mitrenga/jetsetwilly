@@ -31,6 +31,10 @@ export class RoomsMapModel extends AbstractModel {
 
     this.wheelDeltaX = 0;
     this.wheelDeltaY = 0;
+    this.mouseDraggingX = 0;
+    this.mouseDraggingY = 0;
+    this.isMouseDragging = false;
+    this.touchesDragging = {};
 
     this.prevTimestamp = false;
     
@@ -50,7 +54,7 @@ export class RoomsMapModel extends AbstractModel {
         if (roomNumber !== false) {
           var posX = (x-this.selectionX+2)*64-32;
           var posY = (y-this.selectionY+2)*38-19;
-          var roomMapEntity = new RoomMapEntity(this.desktopEntity, posX, posY, roomNumber, (roomNumber > this.roomsOpened));
+          var roomMapEntity = new RoomMapEntity(this.desktopEntity, posX, posY, roomNumber, (roomNumber > this.roomsOpened), x, y);
           this.desktopEntity.addEntity(roomMapEntity);
           this.roomsMapEntities[y][x] = roomMapEntity;
         }
@@ -159,7 +163,55 @@ export class RoomsMapModel extends AbstractModel {
             case 'GamepadExit':
               this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 52, 40, 153, 85, 'OPTIONS', 'MenuModel'));
               return true;
+            case 'Mouse1':
+              this.mouseDraggingX = event.x;
+              this.mouseDraggingY = event.y;
+              break;
+            case 'Touch':
+              if (this.app.inputEventsManager.touchesMap[event.identifier] === false) {
+                this.app.inputEventsManager.touchesMap[event.identifier] = this.desktopEntity;
+                this.desktopEntity.clickState = true;
+              }
+              this.touchesDragging[event.identifier] = {touchDraggingX: event.x, touchDraggingY: event.y, isTouchDragging: false};
+              break;
           }
+        }
+        break;
+
+      case 'keyRelease':
+        switch (event.key) {
+          case 'Mouse1':
+            this.isMouseDragging = false;
+            break;
+          case 'Touch':
+            delete this.touchesDragging[event.identifier];
+            break;
+        }
+        break;
+
+      case 'keyMove':
+        switch (event.key) {
+          case 'Mouse1':
+            var moveX = event.x-this.mouseDraggingX;
+            var moveY = event.y-this.mouseDraggingY;
+            if (this.isMouseDragging || Math.abs(moveX) > 10 || Math.abs(moveY) > 10) {
+              this.moveRooms(moveX, moveY);
+              this.isMouseDragging = true;
+              this.mouseDraggingX = event.x;
+              this.mouseDraggingY = event.y;
+            }
+            return true;
+          case 'Touch':
+            var td = this.touchesDragging[event.identifier];
+            var moveX = event.x-td.touchDraggingX;
+            var moveY = event.y-td.touchDraggingY;
+            if (td.isTouchDragging || Math.abs(moveX) > 10 || Math.abs(moveY) > 10) {
+              this.moveRooms(moveX, moveY);
+              td.isTouchDragging = true;
+              td.touchDraggingX = event.x;
+              td.touchDraggingY = event.y;
+            }
+            return true;
         }
         break;
 
@@ -177,10 +229,72 @@ export class RoomsMapModel extends AbstractModel {
           this.wheelDeltaY = 0;
         }
         return true;
+
+      case 'selectRoomMapEntity':
+        this.roomSelectionEntity.x += (event.roomsMapX-this.selectionX)*64+this.adjustSelectionX;
+        this.adjustX = 0;
+        this.adjustSelectionX = 0;
+        this.selectionX = event.roomsMapX;
+        this.roomSelectionEntity.y += (event.roomsMapY-this.selectionY)*38+this.adjustSelectionY;
+        this.adjustY = 0;
+        this.adjustSelectionY = 0;
+        this.selectionY = event.roomsMapY;
+        return true;
+
+      case 'fixSelectionPosition':
+        if (this.roomSelectionEntity.x+this.adjustX < 0) {
+          this.adjustX += 64;
+        }
+        if (this.roomSelectionEntity.x+this.adjustX > 255-64) {
+          this.adjustX -= 64;
+        }
+        var diffX = (this.roomSelectionEntity.x+this.adjustX-32)%64+3;
+        if (diffX < 32) {
+          this.adjustX -= diffX;
+        } else {
+          this.adjustX += 64-diffX;
+        }
+        if (this.roomSelectionEntity.y+this.adjustY < 0) {
+          this.adjustY += 38;
+        }
+        if (this.roomSelectionEntity.y+this.adjustY > 192-38) {
+          this.adjustY -= 38;
+        }
+        var diffY = (this.roomSelectionEntity.y+this.adjustY-19)%38+3;
+        if (diffY < 19) {
+          this.adjustY -= diffY;
+        } else {
+          this.adjustY += 38-diffY;
+        }
+        return true;
     }
     
     return false;
   } // handleEvent
+
+  moveRooms(moveX, moveY) {
+    for (var y = 0; y < this.roomsMapEntities.length; y++) {
+      for (var x = 0; x < this.roomsMapEntities[y].length; x++) {
+        var roomMapEntity = this.roomsMapEntities[y][x];
+        if (roomMapEntity !== null) {
+          roomMapEntity.x += moveX;
+          roomMapEntity.y += moveY;
+        }
+      }
+    }
+    this.roomSelectionEntity.x += moveX;
+    this.roomSelectionEntity.y += moveY;
+  } // moveRooms
+
+  isTouchDragging() {
+    var result = false;
+    Object.keys(this.touchesDragging).forEach((touchDragging) => {
+      if (this.touchesDragging[touchDragging].isTouchDragging) {
+        result = true;
+      }
+    });
+    return result;
+  } // isTouchDragging
 
   selectAdjoiningRoom(adjoiningRoom) {
     if (adjoiningRoom !== false) {
@@ -204,11 +318,6 @@ export class RoomsMapModel extends AbstractModel {
       }
       while (this.roomSelectionEntity.y+this.adjustY+this.adjustSelectionY > 189-38) {
         this.adjustY -= 38;
-      }
-      
-      if (false) {
-        this.adjustX -= deltaX*64;
-        this.adjustY -= deltaY*38;
       }
     }
   } // selectAdjoiningRoom
