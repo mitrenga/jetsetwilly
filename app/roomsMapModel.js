@@ -92,6 +92,7 @@ export class RoomsMapModel extends AbstractModel {
           switch (key) {        
             case 'ArrowUp':
             case 'GamepadUp':
+              this.fixSelectionPosition();
               if ('teleport' in roomData && 'above' in roomData.teleport) {
                 this.selectAdjoiningRoom(roomData.teleport.above);
               } else {
@@ -106,6 +107,7 @@ export class RoomsMapModel extends AbstractModel {
               return true;
             case 'ArrowDown':
             case 'GamepadDown':
+              this.fixSelectionPosition();
               if ('teleport' in roomData && 'below' in roomData.teleport) {
                 this.selectAdjoiningRoom(roomData.teleport.below);
               } else {
@@ -121,6 +123,7 @@ export class RoomsMapModel extends AbstractModel {
               return true;
             case 'ArrowLeft':
             case 'GamepadLeft':
+              this.fixSelectionPosition();
               if ('teleport' in roomData && 'left' in roomData.teleport) {
                 this.selectAdjoiningRoom(roomData.teleport.left);
               } else {
@@ -135,6 +138,7 @@ export class RoomsMapModel extends AbstractModel {
               return true;
             case 'ArrowRight':
             case 'GamepadRight':
+              this.fixSelectionPosition();
               if ('teleport' in roomData && 'right' in roomData.teleport) {
                 this.selectAdjoiningRoom(roomData.teleport.right);
               } else {
@@ -240,39 +244,53 @@ export class RoomsMapModel extends AbstractModel {
         this.adjustSelectionY = 0;
         this.selectionY = event.roomsMapY;
         return true;
-
-      case 'fixSelectionPosition':
-        if (this.roomSelectionEntity.x+this.adjustX < 0) {
-          this.adjustX += 64;
-        }
-        if (this.roomSelectionEntity.x+this.adjustX > 255-64) {
-          this.adjustX -= 64;
-        }
-        var diffX = (this.roomSelectionEntity.x+this.adjustX-32)%64+3;
-        if (diffX < 32) {
-          this.adjustX -= diffX;
-        } else {
-          this.adjustX += 64-diffX;
-        }
-        if (this.roomSelectionEntity.y+this.adjustY < 0) {
-          this.adjustY += 38;
-        }
-        if (this.roomSelectionEntity.y+this.adjustY > 192-38) {
-          this.adjustY -= 38;
-        }
-        var diffY = (this.roomSelectionEntity.y+this.adjustY-19)%38+3;
-        if (diffY < 19) {
-          this.adjustY -= diffY;
-        } else {
-          this.adjustY += 38-diffY;
-        }
-        return true;
     }
     
     return false;
   } // handleEvent
 
   moveRooms(moveX, moveY) {
+    var x1 = false;
+    var x2 = false;
+    for (var y = 0; y < this.roomsMapEntities.length; y++) {
+      var roomMapEntity1 = this.roomsMapEntities[y][0];
+      var roomMapEntity2 = this.roomsMapEntities[y][this.roomsMapEntities[0].length-1];
+      if (roomMapEntity1 !== null && x1 === false) {
+        x1 = roomMapEntity1.x;
+      }
+      if (roomMapEntity2 !== null && x2 === false) {
+        x2 = roomMapEntity2.x+roomMapEntity2.width;
+      }
+      if (x1 !== false && x2 !== false) {
+        break;
+      }
+    }
+    if (x1 !== false && x1+moveX > 32) {
+      moveX = 32-x1;
+    }
+    if (x2 !== false && x2+moveX < 256-32) {
+      moveX = 256-32-x2;
+    }
+
+    var y1 = false;
+    var y2 = false;
+    for (var x = 0; x < this.roomsMapEntities[0].length; x++) {
+      var roomMapEntity1 = this.roomsMapEntities[0][x];
+      var roomMapEntity2 = this.roomsMapEntities[this.roomsMapEntities.length-1][x];
+      if (roomMapEntity1 !== null && y1 === false) {
+        y1 = roomMapEntity1.y;
+      }
+      if (roomMapEntity2 !== null && y2 === false) {
+        y2 = roomMapEntity2.y+roomMapEntity2.height;
+      }
+    }
+    if (y1 !== false && y1+moveY > 19) {
+      moveY = 19-y1;
+    }
+    if (y2 !== false && y2+moveY < 192-19) {
+      moveY = 192-19-y2;
+    }
+
     for (var y = 0; y < this.roomsMapEntities.length; y++) {
       for (var x = 0; x < this.roomsMapEntities[y].length; x++) {
         var roomMapEntity = this.roomsMapEntities[y][x];
@@ -285,6 +303,37 @@ export class RoomsMapModel extends AbstractModel {
     this.roomSelectionEntity.x += moveX;
     this.roomSelectionEntity.y += moveY;
   } // moveRooms
+
+  fixSelectionPosition() {
+    if (this.adjustX == 0) {
+      while (this.roomSelectionEntity.x+this.adjustX < 0) {
+        this.adjustX += 64;
+      }
+      while (this.roomSelectionEntity.x+this.adjustX > 255-64) {
+        this.adjustX -= 64;
+      }
+      var diffX = (this.roomSelectionEntity.x+this.adjustX-32)%64+3;
+      if (diffX < 32) {
+        this.adjustX -= diffX;
+      } else {
+        this.adjustX += 64-diffX;
+      }
+    }
+    if (this.adjustY == 0) {
+      while (this.roomSelectionEntity.y+this.adjustY < 0) {
+        this.adjustY += 38;
+      }
+      while (this.roomSelectionEntity.y+this.adjustY > 192-38) {
+        this.adjustY -= 38;
+      }
+      var diffY = (this.roomSelectionEntity.y+this.adjustY-19)%38+3;
+      if (diffY < 19) {
+        this.adjustY -= diffY;
+      } else {
+        this.adjustY += 38-diffY;
+      }
+    }
+  } // fixSelectionPosition
 
   isTouchDragging() {
     var result = false;

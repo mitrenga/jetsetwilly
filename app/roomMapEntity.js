@@ -370,14 +370,14 @@ export class RoomMapEntity extends AbstractEntity {
       case 'keyPress':
         switch (event.key) {            
           case 'Mouse1':
-            if (!this.locked && this.pointOnEntity(event)) {
+            if (!this.locked && this.pointOnEntity(event) && this.app.model.desktopEntity.pointOnEntity(event)) {
               this.sendEvent(0, 0, {id: 'selectRoomMapEntity', roomsMapX: this.roomsMapX, roomsMapY: this.roomsMapY});
               this.app.inputEventsManager.keysMap.Mouse1 = this;
               this.clickState = true;
             }
             break;
           case 'Touch':
-            if (!this.locked && this.pointOnEntity(event)) {
+            if (!this.locked && this.pointOnEntity(event)&& this.app.model.desktopEntity.pointOnEntity(event)) {
               this.sendEvent(0, 0, {id: 'selectRoomMapEntity', roomsMapX: this.roomsMapX, roomsMapY: this.roomsMapY});
               this.app.inputEventsManager.touchesMap[event.identifier] = this;
               this.clickState = true;
@@ -398,8 +398,6 @@ export class RoomMapEntity extends AbstractEntity {
                 this.app.startRoom(false, true, false, true, extraGame, this.roomNumber);
                 return true;
               }
-            } else {
-              this.sendEvent(0, 0, {id: 'fixSelectionPosition'});
             }
             break;
           case 'Touch':
@@ -412,8 +410,6 @@ export class RoomMapEntity extends AbstractEntity {
                 this.app.startRoom(false, true, false, true, extraGame, this.roomNumber);
                 return true;
               }
-            } else {
-              this.sendEvent(0, 0, {id: 'fixSelectionPosition'});
             }
             break;
         }
