@@ -335,6 +335,7 @@ export class GameApp extends AbstractApp {
       var x = this.binToInt(binaryItem.substring(11, 16));
       var y = this.binToInt(binaryItem.substring(0, 1)+binaryItem.substring(8, 11));
       var room = this.binToInt(binaryItem.substring(2, 8));
+      if (room == 43) console.log(item);
       this.items[room].push({x: x, y: y, id: id});
       id++;
     });
