@@ -15,6 +15,10 @@ CREATE TABLE IF NOT EXISTS rg_jsw_hallOfFame (
   `name` CHAR(64) NOT NULL,
   `score` BIGINT(20) NOT NULL,
   `completed` INT(11) NOT NULL,
+  `created` TIMESTAMP NOT NULL,
   PRIMARY KEY (`ndx`),
-  INDEX (`score`)
+  INDEX `score` (`score`),
+  INDEX `name` (`name`),
+  INDEX `created` (`created`),
+  INDEX `created_name` (`created`, `name`)
 );
