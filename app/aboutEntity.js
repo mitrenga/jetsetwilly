@@ -15,17 +15,17 @@ export class AboutEntity extends AbstractEntity {
     super(parentEntity, x, y, width, height, false, false);
     this.id = 'AboutEntity';    
 
-    this.sysInfoCounter = 0;
+    this.clickCounter = 0;
   } // constructor
 
   init() {
     super.init();
     
     this.addEntity(new AbstractEntity(this, 0, 6, this.width, this.height-6, false, this.app.platform.colorByName('black')));
-    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, 0, 0, 59, 7, 'ABOUT GAME', {id: 'sysInfo'}, [], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('black'), {topMargin: 1, leftMargin: 2, member: 'titleBar', hoverColor: this.app.platform.colorByName('black'), clickColor: this.app.platform.colorByName('black')}));
+    this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, 0, 0, 59, 7, 'ABOUT GAME', {id: 'clickLabel'}, [], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('black'), {topMargin: 1, leftMargin: 2, member: 'titleBar', hoverColor: this.app.platform.colorByName('black'), clickColor: this.app.platform.colorByName('black')}));
     this.addEntity(new AbstractEntity(this, 1, 7, this.width-2, this.height-8, false, this.app.platform.colorByName('brightWhite')));
 
-    var aboutText = 'JET SET WILLY IS A REMAKE OF THE ORIGINAL 1984 GAME BY MATTHEW SMITH.\n' +
+    this.aboutText = 'JET SET WILLY IS A REMAKE OF THE ORIGINAL 1984 GAME BY MATTHEW SMITH.\n' +
                     'FUNNY THING IS, DURING DEVELOPMENT, I STUDIED THE ORIGINAL CODE AND CAME ' +
                     'ACROSS BUGS THAT MADE IT IMPOSSIBLE TO COMPLETE THE GAME SUCCESSFULLY.\n' +
                     'WHILE RESEARCHING FURTHER, I DISCOVERED THAT THESE BUGS HAD BEEN DOCUMENTED ' +
@@ -33,25 +33,52 @@ export class AboutEntity extends AbstractEntity {
                     'AND I ONLY FOUND OUT ABOUT IT 40 YEARS LATER :-) SO MANY MONTHS AND ' +
                     'SLEEPLESS NIGHTS WERE SPENT WITH FRIENDS TRYING TO GET THROUGH ' +
                     'ROOMS LIKE THE BANYAN TREE OR CONSERVATORY ROOF.';
-    this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 1, 7, this.width-2, 120, aboutText, this.app.platform.colorByName('black'), false, {align: 'justify', textWrap: true, margin: 2, member: 'aboutText'}));
+    this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 1, 7, this.width-2, 120, this.aboutText, this.app.platform.colorByName('black'), false, {align: 'justify', textWrap: true, margin: 2, member: 'aboutText'}));
     this.addEntity(new ButtonEntity(this, this.app.fonts.fonts3x3, 1, this.height-8, 103, 7, 'github:mitrenga/jetsetwilly', {id: 'openGithub'}, [], '#a3a3a3', false, {margin:2, hoverColor: '#e6e6e6', clickColor: '#bebebe'}));
 
     this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', {id: 'closeAbout'}, ['Enter', 'Escape', ' ', 'GamepadOK', 'GamepadExit'], this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('blue'), {align: 'center', margin: 4}));
+
+    this.statsText = 'error:\nstatistics data not available!';
+    this.fetchData('stats.db', false, {});
   } // init
 
-  updateSysInfo() {
-    var ipLabelSeparator = ' ';
-    if (window.clientIP.indexOf(':') >= 0) {
-      ipLabelSeparator = '\n';
+  setData(data) {
+    this.statsText = '';
+    Object.entries(data.data).forEach(([periodKey, periodValue]) => {
+      this.statsText += periodKey + ': [';
+      Object.entries(periodValue).forEach(([key, value]) => {
+        this.statsText += key + ':' + value + ', ';
+      });
+      this.statsText = this.statsText.slice(0, -2) + ']\n';
+    });
+  } // setData
+
+  updateAbout() {
+    switch (Math.floor(this.clickCounter/5)) {
+      case 1:
+        this.sendEvent(0, 0, {id: 'updateEntity', member: 'titleBar', text: 'GAME STATS'});
+        this.sendEvent(0, 0, {id: 'updateEntity', member: 'aboutText', text: this.statsText});
+        break;
+      case 2:
+        this.sendEvent(0, 0, {id: 'updateEntity', member: 'titleBar', text: 'SYSTEM INFO'});
+        var ipLabelSeparator = ' ';
+        if (window.clientIP.indexOf(':') >= 0) {
+          ipLabelSeparator = '\n';
+        }
+        var sysInfoText =
+          'version: ' + this.app.version + '\n' +
+          'element: ' + this.app.element.clientWidth + ' x ' + this.app.element.clientHeight + '\n' +
+          'canvas: ' + this.app.element.width + ' x ' + this.app.element.height + '\n' +
+          'ratio: ' + this.app.layout.ratio + '\n' +
+          'ip:' + ipLabelSeparator + window.clientIP + '\n';
+        this.sendEvent(0, 0, {id: 'updateEntity', member: 'aboutText', text: sysInfoText});
+        break;
+      default:
+        this.sendEvent(0, 0, {id: 'updateEntity', member: 'titleBar', text: 'ABOUT GAME'});
+        this.sendEvent(0, 0, {id: 'updateEntity', member: 'aboutText', text: this.aboutText});
+        break;
     }
-    var sysInfoText =
-      'version: ' + this.app.version + '\n' +
-      'element: ' + this.app.element.clientWidth + ' x ' + this.app.element.clientHeight + '\n' +
-      'canvas: ' + this.app.element.width + ' x ' + this.app.element.height + '\n' +
-      'ratio: ' + this.app.layout.ratio + '\n' +
-      'ip:' + ipLabelSeparator + window.clientIP + '\n'
-    this.sendEvent(0, 0, {id: 'updateEntity', member: 'aboutText', text: sysInfoText});
-  } // updateSysInfo
+  } // updateAbout
 
   handleEvent(event) {
     if (super.handleEvent(event)) {
@@ -63,26 +90,26 @@ export class AboutEntity extends AbstractEntity {
         this.destroy();
         return true;
 
-      case 'sysInfo':
-        if (this.sysInfoCounter == 4) {
-          this.sendEvent(0, 0, {id: 'updateEntity', member: 'titleBar', text: 'SYSTEM INFO'});
-          this.updateSysInfo();
+      case 'clickLabel':
+        if (this.clickCounter < 14) {
+          this.clickCounter++;
+        } else {
+          this.clickCounter = 0;
         }
-        if (this.sysInfoCounter < 4) {
-          this.sysInfoCounter++;
+        if (this.clickCounter%5 == 0) {
+          this.updateAbout();
         }
         return true;
+
+      case 'resizeModel':
+        if (this.clickCounter > 9) {
+          this.updateAbout();
+        }
+        return false;
 
       case 'openGithub':
         window.open('https://github.com/mitrenga/jetsetwilly', 'github:jsw');
         return true;
-
-      case 'resizeModel':
-        if (this.sysInfoCounter == 4) {
-          this.updateSysInfo();
-        }
-        return false;
-
     }
     return false;
   } // handleEvent
