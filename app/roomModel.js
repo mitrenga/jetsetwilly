@@ -50,127 +50,7 @@ export class RoomModel extends AbstractModel {
         0  // fallingDirection       [16]
       ]
     };
-
-    this.worker = new Worker(this.app.importPath+'/gameWorker.js?ver='+window.srcVersion);
-    this.worker.onmessage = (event) => {
-
-      if (this.demo && event.data.id == 'update' && event.data.gameData.info[0] == 80) {
-        this.sendEvent(1, {id: 'animationDemoRoomDone'});
-        return;
-      }
-
-      switch (event.data.id) {
-        case 'update':
-          if (this.bkAnimation !== false) {
-            this.gameAreaEntity.bkColor = this.app.platform.color(this.bkAnimation);
-            if (this.bkAnimation >= 0) {
-              this.bkAnimation--;
-            } else {
-              this.bkAnimation = false;
-            }
-            if (this.bkAnimation < 0) {
-              this.gameAreaEntity.restoreBkColor();
-              this.bkAnimation = false;
-            }
-          }
-          Object.keys(event.data.gameData).forEach((objectsType) => {
-            switch (objectsType) {
-              case 'info':
-                this.app.gameState = event.data.gameData.info[9];
-                if (this.app.gameState == 2 && !this.app.extraGame && !this.app.gameCompleted) {
-                  this.app.gameCompleted = 1;
-                  this.fetchData('saveGame.db', false, {name: this.app.playerName, score: Object.keys(this.app.itemsCollected).length, completed: 1});
-                }
-                if (!this.safeInitPosition && event.data.gameData.info[12]) {
-                  this.safeInitPosition = true;
-                  this.app.willySafeInitPositionCache = {...this.app.willyRoomsCache};
-                  this.app.willySafeInitPositionCache.roomNumber = this.roomNumber;
-                }
-                if (event.data.gameData.info[7] !== false) {
-                  this.app.timeCounter += event.data.gameData.info[0];
-                  this.sendEvent(
-                    1,
-                    {
-                      id: 'changeRoom',
-                      adjoiningRoom: this.adjoiningRoom[event.data.gameData.info[7]],
-                      willyData: event.data.gameData.info[8],
-                      previousDirection: event.data.gameData.info[11],
-                      jumpCounter: event.data.gameData.info[13],
-                      jumpDirection: event.data.gameData.info[14],
-                      fallingCounter: event.data.gameData.info[15],
-                      fallingDirection: event.data.gameData.info[16]
-                    }
-                  );
-                }
-                for (var l = 0; l < this.app.lives; l++) {
-                  this.gameInfoEntity.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
-                  this.gameInfoEntity.liveEntities[l].frame = event.data.gameData.info[3]%4;
-                }
-                var hour = 7+Math.floor((this.app.timeCounter+event.data.gameData.info[0])/15360);
-                var minute = Math.floor((this.app.timeCounter+event.data.gameData.info[0])%15360/256);
-                var hour12 = hour%12;
-                if (hour12 == 0) {
-                  hour12 = 12;
-                }
-                this.app.timeStr = hour12.toString().padStart(2, ' ')+':'+minute.toString().padStart(2, '0');
-                if (hour > 11) {
-                  this.app.timeStr = this.app.timeStr+'pm';
-                } else {
-                  this.app.timeStr = this.app.timeStr+'am';
-                }
-                this.gameInfoEntity.timeEntity.setText(this.app.timeStr);
-                if (hour > 23) {
-                  this.sendEvent(1, {id: 'gameOver'});
-                }
-                if (event.data.gameData.info[5]) {
-                  this.app.timeCounter += event.data.gameData.info[0]; 
-                  this.sendEvent(1, {id: 'crash'});
-                }
-                if (this.app.itemsCollected != event.data.gameData.info[6]) {
-                  this.app.itemsCollected = event.data.gameData.info[6];
-                  if (this.app.extraGame) {
-                    this.gameInfoEntity.itemsCollectedEntity.setText((this.app.totalItems-Object.keys(this.app.itemsCollected).length).toString().padStart(3, '0'));
-                  } else {
-                    this.gameInfoEntity.itemsCollectedEntity.setText(Object.keys(this.app.itemsCollected).length.toString().padStart(3, '0'));
-                  }
-                }
-                break;
-                
-              case 'floors':
-              case 'walls':
-              case 'nasties':
-              case 'ramps':
-                break;
-
-              case 'ropes':
-                this.gameAreaEntity.updateData(event.data.gameData, 'ropes', 'nodes');
-                break;
-
-              default:
-                this.gameAreaEntity.updateData(event.data.gameData, objectsType, false);
-            }
-          });
-          this.drawModel();
-          this.needDraw = false;
-          break;
-
-        case 'playSound':
-          this.sendEvent(0, {id: 'playSound', channel: event.data.channel, sound: event.data.sound, options: event.data.options});
-          break;
-
-        case 'stopAudioChannel':
-          this.sendEvent(0, {id: 'stopAudioChannel', channel: event.data.channel});
-          break;
-      }
-    } // onmessage
-
   } // constructor
-
-  postWorkerMessage(message) {
-    if (this.worker) {
-      this.worker.postMessage(message);
-    }
-  } // postWorkerMessage
 
   init() {
     super.init();
@@ -196,10 +76,7 @@ export class RoomModel extends AbstractModel {
 
   shutdown() {
     super.shutdown();
-    if (this.worker) {
-      this.worker.terminate();
-      this.worker = null;
-    }
+    this.sendWorkerMessage({id: 'reset'});
     this.app.audioManager.stopChannel('extra');
   } // shutdown
 
@@ -264,7 +141,7 @@ export class RoomModel extends AbstractModel {
     }
     super.setData(data.data);
     this.app.inputEventsManager.sendEventsActiveKeys('Press');
-    this.postWorkerMessage({id: 'init', initData: this.initData});
+    this.sendWorkerMessage({id: 'init', initData: this.initData});
   } // setData
 
   handleEvent(event) {
@@ -274,13 +151,13 @@ export class RoomModel extends AbstractModel {
 
     switch (event.id) {
       case 'blurWindow':
-        this.postWorkerMessage({id: 'pause'});
+        this.sendWorkerMessage({id: 'pause'});
         this.app.audioManager.pauseAllChannels();
         this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 52, 40, 153, 85, 'PAUSE GAME', 'GameExitModel'));
         return true;
 
       case 'continueGame':        
-        this.postWorkerMessage({id: 'continue'});
+        this.sendWorkerMessage({id: 'continue'});
         this.app.audioManager.continueAllChannels();
         return true;
 
@@ -309,14 +186,14 @@ export class RoomModel extends AbstractModel {
         switch (key) {
           case 'Escape':
           case 'GamepadExit':
-            this.postWorkerMessage({id: 'pause'});
+            this.sendWorkerMessage({id: 'pause'});
             this.app.audioManager.pauseAllChannels();
             this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 52, 40, 153, 85, 'PAUSE GAME', 'GameExitModel'));
             return true;
 
           case this.app.controls.mouse.right:
             if (this.app.controls.mouse.enable && this.app.inputEventsManager.keysMap[this.app.controls.mouse.right] === false) {
-              this.postWorkerMessage({id: 'controls', action: 'right', value: true});
+              this.sendWorkerMessage({id: 'controls', action: 'right', value: true});
             }
             return true;
 
@@ -334,35 +211,35 @@ export class RoomModel extends AbstractModel {
             break;
 
           case 'RetryTouch':
-            this.postWorkerMessage({id: 'controls', action: event.action, value: true});
+            this.sendWorkerMessage({id: 'controls', action: event.action, value: true});
             return true;
 
           case this.app.controls.keyboard.right:
           case 'GamepadRight':  
-            this.postWorkerMessage({id: 'controls', action: 'right', value: true});
+            this.sendWorkerMessage({id: 'controls', action: 'right', value: true});
             return true;
 
           case this.app.controls.mouse.left:
             if (this.app.controls.mouse.enable && this.app.inputEventsManager.keysMap[this.app.controls.mouse.left] === false) {
-              this.postWorkerMessage({id: 'controls', action: 'left', value: true});
+              this.sendWorkerMessage({id: 'controls', action: 'left', value: true});
             }
             return true;
 
           case this.app.controls.keyboard.left:
           case 'GamepadLeft':  
-            this.postWorkerMessage({id: 'controls', action: 'left', value: true});
+            this.sendWorkerMessage({id: 'controls', action: 'left', value: true});
             return true;
 
           case this.app.controls.mouse.jump:
             if (this.app.controls.mouse.enable && this.app.inputEventsManager.keysMap[this.app.controls.mouse.jump] === false) {
-              this.postWorkerMessage({id: 'controls', action: 'jump', value: true});
+              this.sendWorkerMessage({id: 'controls', action: 'jump', value: true});
               break;
             }
             return true;
 
           case this.app.controls.keyboard.jump:
           case 'GamepadJump':  
-            this.postWorkerMessage({id: 'controls', action: 'jump', value: true});
+            this.sendWorkerMessage({id: 'controls', action: 'jump', value: true});
             return true;
 
           case this.app.controls.keyboard.music:
@@ -408,7 +285,7 @@ export class RoomModel extends AbstractModel {
         switch (key) {
           case this.app.controls.mouse.right:
             if (this.app.controls.mouse.enable && this.app.inputEventsManager.keysMap[this.app.controls.mouse.right] === false) {
-              this.postWorkerMessage({id: 'controls', action: 'right', value: false});
+              this.sendWorkerMessage({id: 'controls', action: 'right', value: false});
             }
             return true;
 
@@ -418,29 +295,29 @@ export class RoomModel extends AbstractModel {
 
           case this.app.controls.keyboard.right:
           case 'GamepadRight':  
-            this.postWorkerMessage({id: 'controls', action: 'right', value: false});
+            this.sendWorkerMessage({id: 'controls', action: 'right', value: false});
             return true;
 
           case this.app.controls.mouse.left:
             if (this.app.controls.mouse.enable && this.app.inputEventsManager.keysMap[this.app.controls.mouse.left] === false) {
-              this.postWorkerMessage({id: 'controls', action: 'left', value: false});
+              this.sendWorkerMessage({id: 'controls', action: 'left', value: false});
             }
             return true;
 
           case this.app.controls.keyboard.left:
           case 'GamepadLeft':  
-            this.postWorkerMessage({id: 'controls', action: 'left', value: false});
+            this.sendWorkerMessage({id: 'controls', action: 'left', value: false});
             return true;
 
           case this.app.controls.mouse.jump:
             if (this.app.controls.mouse.enable && this.app.inputEventsManager.keysMap[this.app.controls.mouse.jump] === false) {
-              this.postWorkerMessage({id: 'controls', action: 'jump', value: false});
+              this.sendWorkerMessage({id: 'controls', action: 'jump', value: false});
             }
             return true;
 
           case this.app.controls.keyboard.jump:
           case 'GamepadJump':  
-            this.postWorkerMessage({id: 'controls', action: 'jump', value: false});
+            this.sendWorkerMessage({id: 'controls', action: 'jump', value: false});
             return true;
         }
         break;
@@ -454,10 +331,7 @@ export class RoomModel extends AbstractModel {
         break;
 
       case 'animationDemoRoomDone':
-        if (this.worker) {
-          this.worker.terminate();
-          this.worker = null;
-        }
+        this.sendWorkerMessage({id: 'reset'});
         this.gameAreaEntity.setMonochromeColors(this.app.platform.color(3), this.app.platform.color(7));
         this.animationTime = this.timer;
         this.animationType = 'demoRoomDone';
@@ -486,11 +360,13 @@ export class RoomModel extends AbstractModel {
         break;
 
       case 'crash':
-        if (this.worker) {
-          this.worker.terminate();
-          this.worker = null;
+        if (this.animationTime !== false) {
+          return true;
         }
-        this.gameAreaEntity.spriteEntities.willy[0].hide = true;
+        this.sendWorkerMessage({id: 'reset'});
+        if (!this.demo) {
+          this.gameAreaEntity.spriteEntities.willy[0].hide = true;
+        }
         this.sendEvent(0, {id: 'stopAllAudioChannels'});
         this.borderEntity.bkColor = this.app.platform.color(0);
         this.gameAreaEntity.setMonochromeColors(this.app.platform.color(15), this.app.platform.color(0));
@@ -521,7 +397,7 @@ export class RoomModel extends AbstractModel {
   touchStart(event, side) {
     var ts = this.app.controlsOptions.touchscreen.types[this.app.controls.touchscreen.type][side];
     if (ts.type == 'button') {
-      this.postWorkerMessage({id: 'controls', action: ts.action, value: true});
+      this.sendWorkerMessage({id: 'controls', action: ts.action, value: true});
     }
     this.app.inputEventsManager.touchesGameControls[event.identifier] = {center: {x: event.x, y: event.y}, type: ts.type, control: ts.control, action: ts.action, actions: ts.actions};
   } // touchStart
@@ -530,7 +406,7 @@ export class RoomModel extends AbstractModel {
     var ts = this.app.controlsOptions.touchscreen.types[this.app.controls.touchscreen.type][side];
     if (event.identifier in this.app.inputEventsManager.touchesGameControls) {
       if (this.app.inputEventsManager.touchesGameControls[event.identifier].action !== false) {
-        this.postWorkerMessage({id: 'controls', action: this.app.inputEventsManager.touchesGameControls[event.identifier].action, value: false});
+        this.sendWorkerMessage({id: 'controls', action: this.app.inputEventsManager.touchesGameControls[event.identifier].action, value: false});
       }
       delete this.app.inputEventsManager.touchesGameControls[event.identifier];
     }
@@ -564,9 +440,9 @@ export class RoomModel extends AbstractModel {
             break;
         }
         if (touchGameControl.action !== action) {
-          this.postWorkerMessage({id: 'controls', action: touchGameControl.action, value: false});
+          this.sendWorkerMessage({id: 'controls', action: touchGameControl.action, value: false});
           touchGameControl.action = action;
-          this.postWorkerMessage({id: 'controls', action: touchGameControl.action, value: true});
+          this.sendWorkerMessage({id: 'controls', action: touchGameControl.action, value: true});
         }
       }
     }
@@ -624,6 +500,128 @@ export class RoomModel extends AbstractModel {
     }
     this.needDraw = true;
   } // loopModel
+
+  sendWorkerMessage(event) {
+    if (this.app.worker) {
+      this.app.worker.postMessage(event);
+    }
+  } // sendWorkerMessage
+
+  handleWorkerMessage(event) {
+    if (this.demo && event.data.id == 'update' && event.data.gameData.info[0] == 80) {
+      this.sendEvent(1, {id: 'animationDemoRoomDone'});
+      return;
+    }
+
+    switch (event.data.id) {
+      case 'update':
+        if (this.bkAnimation !== false) {
+          this.gameAreaEntity.bkColor = this.app.platform.color(this.bkAnimation);
+          if (this.bkAnimation >= 0) {
+            this.bkAnimation--;
+          } else {
+            this.bkAnimation = false;
+          }
+          if (this.bkAnimation < 0) {
+            this.gameAreaEntity.restoreBkColor();
+            this.bkAnimation = false;
+          }
+        }
+        Object.keys(event.data.gameData).forEach((objectsType) => {
+          switch (objectsType) {
+            case 'info':
+              if (this.animationTime !== false) {
+                break;
+              }
+              this.app.gameState = event.data.gameData.info[9];
+              if (this.app.gameState == 2 && !this.app.extraGame && !this.app.gameCompleted) {
+                this.app.gameCompleted = 1;
+                this.fetchData('saveGame.db', false, {name: this.app.playerName, score: Object.keys(this.app.itemsCollected).length, completed: 1});
+              }
+              if (!this.safeInitPosition && event.data.gameData.info[12]) {
+                this.safeInitPosition = true;
+                this.app.willySafeInitPositionCache = {...this.app.willyRoomsCache};
+                this.app.willySafeInitPositionCache.roomNumber = this.roomNumber;
+              }
+              if (event.data.gameData.info[7] !== false) {
+                this.app.timeCounter += event.data.gameData.info[0];
+                this.sendEvent(
+                  1,
+                  {
+                    id: 'changeRoom',
+                    adjoiningRoom: this.adjoiningRoom[event.data.gameData.info[7]],
+                    willyData: event.data.gameData.info[8],
+                    previousDirection: event.data.gameData.info[11],
+                    jumpCounter: event.data.gameData.info[13],
+                    jumpDirection: event.data.gameData.info[14],
+                    fallingCounter: event.data.gameData.info[15],
+                    fallingDirection: event.data.gameData.info[16]
+                  }
+                );
+                break;
+              }
+              for (var l = 0; l < this.app.lives; l++) {
+                this.gameInfoEntity.liveEntities[l].x = event.data.gameData.info[3]%4*2+l*16;
+                this.gameInfoEntity.liveEntities[l].frame = event.data.gameData.info[3]%4;
+              }
+              var hour = 7+Math.floor((this.app.timeCounter+event.data.gameData.info[0])/15360);
+              var minute = Math.floor((this.app.timeCounter+event.data.gameData.info[0])%15360/256);
+              var hour12 = hour%12;
+              if (hour12 == 0) {
+                hour12 = 12;
+              }
+              this.app.timeStr = hour12.toString().padStart(2, ' ')+':'+minute.toString().padStart(2, '0');
+              if (hour > 11) {
+                this.app.timeStr = this.app.timeStr+'pm';
+              } else {
+                this.app.timeStr = this.app.timeStr+'am';
+              }
+              this.gameInfoEntity.timeEntity.setText(this.app.timeStr);
+              if (hour > 23) {
+                this.sendEvent(1, {id: 'gameOver'});
+              }
+              if (this.app.itemsCollected != event.data.gameData.info[6]) {
+                this.app.itemsCollected = event.data.gameData.info[6];
+                if (this.app.extraGame) {
+                  this.gameInfoEntity.itemsCollectedEntity.setText((this.app.totalItems-Object.keys(this.app.itemsCollected).length).toString().padStart(3, '0'));
+                } else {
+                  this.gameInfoEntity.itemsCollectedEntity.setText(Object.keys(this.app.itemsCollected).length.toString().padStart(3, '0'));
+                }
+              }
+              break;
+              
+            case 'floors':
+            case 'walls':
+            case 'nasties':
+            case 'ramps':
+              break;
+
+            case 'ropes':
+              this.gameAreaEntity.updateData(event.data.gameData, 'ropes', 'nodes');
+              break;
+
+            default:
+              this.gameAreaEntity.updateData(event.data.gameData, objectsType, false);
+          }
+        });
+        this.drawModel();
+        this.needDraw = false;
+        break;
+
+      case 'playSound':
+        this.sendEvent(0, {id: 'playSound', channel: event.data.channel, sound: event.data.sound, options: event.data.options});
+        break;
+
+      case 'stopAudioChannel':
+        this.sendEvent(0, {id: 'stopAudioChannel', channel: event.data.channel});
+        break;
+
+      case 'crash':
+        this.app.timeCounter += event.data.gameData.info[0];
+        this.sendEvent(1, {id: 'crash'});
+        break;
+    }
+  } // getWorkerMessage
 
 } // RoomModel
 

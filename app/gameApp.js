@@ -34,7 +34,14 @@ export class GameApp extends AbstractApp {
   constructor(platform, importPath, wsURL) {
     super(platform, 'bodyApp',  importPath, wsURL);
 
-    this.version = '2026.04.06';
+    this.worker = new Worker(this.importPath+'/gameWorker.js?ver='+window.srcVersion);
+    this.worker.onmessage = (event) => {
+      if (this.model) {
+        this.model.handleWorkerMessage(event);
+      }
+    };
+
+    this.version = '2026.05.10';
     this.copyright = '© 2026 GNU General Public Licence';
     
     this.audioManager = new AudioManager(this);

@@ -5,36 +5,50 @@
 /**/
 // begin code
 
-var accelerator = 0;
-var counter = 0;
-var counter2 = 0;
-var counter4 = 0;
-var counter6 = 0;
-var gameData = null;
 var controls = {left: false, right: false, jump: false};
-var standing = [];
-var jumpCounter = 0;
-var jumpDirection = 0;
 var jumpMap = [-4, -4, -3, -3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4];
-var fallingCounter = 0;
-var fallingDirection = 0;
-var mustMovingDirection = 0;
-var shouldMovingDirection = 0;
-var previousDirection = 0;
-var caughtRope = 0;
-var caughtNode = 0;
-var ropeProhibited = {rope: 0, counter: 0};
-var operation = 'walking';
-var pause = false;
-var firstLoop = true;
+var accelerator, counter, counter2, counter4, counter6, gameData,
+    standing, jumpCounter, jumpDirection, fallingCounter, fallingDirection, mustMovingDirection, shouldMovingDirection, previousDirection,
+    caughtRope, caughtNode, ropeProhibited, operation, pause, firstLoop, nextLoop, ended;
+
+function resetData() {
+  accelerator = 0;
+  counter = 0;
+  counter2 = 0;
+  counter4 = 0;
+  counter6 = 0;
+  gameData = null;
+  standing = [];
+  jumpCounter = 0;
+  jumpDirection = 0;
+  fallingCounter = 0;
+  fallingDirection = 0;
+  mustMovingDirection = 0;
+  shouldMovingDirection = 0;
+  previousDirection = 0;
+  caughtRope = 0;
+  caughtNode = 0;
+  ropeProhibited = {rope: 0, counter: 0};
+  operation = 'walking';
+  pause = false;
+  firstLoop = true;
+  nextLoop = false;
+  ended = false;
+} // resetData
 
 function gameLoop() {
+  if (ended) {
+    nextLoop = false;
+    return;
+  }
   if (!pause) {
     var delay = 77;
     if (gameData.info[9] == 2) {
       delay = 38;
     }
-    setTimeout(gameLoop, delay);
+    nextLoop = setTimeout(gameLoop, delay);
+  } else {
+    nextLoop = false;
   }
 
   // delay the first loop when switching between rooms
@@ -73,7 +87,7 @@ function gameLoop() {
       guardians();
       items();
       switches();
-      if (!gameData.info[4]) { // if not demo
+      if (!gameData.info[4] && gameData.info[7] === false) { // if not demo and not changing room
         isTouchingItem();
         isColliding();
         isTouchingSwitch();
@@ -94,7 +108,10 @@ function gameLoop() {
     gameData.info[14] = jumpDirection;
     gameData.info[15] = fallingCounter;
     gameData.info[16] = fallingDirection;
-    postMessage({id: 'update', gameData: gameData});
+
+    if (!ended) {
+      postMessage({id: 'update', gameData: gameData});
+    }
   }
 } // gameLoop
 
@@ -748,6 +765,10 @@ function isColliding() {
   if (isStandingOn(willy.x, willy.y, 10, 16, [gameData.nasties], true).length) {
     gameData.info[5] = true;
   }
+  if (gameData.info[5]) {
+    ended = true;
+    postMessage({id: 'crash', gameData: gameData});
+  }
 } // isColliding
 
 function rampMovement(move, x, y, width, height) {
@@ -794,6 +815,7 @@ function isTouchingSwitch() {
 onmessage = (event) => {
   switch (event.data.id) {
     case 'init':
+      resetData();
       gameData = {};
       Object.keys(event.data.initData).forEach((objectsType) => {
         gameData[objectsType] = [];
@@ -823,13 +845,19 @@ onmessage = (event) => {
       break;
 
     case 'pause':
-      this.pause = true;
+      pause = true;
       break;
 
     case 'continue':
-      this.pause = false;
+      pause = false;
       gameLoop();
       break;
+  
+    case 'reset':
+      clearTimeout(nextLoop);
+      nextLoop = false;
+      controls = {left: false, right: false, jump: false};
+      break;
 
-    }
+  }
 } // onmessage
