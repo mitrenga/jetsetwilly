@@ -208,7 +208,7 @@ export class MainModel extends AbstractModel {
     if (this.timer != false) {
       if (timestamp-this.timer < this.screechDuration) {
         this.slidingTextEntity.animationPosition = Math.round((this.slidingTextEntity.animationWidth-this.slidingTextEntity.width)*(timestamp-this.timer)/this.screechDuration);
-        this.mainImageEntity.attrStep = Math.floor(((timestamp-this.timer)/77)%8)*3;
+        this.mainImageEntity.attrStep = Math.floor(((timestamp-this.timer)/80)%8)*3;
       }
     }
 
