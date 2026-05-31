@@ -1,9 +1,11 @@
 /**/
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { ButtonEntity } = await import('./svision/js/platform/canvas2D/buttonEntity.js?ver='+window.srcVersion);
+const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractEntity from './svision/js/abstractEntity.js';
 import ButtonEntity from './svision/js/platform/canvas2D/buttonEntity.js';
+import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
 /**/
 // begin code
 
@@ -30,6 +32,7 @@ export class BorderEntity  extends AbstractEntity {
 
     this.leftControlEntity = null;
     this.rightControlEntity = null;
+    this.devModeNameEntity = null;
   } // constructor
 
   init() {
@@ -49,24 +52,31 @@ export class BorderEntity  extends AbstractEntity {
       this.rightControlEntity = new AbstractEntity(this, 0, 0, 0, 0, false, false);
       this.addEntity(this.rightControlEntity);
     }
+
+    if (typeof(window.devModeName) === 'string') {
+      this.devModeNameEntity = new TextEntity(this, this.app.fonts.fonts5x5, 0, -9, 100, 9, window.devModeName, this.app.platform.colorByName('black'), this.app.platform.colorByName('yellow'), {align: 'center', margin: 2});
+      this.addEntity(this.devModeNameEntity);
+    }
   } // init
 
   drawEntity() {
     super.drawEntity();
 
-    var penColor = this.app.platform.colorByName('brightWhite');
-    if (this.animation !== false) {
-      penColor = this.app.platform.colorByName('black');
-    }
-    switch (this.bkColor) {
-      case this.app.platform.colorByName('white'):
-      case this.app.platform.colorByName('yellow'):
-      case this.app.platform.colorByName('cyan'):
+    if (this.escapeEntity) {
+      var penColor = this.app.platform.colorByName('brightWhite');
+      if (this.animation !== false) {
         penColor = this.app.platform.colorByName('black');
-        break;
-    }
-    if (this.escapeEntity.penColor !== penColor) {
-      this.escapeEntity.setPenColor(penColor);
+      }
+      switch (this.bkColor) {
+        case this.app.platform.colorByName('white'):
+        case this.app.platform.colorByName('yellow'):
+        case this.app.platform.colorByName('cyan'):
+          penColor = this.app.platform.colorByName('black');
+          break;
+      }
+      if (this.escapeEntity.penColor !== penColor) {
+        this.escapeEntity.setPenColor(penColor);
+      }
     }
 
     if (this.animation === false) {
@@ -138,14 +148,15 @@ export class BorderEntity  extends AbstractEntity {
         }
         return true;
       case 'resizeModel':
-        if (this.model.borderHeight < this.escapeScale*8) {
-          this.escapeEntity.x = this.model.borderWidth+this.model.desktopEntity.width;
-          this.escapeEntity.y = this.model.borderHeight;
-        } else {
-          this.escapeEntity.x = this.model.borderWidth+this.model.desktopEntity.width-this.escapeScale*8;
-          this.escapeEntity.y = this.model.borderHeight-this.escapeScale*8;
+        if (this.escapeEntity) {
+          if (this.model.borderHeight < this.escapeScale*8) {
+            this.escapeEntity.x = this.model.borderWidth+this.model.desktopEntity.width;
+            this.escapeEntity.y = this.model.borderHeight;
+          } else {
+            this.escapeEntity.x = this.model.borderWidth+this.model.desktopEntity.width-this.escapeScale*8;
+            this.escapeEntity.y = this.model.borderHeight-this.escapeScale*8;
+          }
         }
-        
         
         if (this.enableGameControls) {
           var w = Math.floor(this.width/2);
@@ -159,6 +170,11 @@ export class BorderEntity  extends AbstractEntity {
           this.rightControlEntity.y = 0;
           this.rightControlEntity.width = w;
           this.rightControlEntity.height = this.height;
+        }
+
+        if (this.devModeNameEntity) {
+          this.devModeNameEntity.x = (Math.floor(this.width/2)-50);
+          this.devModeNameEntity.y = 2;
         }
         break;
     }
