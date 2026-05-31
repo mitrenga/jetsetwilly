@@ -1,6 +1,7 @@
 /**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
+const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion);
 const { MenuEntity } = await import('./svision/js/platform/canvas2D/menuEntity.js?ver='+window.srcVersion);
 const { SignboardFonts } = await import('./signboardFonts.js?ver='+window.srcVersion);
 const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
@@ -13,6 +14,7 @@ const { ZXWaitForAudioEventEntity } = await import('./svision/js/platform/canvas
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
+import BorderEntity from './borderEntity.js';
 import MenuEntity from './svision/js/platform/canvas2D/menuEntity.js';
 import SignboardFonts from './signboardFonts.js';
 import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
@@ -89,6 +91,10 @@ export class MenuModel extends AbstractModel {
     this.gameFrame = 0;
     this.dataLoaded = false;
   } // constructor
+
+  newBorderEntity() {
+    return new BorderEntity(false, false);
+  } // newBorderEntity
 
   init() {
     super.init();
