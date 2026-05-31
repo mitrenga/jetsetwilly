@@ -65,7 +65,6 @@ export class BorderEntity  extends AbstractEntity {
         } else {
           this.devModeNameEntity.text = devModeName.substring(cfgLen+1);
           try {
-            console.log(devModeName.substring(1, cfgLen+1));
             var cfg = JSON.parse(devModeName.substring(1, cfgLen+1));
             Object.keys(cfg).forEach((item) => {
               this.devModeNameEntity[item] = cfg[item];
