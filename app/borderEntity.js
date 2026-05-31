@@ -54,27 +54,17 @@ export class BorderEntity  extends AbstractEntity {
     }
 
     if (typeof(window.devModeName) === 'string') {
-      this.devModeNameEntity = new TextEntity(this, this.app.fonts.fonts5x5, 0, -9, 100, 9, '', false, false, {align: 'center', margin: 2});
-      this.devModeNameEntity.penColor = this.app.platform.colorByName('black');
-      this.devModeNameEntity.bkColor = this.app.platform.colorByName('yellow');
+      this.devModeNameEntity = new TextEntity(this, this.app.fonts.fonts5x5, 0, -7, 100, 7, '', false, false, {margin: 1});
       var devModeName = window.devModeName;
-      if (devModeName[0] == '.' && devModeName[1] == '{') {
-        var cfgLen = devModeName.indexOf('}');
-        if (cfgLen < 0) {
-          this.devModeNameEntity.text = devModeName;
-        } else {
-          this.devModeNameEntity.text = devModeName.substring(cfgLen+1);
-          try {
-            var cfg = JSON.parse(devModeName.substring(1, cfgLen+1));
-            Object.keys(cfg).forEach((item) => {
-              this.devModeNameEntity[item] = cfg[item];
-            });
-          } catch (error) {
-            console.error(error.message);
-          }
-        }
-      } else {
-        this.devModeNameEntity.text = devModeName;
+      var cfgLen = devModeName.indexOf('}');
+      this.devModeNameEntity.text = devModeName.substring(cfgLen+1);
+      try {
+        var cfg = JSON.parse(devModeName.substring(1, cfgLen+1));
+        Object.keys(cfg).forEach((item) => {
+          this.devModeNameEntity[item] = cfg[item];
+        });
+      } catch (error) {
+        console.error(error.message);
       }
       this.addEntity(this.devModeNameEntity);
     }
@@ -194,8 +184,8 @@ export class BorderEntity  extends AbstractEntity {
         }
 
         if (this.devModeNameEntity) {
-          this.devModeNameEntity.x = (Math.floor(this.width/2)-50);
-          this.devModeNameEntity.y = 2;
+          this.devModeNameEntity.x = Math.floor((this.width-this.devModeNameEntity.width)/2);
+          this.devModeNameEntity.y = Math.max(Math.floor((this.app.model.borderHeight-this.devModeNameEntity.height)/2), 0);
         }
         break;
     }
