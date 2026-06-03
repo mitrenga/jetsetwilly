@@ -5,11 +5,33 @@
 /**/
 // begin code
 
-var controls = {left: false, right: false, jump: false};
+var controls = {
+  left: false,
+  right: false,
+  jump: false,
+  isLeft: function() {
+    if (this.left && !this.right) {
+      return true;
+    }
+    return false;
+  },
+  isRight: function() {
+    if (this.right && !this.left) {
+      return true;
+    }
+    return false;
+  },
+  isJump: function() {
+    return this.jump;
+  }
+};
+
 var jumpMap = [-4, -4, -3, -3, -2, -2, -1, -1, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4];
+var framesInterval = 80;
+
 var accelerator, counter, counter2, counter4, counter6, gameData,
     standing, jumpCounter, jumpDirection, fallingCounter, fallingDirection, mustMovingDirection, shouldMovingDirection, previousDirection,
-    caughtRope, caughtNode, ropeProhibited, operation, pause, firstLoop, nextLoop, ended;
+    caughtRope, caughtNode, ropeProhibited, operation, pause, loopCounter, nextLoop, ended;
 
 function resetData() {
   accelerator = 0;
@@ -31,29 +53,29 @@ function resetData() {
   ropeProhibited = {rope: 0, counter: 0};
   operation = 'walking';
   pause = false;
-  firstLoop = true;
+  loopCounter = 0;
   nextLoop = false;
   ended = false;
 } // resetData
 
 function gameLoop() {
+  loopCounter++;
   if (ended) {
     nextLoop = false;
     return;
   }
   if (!pause) {
-    var delay = 77;
+    var framesDelay = framesInterval;
     if (gameData.info[9] == 2) {
-      delay = 38;
+      framesDelay = Math.floor(framesInterval/2);
     }
-    nextLoop = setTimeout(gameLoop, delay);
+    nextLoop = setTimeout(gameLoop, framesDelay);
   } else {
     nextLoop = false;
   }
 
   // delay the first loop when switching between rooms
-  if (firstLoop) {
-    firstLoop = false;
+  if (loopCounter == 1) {
     return;
   }
 
@@ -111,6 +133,9 @@ function gameLoop() {
 
     if (!ended) {
       postMessage({id: 'update', gameData: gameData});
+    }
+    if (gameData.info[7] !== false) {
+      ended = true;
     }
   }
 } // gameLoop
@@ -277,15 +302,15 @@ function willyWalking() {
     }
   }
 
-  if (shouldMovingDirection == 1 && !controls.left) {
+  if (shouldMovingDirection == 1 && !controls.isLeft()) {
     mustMovingDirection = 1;
   }
-  if (shouldMovingDirection == -1 && !controls.right) {
+  if (shouldMovingDirection == -1 && !controls.isRight()) {
     mustMovingDirection = -1;
   }
 
   var newDirection = 0;
-  if (((gameData.info[9] == 2 || gameData.info[9] < 2 && controls.right && !controls.left ) && !jumpCounter && !fallingCounter && !mustMovingDirection && (!shouldMovingDirection || (shouldMovingDirection == -1 && previousDirection == 1))) ||
+  if (((gameData.info[9] == 2 || gameData.info[9] < 2 && controls.isRight()) && !jumpCounter && !fallingCounter && !mustMovingDirection && (!shouldMovingDirection || (shouldMovingDirection == -1 && previousDirection == 1))) ||
       (jumpCounter && jumpDirection == 1) ||
       (mustMovingDirection == 1)) {
 
@@ -320,7 +345,7 @@ function willyWalking() {
     }
   }
 
-  if ((gameData.info[9] < 2 && controls.left && !controls.right && !jumpCounter && !fallingCounter && !mustMovingDirection && (!shouldMovingDirection || (shouldMovingDirection == 1 && previousDirection == -1))) ||
+  if ((gameData.info[9] < 2 && controls.isLeft() && !jumpCounter && !fallingCounter && !mustMovingDirection && (!shouldMovingDirection || (shouldMovingDirection == 1 && previousDirection == -1))) ||
       (jumpCounter && jumpDirection == -1) ||
       (mustMovingDirection == -1)) {
 
@@ -357,7 +382,7 @@ function willyWalking() {
 
   previousDirection = newDirection;
 
-  if (!jumpCounter && !fallingCounter && controls.jump && gameData.info[9] < 2) {
+  if (!jumpCounter && !fallingCounter && controls.isJump() && gameData.info[9] < 2) {
     if (canMove(0, jumpMap[jumpCounter])) {
       if (willy.y+jumpMap[jumpCounter] < 0) {
         willy.y = 104;
@@ -404,7 +429,7 @@ function willyWalking() {
 
 function willyOnRope() {
   var willy = gameData.willy[0];
-  if (controls.jump) {
+  if (controls.isJump()) {
     operation = 'walking';
     jumpCounter = 1;
     switch (willy.direction) {
@@ -422,7 +447,7 @@ function willyOnRope() {
     willy.frame = Math.floor(willy.x%8/2);
     postMessage({id: 'playSound', channel: 'sounds', sound: 'jumpSound', options: {next: 'longFallingSound', repeat: true}});
   } else {
-    if (controls.right && !controls.left) {
+    if (controls.isRight()) {
       if (willy.direction == 1) {
         willy.direction = 0;
       } else {
@@ -436,7 +461,7 @@ function willyOnRope() {
         }
       }
     }
-    if (controls.left && ! controls.right) {
+    if (controls.isLeft()) {
       if (willy.direction == 0) {
         willy.direction = 1;
       } else {
@@ -815,6 +840,7 @@ function isTouchingSwitch() {
 onmessage = (event) => {
   switch (event.data.id) {
     case 'init':
+      clearTimeout(nextLoop);
       resetData();
       gameData = {};
       Object.keys(event.data.initData).forEach((objectsType) => {
@@ -841,7 +867,11 @@ onmessage = (event) => {
       break;
 
     case 'controls':
-      controls[event.data.action] = event.data.value;
+      if (event.data.action.startsWith('is')) {
+        controls[event.data.action] = new Function('return('+event.data.value+')')();
+      } else {
+        controls[event.data.action] = event.data.value;
+      }
       break;
 
     case 'pause':
@@ -849,6 +879,7 @@ onmessage = (event) => {
       break;
 
     case 'continue':
+      clearTimeout(nextLoop);
       pause = false;
       gameLoop();
       break;
@@ -856,7 +887,9 @@ onmessage = (event) => {
     case 'reset':
       clearTimeout(nextLoop);
       nextLoop = false;
-      controls = {left: false, right: false, jump: false};
+      controls.left = false;
+      controls.right = false;
+      controls.jump = false;
       break;
 
   }
