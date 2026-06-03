@@ -868,7 +868,7 @@ onmessage = (event) => {
 
     case 'controls':
       if (event.data.action.startsWith('is')) {
-        controls[event.data.action] = new Function('return('+event.data.value+')')();
+        controls[event.data.action] = new Function(event.data.value);
       } else {
         controls[event.data.action] = event.data.value;
       }
