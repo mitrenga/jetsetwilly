@@ -1,15 +1,21 @@
 /**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
+const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion);
 const { GameAreaEntity } = await import('./gameAreaEntity.js?ver='+window.srcVersion);
 const { GameInfoEntity } = await import('./gameInfoEntity.js?ver='+window.srcVersion);
 const { PauseGameEntity } = await import('./pauseGameEntity.js?ver='+window.srcVersion);
+const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
+const { SpriteTool } = await import('./svision/js/spriteTool.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
+import Tool from './svision/js/tools.js';
 import BorderEntity from './borderEntity.js';
 import GameAreaEntity from './gameAreaEntity.js';
 import GameInfoEntity from './gameInfoEntity.js';
 import PauseGameEntity from './pauseGameEntity.js';
+import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
+import SpriteTool from './svision/js/spriteTool.js';
 /**/
 // begin code
 
@@ -139,8 +145,13 @@ export class RoomModel extends AbstractModel {
     for (var l = 0; l < this.app.lives; l++) {
       this.gameInfoEntity.liveEntities[l].setGraphicsData(data.data.willy);
     }
-    super.setData(data.data);
     this.app.inputEventsManager.sendEventsActiveKeys('Press');
+    if (typeof(window.gameSprite) == 'string') {
+      var gameSprite = SpriteTool.decode(window.gameSprite);
+      this['gameSprite'] = new Function('gameSprite', gameSprite.sprite[0].grid.join(''));
+      this['gameSprite'](gameSprite);
+    }
+    super.setData(data.data);
     this.sendWorkerMessage({id: 'init', initData: this.initData});
   } // setData
 
