@@ -31,7 +31,7 @@ import ZXErrorEntity from './svision/js/platform/canvas2D/zxSpectrum/zxErrorEnti
 
 export class GameApp extends AbstractApp {
   
-  constructor(platform, importPath, wsURL) {
+  constructor(platform, importPath, wsURL, devModeName, appIconSprite) {
     super(platform, 'bodyApp',  importPath, wsURL);
 
     this.worker = new Worker(this.importPath+'/gameWorker.js?ver='+window.srcVersion);
@@ -43,6 +43,8 @@ export class GameApp extends AbstractApp {
 
     this.version = '2026.05.10';
     this.copyright = '© 2026 GNU General Public Licence';
+    this.devModeName = devModeName;
+    this.appIconSprite = appIconSprite;
     
     this.audioManager = new AudioManager(this);
     this.muted = {sounds: false, music: false};
@@ -342,7 +344,6 @@ export class GameApp extends AbstractApp {
       var x = this.binToInt(binaryItem.substring(11, 16));
       var y = this.binToInt(binaryItem.substring(0, 1)+binaryItem.substring(8, 11));
       var room = this.binToInt(binaryItem.substring(2, 8));
-      if (room == 43) console.log(item);
       this.items[room].push({x: x, y: y, id: id});
       id++;
     });

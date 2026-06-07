@@ -53,13 +53,12 @@ export class BorderEntity  extends AbstractEntity {
       this.addEntity(this.rightControlEntity);
     }
 
-    if (typeof(window.devModeName) === 'string') {
+    if (this.app.devModeName !== false) {
       this.devModeNameEntity = new TextEntity(this, this.app.fonts.fonts5x5, 0, -7, 100, 7, '', false, false, {margin: 1});
-      var devModeName = window.devModeName;
-      var cfgLen = devModeName.indexOf('}');
-      this.devModeNameEntity.text = devModeName.substring(cfgLen+1);
+      var cfgLen = this.app.devModeName.indexOf('}');
+      this.devModeNameEntity.text = this.app.devModeName.substring(cfgLen+1);
       try {
-        var cfg = JSON.parse(devModeName.substring(1, cfgLen+1));
+        var cfg = JSON.parse(this.app.devModeName.substring(1, cfgLen+1));
         Object.keys(cfg).forEach((item) => {
           this.devModeNameEntity[item] = cfg[item];
         });

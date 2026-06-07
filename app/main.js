@@ -7,7 +7,7 @@ import appPlatform from './appPlatform.js';
 /**/
 // begin code
 
-var gameApp = new GameApp(appPlatform(), window.importPath, window.wsURL);
+var gameApp = new GameApp(appPlatform(), window.importPath, window.wsURL, window.devModeName, window.appIconSprite);
 
 // animation loop
 function loopGame(timestamp) {

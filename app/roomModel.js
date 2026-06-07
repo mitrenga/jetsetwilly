@@ -146,11 +146,7 @@ export class RoomModel extends AbstractModel {
       this.gameInfoEntity.liveEntities[l].setGraphicsData(data.data.willy);
     }
     this.app.inputEventsManager.sendEventsActiveKeys('Press');
-    if (typeof(window.gameSprite) == 'string') {
-      var gameSprite = SpriteTool.decode(window.gameSprite);
-      this['gameSprite'] = new Function('gameSprite', gameSprite.sprite[0].grid.join(''));
-      this['gameSprite'](gameSprite);
-    }
+    SpriteTool.scriptedSprite(this, this.app.appIconSprite);
     super.setData(data.data);
     this.sendWorkerMessage({id: 'init', initData: this.initData});
   } // setData
