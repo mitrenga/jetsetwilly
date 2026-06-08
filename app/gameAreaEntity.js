@@ -2,11 +2,13 @@
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { DrawingCache } = await import('./svision/js/platform/canvas2D/drawingCache.js?ver='+window.srcVersion);
 const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
+const { SpriteTool } = await import('./svision/js/spriteTool.js?ver='+window.srcVersion);
 const { RopeEntity } = await import('./ropeEntity.js?ver='+window.srcVersion);
 /*/
 import AbstractEntity from './svision/js/abstractEntity.js';
 import DrawingCache from './svision/js/platform/canvas2D/drawingCache.js';
 import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
+import SpriteTool from './svision/js/spriteTool.js';
 import RopeEntity from './ropeEntity.js';
 /**/
 // begin code
@@ -457,7 +459,7 @@ export class GameAreaEntity extends AbstractEntity {
         entity.setFixSize(8, 8);
         entity.setRepeatX(conveyorData.length);
         var conveyorSpriteData = conveyorData.data.substring(2, 18);
-        entity.setGraphicsDataFromHexStr(conveyorSpriteData);
+        entity.setGraphicsData(SpriteTool.decodeHexStr(conveyorSpriteData));
         entity.cloneSprite(0);
         var rotateDirection = 1;
         if (conveyorData.moving == 'right') {
@@ -624,7 +626,7 @@ export class GameAreaEntity extends AbstractEntity {
         var entity = new SpriteEntity(this, item.x*8, item.y*8, false, false, 0, 0);
         this.addEntity(entity);
         entity.setColorsMap({1: {0: penColor0, 1: penColor1, 2: penColor2, 3: penColor3}});
-        entity.setGraphicsDataFromHexStr(graphicData.item);
+        entity.setGraphicsData(SpriteTool.decodeHexStr(graphicData.item));
         entity.cloneSprite(0);
         entity.cloneSprite(0);
         entity.cloneSprite(0);
