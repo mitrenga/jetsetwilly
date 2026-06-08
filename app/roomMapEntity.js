@@ -11,12 +11,11 @@ import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
 
 export class RoomMapEntity extends AbstractEntity {
   
-  constructor(parentEntity, x, y, roomNumber, locked, roomsMapX, roomsMapY) {
+  constructor(parentEntity, x, y, roomNumber, roomsMapX, roomsMapY) {
     super(parentEntity, x, y, 64, 38, false, false);
     this.id = 'RoomMapEntity';
 
     this.roomNumber = roomNumber;
-    this.locked = locked;
     this.roomsMapX = roomsMapX;
     this.roomsMapY = roomsMapY;
     this.roomData = null;
@@ -24,7 +23,6 @@ export class RoomMapEntity extends AbstractEntity {
     this.mapKinds = ['floor', 'wall', 'nasty'];
     this.layoutObjects = [false, 'floor', 'wall', 'nasty'];
     this.roomNameEntity = null;
-    this.padlockEntity = null;
 
     this.app.layout.newDrawingCache(this, 0);
     this.app.layout.newDrawingCropCache(this);
@@ -37,12 +35,6 @@ export class RoomMapEntity extends AbstractEntity {
       this.roomNameEntity = new TextEntity(this, this.app.fonts.fonts3x3, 0, 32, 64, 6, '', this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('brightBlack'), {align: 'center', topMargin: 1});
       this.roomNameEntity.enablePaintWithVisibility();
       this.addEntity(this.roomNameEntity);
-      if (this.locked) {
-        this.padlockEntity = new SpriteEntity(this, Math.floor((this.width-11)/2), Math.floor((this.height-13)/2), this.app.platform.colorByName('red'), false, 0, 0);
-        this.padlockEntity.enablePaintWithVisibility();
-        this.padlockEntity.setCompressedGraphicsData('lP100B00D0B040307050209010F080A0G012334140414041415671815696A656', false);
-        this.addEntity(this.padlockEntity);
-      }
       var roomId = 'room'+this.roomNumber.toString().padStart(2, '0');
       this.fetchData(roomId+'.data', {key: roomId, when: 'required'}, {});
     }
@@ -353,11 +345,6 @@ export class RoomMapEntity extends AbstractEntity {
       }
       
       this.drawSubEntity(this.roomNameEntity);
-
-      if (this.locked) {
-        this.app.layout.paint(this, moveX, moveY, cropWidth, cropHeight, '#9a9595c0');
-        this.drawSubEntity(this.padlockEntity);
-      }      
     }
   } // drawEntity
 
@@ -370,14 +357,14 @@ export class RoomMapEntity extends AbstractEntity {
       case 'keyPress':
         switch (event.key) {            
           case 'Mouse1':
-            if (!this.locked && this.pointOnEntity(event) && this.app.model.desktopEntity.pointOnEntity(event)) {
+            if (this.pointOnEntity(event) && this.app.model.desktopEntity.pointOnEntity(event)) {
               this.sendEvent(0, 0, {id: 'selectRoomMapEntity', roomsMapX: this.roomsMapX, roomsMapY: this.roomsMapY});
               this.app.inputEventsManager.keysMap.Mouse1 = this;
               this.clickState = true;
             }
             break;
           case 'Touch':
-            if (!this.locked && this.pointOnEntity(event)&& this.app.model.desktopEntity.pointOnEntity(event)) {
+            if (this.pointOnEntity(event)&& this.app.model.desktopEntity.pointOnEntity(event)) {
               this.sendEvent(0, 0, {id: 'selectRoomMapEntity', roomsMapX: this.roomsMapX, roomsMapY: this.roomsMapY});
               this.app.inputEventsManager.touchesMap[event.identifier] = this;
               this.clickState = true;

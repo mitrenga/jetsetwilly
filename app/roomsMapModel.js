@@ -37,8 +37,6 @@ export class RoomsMapModel extends AbstractModel {
     this.touchesDragging = {};
 
     this.prevTimestamp = false;
-    
-    this.roomsOpened = 81; // temporary
   } // constructor
 
   init() {
@@ -54,7 +52,7 @@ export class RoomsMapModel extends AbstractModel {
         if (roomNumber !== false) {
           var posX = (x-this.selectionX+2)*64-32;
           var posY = (y-this.selectionY+2)*38-19;
-          var roomMapEntity = new RoomMapEntity(this.desktopEntity, posX, posY, roomNumber, (roomNumber > this.roomsOpened), x, y);
+          var roomMapEntity = new RoomMapEntity(this.desktopEntity, posX, posY, roomNumber, x, y);
           this.desktopEntity.addEntity(roomMapEntity);
           this.roomsMapEntities[y][x] = roomMapEntity;
         }
