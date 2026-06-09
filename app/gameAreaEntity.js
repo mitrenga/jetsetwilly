@@ -385,7 +385,7 @@ export class GameAreaEntity extends AbstractEntity {
       }
     });
 
-    // walls & floors & nasties
+    // walls & floors & nasties
     ['walls', 'floors', 'nasties'].forEach((objectType) => {
       if (objectType in graphicData) {
         graphicData[objectType].forEach((objData) => {

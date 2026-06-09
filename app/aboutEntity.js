@@ -26,7 +26,7 @@ export class AboutEntity extends AbstractEntity {
     this.addEntity(new AbstractEntity(this, 1, 7, this.width-2, this.height-8, false, this.app.platform.colorByName('brightWhite')));
 
     this.aboutText = 'JET SET WILLY IS A REMAKE OF THE ORIGINAL 1984 GAME BY MATTHEW SMITH.\n' +
-                    'FUNNY THING IS, DURING DEVELOPMENT, I STUDIED THE ORIGINAL CODE AND CAME ' +
+                    'FUNNY THING IS, DURING DEVELOPMENT, I\u00A0STUDIED THE ORIGINAL CODE AND CAME ' +
                     'ACROSS BUGS THAT MADE IT IMPOSSIBLE TO COMPLETE THE GAME SUCCESSFULLY.\n' +
                     'WHILE RESEARCHING FURTHER, I DISCOVERED THAT THESE BUGS HAD BEEN DOCUMENTED ' +
                     'IN THE 80\'S, AND INSTRUCTIONS ON HOW TO FIX THEM WERE PUBLISHED.\n' +
