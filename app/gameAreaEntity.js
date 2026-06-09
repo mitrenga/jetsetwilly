@@ -489,7 +489,7 @@ export class GameAreaEntity extends AbstractEntity {
             hexStr.padStart(2, '0');
             reverseSpriteData = reverseSpriteData+hexStr;
           }
-          entity.addGraphicsDataFromHexStr(reverseSpriteData);
+          entity.addFrameData(SpriteTool.decodeHexStr(reverseSpriteData).sprite, false);
           entity.cloneSprite(4);
           entity.rotateSpriteRow(5, 0, -2*rotateDirection);
           entity.rotateSpriteRow(5, 2, 2*rotateDirection);
