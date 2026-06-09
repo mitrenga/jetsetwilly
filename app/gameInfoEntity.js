@@ -27,9 +27,9 @@ export class GameInfoEntity extends AbstractEntity {
     this.roomNameEntity = new TextEntity(this, this.app.fonts.zxFonts8x8, 0, 0, 32*8, 8, '', this.app.platform.colorByName('brightYellow'), this.app.platform.colorByName('brightBlack'), {align: 'center'});
     this.addEntity(this.roomNameEntity);
     this.addEntity(new AbstractEntity(this, 0, 8, 32*8, 7*8, false, this.app.platform.colorByName('black')));
-    var colorsMap = {};
+    var penColorsMap = {};
     for (var c = 0; c < 7; c++) {
-      colorsMap[c] = this.app.platform.color(c+1);
+      penColorsMap[c] = this.app.platform.color(c+1);
     }
     var itemsLabel = 'Items collected';
     var itemsCounter = Object.keys(this.app.itemsCollected).length;
@@ -37,15 +37,15 @@ export class GameInfoEntity extends AbstractEntity {
       itemsLabel = 'Items remaining';
       itemsCounter = this.app.totalItems-itemsCounter;
     }
-    this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 1*8, 2*8, 13*8, 8, itemsLabel, false, false, {penColorsMap: colorsMap}));
+    this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 1*8, 2*8, 13*8, 8, itemsLabel, false, false, {penColorsMap: penColorsMap}));
     this.itemsCollectedEntity = new TextEntity(this, this.app.fonts.zxFonts8x8Mono, 15*8, 2*8, 3*8, 8, itemsCounter.toString().padStart(3, '0'), this.app.platform.colorByName('white'), false, {});
     this.addEntity(this.itemsCollectedEntity);
     this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 20*8, 2*8, 4*8, 8, 'Time', this.app.platform.colorByName('white'), false, {}));
-    colorsMap = {};
+    penColorsMap = {};
     for (var c = 0; c < 7; c++) {
-      colorsMap[c] = this.app.platform.color(7-c);
+      penColorsMap[c] = this.app.platform.color(7-c);
     }
-    this.timeEntity = new TextEntity(this, this.app.fonts.zxFonts8x8, 25*8, 2*8, 6*8, 8, this.app.timeStr, false, false, {align: 'right', penColorsMap: colorsMap});
+    this.timeEntity = new TextEntity(this, this.app.fonts.zxFonts8x8, 25*8, 2*8, 6*8, 8, this.app.timeStr, false, false, {align: 'right', penColorsMap: penColorsMap});
     this.addEntity(this.timeEntity);
     for (var l = 0; l < this.app.lives; l++) {
       this.liveEntities[l] = new SpriteEntity(this, l*16, 5*8, this.app.platform.colorByName(this.liveColors[l]), false, 0, 0);

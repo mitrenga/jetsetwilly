@@ -64,19 +64,19 @@ export class GameOverModel extends AbstractModel {
       this.desktopEntity.addEntity(this.pillarEntity);
     }
 
-    var colorsMap = {};
+    var penColorsMap = {};
     for (var ch = 0; ch < 4; ch++) {
-      colorsMap[ch] = this.app.platform.penColorByAttr(this.colorCounter);
+      penColorsMap[ch] = this.app.platform.penColorByAttr(this.colorCounter);
       this.colorCounter = this.app.rotateInc(this.colorCounter, 65, 71);
     }
-    this.gameEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 10*8, 6*8, 4*8, 8, 'Game', this.app.platform.colorByName('brightWhite'), false, {penColorsMap: colorsMap, hide: true});
+    this.gameEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 10*8, 6*8, 4*8, 8, 'Game', this.app.platform.colorByName('brightWhite'), false, {penColorsMap: penColorsMap, hide: true});
     this.desktopEntity.addEntity(this.gameEntity);
-    colorsMap = {};
+    penColorsMap = {};
     for (var ch = 0; ch < 4; ch++) {
-      colorsMap[ch] = this.app.platform.penColorByAttr(this.colorCounter);
+      penColorsMap[ch] = this.app.platform.penColorByAttr(this.colorCounter);
       this.colorCounter = this.app.rotateInc(this.colorCounter, 65, 71);
     }
-    this.overEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 18*8, 6*8, 4*8, 8, 'Over', this.app.platform.colorByName('brightWhite'), false, {penColorsMap: colorsMap, hide: true});
+    this.overEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 18*8, 6*8, 4*8, 8, 'Over', this.app.platform.colorByName('brightWhite'), false, {penColorsMap: penColorsMap, hide: true});
     this.desktopEntity.addEntity(this.overEntity);
     this.contiueEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 21*8, 32*8, 8, 'Continue in the last room?', this.app.platform.colorByName('brightWhite'), false, {align: 'center', hide: true});
     this.desktopEntity.addEntity(this.contiueEntity);

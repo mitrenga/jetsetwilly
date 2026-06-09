@@ -625,7 +625,7 @@ export class GameAreaEntity extends AbstractEntity {
         var penColor3 = this.app.platform.color(tmpColor);
         var entity = new SpriteEntity(this, item.x*8, item.y*8, false, false, 0, 0);
         this.addEntity(entity);
-        entity.setColorsMap({1: {0: penColor0, 1: penColor1, 2: penColor2, 3: penColor3}});
+        entity.setSharedPalette({1: {0: penColor0, 1: penColor1, 2: penColor2, 3: penColor3}});
         entity.setGraphicsData(SpriteTool.decodeHexStr(graphicData.item));
         entity.cloneSprite(0);
         entity.cloneSprite(0);

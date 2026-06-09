@@ -9,7 +9,7 @@ const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEnti
 const { SpriteTool } = await import('./svision/js/spriteTool.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
-import Tool from './svision/js/tools.js';
+import Tool from './svision/js/tool.js';
 import BorderEntity from './borderEntity.js';
 import GameAreaEntity from './gameAreaEntity.js';
 import GameInfoEntity from './gameInfoEntity.js';
