@@ -459,20 +459,17 @@ export class GameAreaEntity extends AbstractEntity {
         entity.setFixSize(8, 8);
         entity.setRepeatX(conveyorData.length);
         var conveyorSpriteData = conveyorData.data.substring(2, 18);
-        entity.setGraphicsData(SpriteTool.decodeHexStr(conveyorSpriteData));
-        entity.cloneSprite(0);
+        var conveyorSprite = SpriteTool.decodeHexStr(conveyorSpriteData);
+        entity.setGraphicsData(conveyorSprite);
         var rotateDirection = 1;
         if (conveyorData.moving == 'right') {
           rotateDirection = -1;
         }
-        entity.rotateSpriteRow(1, 0, -2*rotateDirection);
-        entity.rotateSpriteRow(1, 2, 2*rotateDirection);
-        entity.cloneSprite(1);
-        entity.rotateSpriteRow(2, 0, -2*rotateDirection);
-        entity.rotateSpriteRow(2, 2, 2*rotateDirection);
-        entity.cloneSprite(2);
-        entity.rotateSpriteRow(3, 0, -2*rotateDirection);
-        entity.rotateSpriteRow(3, 2, 2*rotateDirection);
+        for (var f = 1; f <= 3; f++) {
+          var grid = SpriteTool.rotateRow(conveyorSprite.sprite, 0, -2*f*rotateDirection);
+          grid = SpriteTool.rotateRow(grid, 2, 2*f*rotateDirection);
+          entity.addFrameData(grid, false);
+        }
         var conveyorInitData = {
           x: conveyorData.location.x*8,
           y: conveyorData.location.y*8,
@@ -489,16 +486,13 @@ export class GameAreaEntity extends AbstractEntity {
             hexStr.padStart(2, '0');
             reverseSpriteData = reverseSpriteData+hexStr;
           }
-          entity.addFrameData(SpriteTool.decodeHexStr(reverseSpriteData).sprite, false);
-          entity.cloneSprite(4);
-          entity.rotateSpriteRow(5, 0, -2*rotateDirection);
-          entity.rotateSpriteRow(5, 2, 2*rotateDirection);
-          entity.cloneSprite(5);
-          entity.rotateSpriteRow(6, 0, -2*rotateDirection);
-          entity.rotateSpriteRow(6, 2, 2*rotateDirection);
-          entity.cloneSprite(6);
-          entity.rotateSpriteRow(7, 0, -2*rotateDirection);
-          entity.rotateSpriteRow(7, 2, 2*rotateDirection);
+          var reverseGrid = SpriteTool.decodeHexStr(reverseSpriteData).sprite;
+          entity.addFrameData(reverseGrid, false);
+          for (var f = 1; f <= 3; f++) {
+            var grid = SpriteTool.rotateRow(reverseGrid, 0, -2*f*rotateDirection);
+            grid = SpriteTool.rotateRow(grid, 2, 2*f*rotateDirection);
+            entity.addFrameData(grid, false);
+          }
           conveyorInitData.flashShiftFrames = 4;
         }
         this.addEntity(entity);
@@ -626,10 +620,11 @@ export class GameAreaEntity extends AbstractEntity {
         var entity = new SpriteEntity(this, item.x*8, item.y*8, false, false, 0, 0);
         this.addEntity(entity);
         entity.setSharedPalette({1: {0: penColor0, 1: penColor1, 2: penColor2, 3: penColor3}});
-        entity.setGraphicsData(SpriteTool.decodeHexStr(graphicData.item));
-        entity.cloneSprite(0);
-        entity.cloneSprite(0);
-        entity.cloneSprite(0);
+        var itemSprite = SpriteTool.decodeHexStr(graphicData.item);
+        entity.setGraphicsData(itemSprite);
+        for (var f = 0; f < 3; f++) {
+          entity.addFrameData(itemSprite.sprite, false);
+        }
         this.spriteEntities.items.push(entity);
         this.initData.items.push({id: item.id, hide: false, x: item.x*8, y: item.y*8, width: 8, height: 8, frame: 0, direction: 0});
         if (!('matchColorsOfItems' in data) && (!data.matchColorsOfItems)) {
