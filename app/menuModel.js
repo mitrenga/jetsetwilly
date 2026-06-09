@@ -268,7 +268,7 @@ export class MenuModel extends AbstractModel {
           }
           if (this.headDirectionX > 0 && this.headX > 235) {
             this.headDirectionX *= -1;
-            this.headEntity.switchDirection();
+            this.headEntity.direction = 1-this.headEntity.direction;
             this.headDirectionY = Math.round(Math.random()*2)-1;
             if (this.headDirectionY != 0) {
               this.headY += this.wave[this.waveCounter];
@@ -278,7 +278,7 @@ export class MenuModel extends AbstractModel {
           if ((this.headDirectionX > 0 && this.headX > 235) ||
               (this.headDirectionX < 0 && this.headX < 6)) {
             this.headDirectionX *= -1;
-            this.headEntity.switchDirection();
+            this.headEntity.direction = 1-this.headEntity.direction;
             this.headDirectionY = Math.round((Math.random()*4)-2)/2;
             if (this.headDirectionY != 0) {
               this.headY += this.wave[this.waveCounter];
