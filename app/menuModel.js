@@ -11,6 +11,7 @@ const { ZXVolumeEntity } = await import('./svision/js/platform/canvas2D/zxSpectr
 const { ZXControlsEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxControlsEntity.js?ver='+window.srcVersion);
 const { AboutEntity } = await import('./aboutEntity.js?ver='+window.srcVersion);
 const { ZXWaitForAudioEventEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxWaitForAudioEventEntity.js?ver='+window.srcVersion);
+const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
@@ -24,6 +25,7 @@ import ZXVolumeEntity from './svision/js/platform/canvas2D/zxSpectrum/zxVolumeEn
 import ZXControlsEntity from './svision/js/platform/canvas2D/zxSpectrum/zxControlsEntity.js';
 import AboutEntity from './aboutEntity.js';
 import ZXWaitForAudioEventEntity from './svision/js/platform/canvas2D/zxSpectrum/zxWaitForAudioEventEntity.js';
+import Tool from './svision/js/tool.js';
 /**/
 // begin code
 
@@ -258,7 +260,7 @@ export class MenuModel extends AbstractModel {
       
           // head
           if (this.gameFrame%2 == 0) {
-            this.headEntity.incFrame();
+            this.headEntity.frame = Tool.cycleInc(this.headEntity.frame, 0, this.headEntity.frames-1);
           }
           this.headX += this.headDirectionX;
           if (this.headEntity.drawingCropCache != null && this.headX >= 0) {
@@ -308,7 +310,7 @@ export class MenuModel extends AbstractModel {
           this.willyEntity.y = this.headEntity.y-11;
           this.willyEntity.direction = this.headEntity.direction;
           if (this.gameFrame == 1 || this.gameFrame == 4) {
-            this.willyEntity.incFrame();
+            this.willyEntity.frame = Tool.cycleInc(this.willyEntity.frame, 0, this.willyEntity.frames-1);
           }
 
           // body
@@ -317,7 +319,7 @@ export class MenuModel extends AbstractModel {
             entity.y = this.track[this.bodyObjects[e].trackY].y;
             entity.direction = this.track[this.bodyObjects[e].trackX].direction;
             if (this.gameFrame%4 == 0) {
-              entity.incFrame();
+              entity.frame = Tool.cycleInc(entity.frame, 0, entity.frames-1);
             }
             if (entity.drawingCropCache != null && entity.x >= 0) {
               entity.disablePaintWithVisibility();
