@@ -2,10 +2,12 @@
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { ButtonEntity } = await import('./svision/js/platform/canvas2D/buttonEntity.js?ver='+window.srcVersion);
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
+const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 /*/
 import AbstractEntity from './svision/js/abstractEntity.js';
 import ButtonEntity from './svision/js/platform/canvas2D/buttonEntity.js';
 import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
+import Tool from './svision/js/tool.js';
 /**/
 // begin code
 
@@ -124,7 +126,7 @@ export class BorderEntity  extends AbstractEntity {
         if (this.animation == 'screech') {
           color = Math.floor(Math.random()*this.style[this.animation].colors.length);
         } else {
-          color = this.app.rotateInc(color, 0, this.style[this.animation].colors.length-1);
+          color = Tool.cycleInc(color, 0, this.style[this.animation].colors.length-1);
         }
       }
     }
@@ -152,7 +154,7 @@ export class BorderEntity  extends AbstractEntity {
           if (this.animation == 'screech') {
             this.diff = Math.floor(Math.random()*this.style[this.animation].colors.length*10);
           } else {
-            this.diff = this.app.rotateInc(this.diff, 0, this.style[this.animation].colors.length*10-1);
+            this.diff = Tool.cycleInc(this.diff, 0, this.style[this.animation].colors.length*10-1);
           }
           this.sendEvent(0, 50, {id: 'moveStripes'});
         }

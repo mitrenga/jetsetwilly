@@ -1,7 +1,9 @@
 /**/
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
+const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 /*/
 import AbstractEntity from './svision/js/abstractEntity.js';
+import Tool from './svision/js/tool.js';
 /**/
 // begin code
 
@@ -43,7 +45,7 @@ export class MainImageEntity extends AbstractEntity {
         for (var column = 0; column < 32; column++) {
           var hexAttr = this.introImageAttributes[block*8+row].substring(column*2, column*2+2);
           if (hexAttr != '00') {
-            attr = this.app.hexToInt(hexAttr);
+            attr = Tool.hexToInt(hexAttr);
             if (this.attrStep == 0) {
               if (this.app.stack.flashState) {
                 if (attr == 211) {

@@ -6,6 +6,7 @@ const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEnti
 const { PillarEntity } = await import('./pillarEntity.js?ver='+window.srcVersion);
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
 const { ButtonEntity } = await import('./svision/js/platform/canvas2D/buttonEntity.js?ver='+window.srcVersion);
+const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import AbstractEntity from './svision/js/abstractEntity.js';
@@ -14,6 +15,7 @@ import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
 import PillarEntity from './pillarEntity.js';
 import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
 import ButtonEntity from './svision/js/platform/canvas2D/buttonEntity.js';
+import Tool from './svision/js/tool.js';
 /**/
 // begin code
 
@@ -49,32 +51,32 @@ export class GameOverModel extends AbstractModel {
     this.gameInfoEntity.roomNameEntity.setText(this.app.roomName);
 
     if (this.shoeAnimation) {
-      var barrelEntity = new SpriteEntity(this.desktopEntity, 15*8, 14*8, this.app.platform.penColorByAttr(this.app.hexToInt(this.app.globalData.gameOver.barrel.attribute)), false, 0, 0);
+      var barrelEntity = new SpriteEntity(this.desktopEntity, 15*8, 14*8, this.app.platform.penColorByAttr(Tool.hexToInt(this.app.globalData.gameOver.barrel.attribute)), false, 0, 0);
       this.desktopEntity.addEntity(barrelEntity);
       barrelEntity.setGraphicsData(this.app.globalData.gameOver.barrel);
-      var willyEntity = new SpriteEntity(this.desktopEntity, 15*8+3, 12*8, this.app.platform.penColorByAttr(this.app.hexToInt(this.app.globalData.gameOver.willy.attribute)), false, 0, 0);
+      var willyEntity = new SpriteEntity(this.desktopEntity, 15*8+3, 12*8, this.app.platform.penColorByAttr(Tool.hexToInt(this.app.globalData.gameOver.willy.attribute)), false, 0, 0);
       this.desktopEntity.addEntity(willyEntity);
       willyEntity.setGraphicsData(this.app.globalData.gameOver.willy);
       this.footEntity = new AbstractEntity(this.desktopEntity, 15*8, 0, 16, 16, false, this.desktopEntity.bkColor);
       this.desktopEntity.addEntity(this.footEntity);
-      var footSpriteEntity = new SpriteEntity(this.footEntity, 0, 0, this.app.platform.penColorByAttr(this.app.hexToInt(this.app.globalData.gameOver.foot.attribute)), false, 0, 0);
+      var footSpriteEntity = new SpriteEntity(this.footEntity, 0, 0, this.app.platform.penColorByAttr(Tool.hexToInt(this.app.globalData.gameOver.foot.attribute)), false, 0, 0);
       this.footEntity.addEntity(footSpriteEntity);
       footSpriteEntity.setGraphicsData(this.app.globalData.gameOver.foot);
-      this.pillarEntity = new PillarEntity(this.desktopEntity, 15*8, 0, 16, 0, this.app.platform.penColorByAttr(this.app.hexToInt(this.app.globalData.gameOver.pillar.attribute)), this.app.globalData.gameOver.pillar);
+      this.pillarEntity = new PillarEntity(this.desktopEntity, 15*8, 0, 16, 0, this.app.platform.penColorByAttr(Tool.hexToInt(this.app.globalData.gameOver.pillar.attribute)), this.app.globalData.gameOver.pillar);
       this.desktopEntity.addEntity(this.pillarEntity);
     }
 
     var penColorsMap = {};
     for (var ch = 0; ch < 4; ch++) {
       penColorsMap[ch] = this.app.platform.penColorByAttr(this.colorCounter);
-      this.colorCounter = this.app.rotateInc(this.colorCounter, 65, 71);
+      this.colorCounter = Tool.cycleInc(this.colorCounter, 65, 71);
     }
     this.gameEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 10*8, 6*8, 4*8, 8, 'Game', this.app.platform.colorByName('brightWhite'), false, {penColorsMap: penColorsMap, hide: true});
     this.desktopEntity.addEntity(this.gameEntity);
     penColorsMap = {};
     for (var ch = 0; ch < 4; ch++) {
       penColorsMap[ch] = this.app.platform.penColorByAttr(this.colorCounter);
-      this.colorCounter = this.app.rotateInc(this.colorCounter, 65, 71);
+      this.colorCounter = Tool.cycleInc(this.colorCounter, 65, 71);
     }
     this.overEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 18*8, 6*8, 4*8, 8, 'Over', this.app.platform.colorByName('brightWhite'), false, {penColorsMap: penColorsMap, hide: true});
     this.desktopEntity.addEntity(this.overEntity);
@@ -154,12 +156,12 @@ export class GameOverModel extends AbstractModel {
         this.colorTimer = timestamp;
         for (var ch = 0; ch < 4; ch++) {
           this.gameEntity.options.penColorsMap[ch] = this.app.platform.penColorByAttr(this.colorCounter);
-          this.colorCounter = this.app.rotateInc(this.colorCounter, 65, 71);
+          this.colorCounter = Tool.cycleInc(this.colorCounter, 65, 71);
         }
         this.gameEntity.drawingCache[0].cleanCache();
         for (var ch = 0; ch < 4; ch++) {
           this.overEntity.options.penColorsMap[ch] = this.app.platform.penColorByAttr(this.colorCounter);
-          this.colorCounter = this.app.rotateInc(this.colorCounter, 65, 71);
+          this.colorCounter = Tool.cycleInc(this.colorCounter, 65, 71);
         }
         this.overEntity.drawingCache[0].cleanCache();
       }

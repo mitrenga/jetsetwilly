@@ -12,6 +12,7 @@ const { RoomModel } = await import('./roomModel.js?ver='+window.srcVersion);
 const { GameOverModel } = await import('./gameOverModel.js?ver='+window.srcVersion);
 const { TapeLoadingModel } = await import('./tapeLoadingModel.js?ver='+window.srcVersion);
 const { ZXErrorEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxErrorEntity.js?ver='+window.srcVersion);
+const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 /*/
 import AbstractApp from './svision/js/abstractApp.js';
 import AudioManager from './audioManager.js';
@@ -26,6 +27,7 @@ import RoomModel from './roomModel.js';
 import GameOverModel from './gameOverModel.js';
 import TapeLoadingModel from './tapeLoadingModel.js';
 import ZXErrorEntity from './svision/js/platform/canvas2D/zxSpectrum/zxErrorEntity.js';
+import Tool from './svision/js/tool.js';
 /**/
 // begin code
 
@@ -157,7 +159,7 @@ export class GameApp extends AbstractApp {
     this.lives = 7;
     this.extraGame = false;
     this.gameState = 1;
-    this.playerName = this.readCookie('playerName', '');
+    this.playerName = Tool.readCookie('playerName', '');
     this.items = [];
     this.totalItems = 0;
     this.itemsCollected = {};
@@ -191,7 +193,7 @@ export class GameApp extends AbstractApp {
       case 'keyboard':
       case 'mouse':
       case 'touchscreen':
-        var cfgString = this.readCookie(device, false);
+        var cfgString = Tool.readCookie(device, false);
         if (cfgString !== false) {
           try {
             var cfg = JSON.parse(cfgString);
@@ -207,7 +209,7 @@ export class GameApp extends AbstractApp {
         }
         break;
       case 'gamepads':
-        var devicesString = this.readCookie('gamepads', false);
+        var devicesString = Tool.readCookie('gamepads', false);
         if (devicesString !== false) {
           try {
             var devices = JSON.parse(devicesString);
@@ -216,7 +218,7 @@ export class GameApp extends AbstractApp {
           } finally {
             if (Array.isArray(devices)) {
               devices.forEach((id) => {
-                var deviceString = this.readCookie(id, false);
+                var deviceString = Tool.readCookie(id, false);
                 if (deviceString !== false) {
                   try {
                     var device = JSON.parse(deviceString);
@@ -334,16 +336,16 @@ export class GameApp extends AbstractApp {
     }
     var dataItems = this.globalData.items;
     dataItems.forEach((item) => {
-      var binaryItem = this.hexToBin(item);
+      var binaryItem = Tool.hexToBin(item);
       // The location of an item is defined by a pair of bytes. The meaning of the bits in each byte pair is as follows:
       // 15 Most significant bit of the y-coordinate
       // 14 Collection flag (reset=collected, set=uncollected)
       // 8-13 Room number
       // 5-7 Least significant bits of the y-coordinate
       // 0-4 x-coordinate
-      var x = this.binToInt(binaryItem.substring(11, 16));
-      var y = this.binToInt(binaryItem.substring(0, 1)+binaryItem.substring(8, 11));
-      var room = this.binToInt(binaryItem.substring(2, 8));
+      var x = Tool.binToInt(binaryItem.substring(11, 16));
+      var y = Tool.binToInt(binaryItem.substring(0, 1)+binaryItem.substring(8, 11));
+      var room = Tool.binToInt(binaryItem.substring(2, 8));
       this.items[room].push({x: x, y: y, id: id});
       id++;
     });

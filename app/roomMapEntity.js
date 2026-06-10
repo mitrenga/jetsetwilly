@@ -2,10 +2,12 @@
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
 const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
+const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 /*/
 import AbstractEntity from './svision/js/abstractEntity.js';
 import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
 import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
+import Tool from './svision/js/tool.js';
 /**/
 // begin code
 
@@ -52,7 +54,7 @@ export class RoomMapEntity extends AbstractEntity {
     if ('extends' in graphicData) {
       data.data.layout.forEach((row, r) => {
         for (var column = 0; column < 32; column++) {
-          var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
+          var item = Tool.binToInt(Tool.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
           var idItem = this.layoutObjects[item];
           if (idItem !== false) {
             if (this.mapKinds.includes(idItem)) {
@@ -115,7 +117,7 @@ export class RoomMapEntity extends AbstractEntity {
     }
 
     if (this.roomData) {
-      var roomBkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(this.roomData.bkColor));
+      var roomBkColor = this.app.platform.bkColorByAttr(Tool.hexToInt(this.roomData.bkColor));
 
       this.app.layout.paint(this, moveX, moveY, cropWidth, cropHeight, roomBkColor);
 
@@ -127,7 +129,7 @@ export class RoomMapEntity extends AbstractEntity {
         ['walls', 'floors', 'nasties'].forEach((objectType) => {
           if (objectType in graphicData) {
             graphicData[objectType].forEach((objData) => {
-              var attr = this.app.hexToInt(objData.data.substring(0, 2));
+              var attr = Tool.hexToInt(objData.data.substring(0, 2));
               var penColor = this.app.platform.penColorByAttr(attr);
               var bkColor = this.app.platform.bkColorByAttr(attr);
               if (bkColor == roomBkColor) {
@@ -171,10 +173,10 @@ export class RoomMapEntity extends AbstractEntity {
         // layout
         this.roomData.layout.forEach((row, r) => {
           for (var column = 0; column < 32; column++) {
-            var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
+            var item = Tool.binToInt(Tool.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
             var idItem = this.layoutObjects[item];
             if (idItem !== false) {
-              var attr = this.app.hexToInt(graphicData[idItem].substring(0, 2));
+              var attr = Tool.hexToInt(graphicData[idItem].substring(0, 2));
               if (this.mapKinds.includes(idItem)) {
                 var penColor = this.app.platform.penColorByAttr(attr);
                 var bkColor = this.app.platform.bkColorByAttr(attr);
@@ -217,8 +219,8 @@ export class RoomMapEntity extends AbstractEntity {
               corrX = 0;
           }
           var attr = rampData.data.substring(0, 2);
-          var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(attr));
-          var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(attr)&63);
+          var penColor = this.app.platform.penColorByAttr(Tool.hexToInt(attr));
+          var bkColor = this.app.platform.bkColorByAttr(Tool.hexToInt(attr)&63);
           var locations = false;
           if ('locations' in rampData) {
             locations = rampData.locations;
@@ -237,7 +239,7 @@ export class RoomMapEntity extends AbstractEntity {
         // conveyors
         if ('conveyors' in graphicData) {
           graphicData.conveyors.forEach((conveyorData) => {
-            var attr = this.app.hexToInt(conveyorData.data.substring(0, 2));
+            var attr = Tool.hexToInt(conveyorData.data.substring(0, 2));
             var penColor = this.app.platform.penColorByAttr(attr);
             var bkColor = this.app.platform.bkColorByAttr(attr);
             this.app.layout.paintRect(this.drawingCache[0].ctx, conveyorData.location.x*2, conveyorData.location.y*2, conveyorData.length*2, 2, bkColor);
@@ -248,7 +250,7 @@ export class RoomMapEntity extends AbstractEntity {
         // ropes
         if ('ropes' in this.roomData) {
           this.roomData.ropes.forEach((ropeData) => {
-            var color = this.app.platform.penColorByAttr(this.app.hexToInt(ropeData.attribute));
+            var color = this.app.platform.penColorByAttr(Tool.hexToInt(ropeData.attribute));
             var x = ropeData.init.x;
             var y = ropeData.init.y;
             var ptr = Math.abs(ropeData.init.frame);
@@ -270,7 +272,7 @@ export class RoomMapEntity extends AbstractEntity {
               var guardianTypeData = this.roomData.guardians[guardianType];
               guardianTypeData.forEach((guardianDefs) => {
                 guardianDefs.figures.forEach((guardian) => {
-                  var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(guardian.attribute));
+                  var penColor = this.app.platform.penColorByAttr(Tool.hexToInt(guardian.attribute));
                   if ('mapSprite' in guardianDefs) {
                     for (var r = 0; r < guardianDefs.mapSprite.length; r++) {
                       for (var c = 0; c < guardianDefs.mapSprite[r].length; c++) {
@@ -305,15 +307,15 @@ export class RoomMapEntity extends AbstractEntity {
           this.app.layout.paintRect(this.drawingCache[0].ctx, item.x*2, item.y*2, 1, 1, this.app.platform.color(itemColor));
           this.app.layout.paintRect(this.drawingCache[0].ctx, item.x*2+1, item.y*2+1, 1, 1, this.app.platform.color(itemColor));
           if (!('matchColorsOfItems' in this.roomData) && (!this.roomData.matchColorsOfItems)) {
-            itemColor = this.app.rotateInc(itemColor, 3, 6);
+            itemColor = Tool.cycleInc(itemColor, 3, 6);
           }
         });
 
         // switches
         if ('switches' in this.roomData) {
           this.roomData.switches.forEach((switche) => {
-            var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(switche.attribute));
-            var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(switche.attribute));
+            var penColor = this.app.platform.penColorByAttr(Tool.hexToInt(switche.attribute));
+            var bkColor = this.app.platform.bkColorByAttr(Tool.hexToInt(switche.attribute));
             if ('mapSprite' in switche) {
               this.app.layout.paintRect(this.drawingCache[0].ctx, Math.floor(switche.x*2), Math.floor(switche.y*2), switche.width/4, switche.height/4, bkColor);
               for (var r = 0; r < switche.mapSprite.length; r++) {

@@ -4,12 +4,14 @@ const { DrawingCache } = await import('./svision/js/platform/canvas2D/drawingCac
 const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
 const { SpriteTool } = await import('./svision/js/spriteTool.js?ver='+window.srcVersion);
 const { RopeEntity } = await import('./ropeEntity.js?ver='+window.srcVersion);
+const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 /*/
 import AbstractEntity from './svision/js/abstractEntity.js';
 import DrawingCache from './svision/js/platform/canvas2D/drawingCache.js';
 import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
 import SpriteTool from './svision/js/spriteTool.js';
 import RopeEntity from './ropeEntity.js';
+import Tool from './svision/js/tool.js';
 /**/
 // begin code
 
@@ -42,7 +44,7 @@ export class GameAreaEntity extends AbstractEntity {
   drawEntity() {
     if (this.roomData) {
       var graphicData = this.roomData.graphicData;
-      var roomBkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(this.roomData.bkColor), 56, 8);
+      var roomBkColor = this.app.platform.zxColorByAttr(Tool.hexToInt(this.roomData.bkColor), 56, 8);
 
       this.app.layout.paint(this, 0, 0, this.width, this.height, this.bkColor);
 
@@ -51,10 +53,10 @@ export class GameAreaEntity extends AbstractEntity {
           // layout - bkColor
           this.roomData.layout.forEach((row, r) => {
             for (var column = 0; column < 32; column++) {
-              var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
+              var item = Tool.binToInt(Tool.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
               var idItem = this.layoutObjects[item];
               if (idItem !== false) {
-                var attr = this.app.hexToInt(graphicData[idItem].substring(0, 2));
+                var attr = Tool.hexToInt(graphicData[idItem].substring(0, 2));
                 if (this.staticKinds.includes(idItem)) {
                   var penColor = this.penColorByAttr(attr);
                   var bkColor = this.bkColorByAttr(attr);
@@ -76,7 +78,7 @@ export class GameAreaEntity extends AbstractEntity {
           ['walls', 'floors', 'nasties'].forEach((objectType) => {
             if (objectType in graphicData) {
               graphicData[objectType].forEach((objData) => {
-                var attr = this.app.hexToInt(objData.data.substring(0, 2));
+                var attr = Tool.hexToInt(objData.data.substring(0, 2));
                 var penColor = this.penColorByAttr(attr);
                 var bkColor = this.bkColorByAttr(attr);
                 if (bkColor == roomBkColor) {
@@ -122,15 +124,15 @@ export class GameAreaEntity extends AbstractEntity {
           // layout - penColor
           this.roomData.layout.forEach((row, r) => {
             for (var column = 0; column < 32; column++) {
-              var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
+              var item = Tool.binToInt(Tool.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
               var idItem = this.layoutObjects[item];
               if (idItem !== false) {
                 var itemData = graphicData[idItem];
                 var attr = itemData.substring(0, 2);
                 if (this.staticKinds.includes(idItem)) {
                   if (this.graphicCache[itemData].needToRefresh(this, 8, 8)) {
-                    var penColor = this.penColorByAttr(this.app.hexToInt(attr));
-                    var bkColor = this.bkColorByAttr(this.app.hexToInt(attr));
+                    var penColor = this.penColorByAttr(Tool.hexToInt(attr));
+                    var bkColor = this.bkColorByAttr(Tool.hexToInt(attr));
                     if (bkColor == roomBkColor) {
                       bkColor = false;
                     }
@@ -138,7 +140,7 @@ export class GameAreaEntity extends AbstractEntity {
                       penColor = bkColor;
                     }
                     for (var y = 0; y < 8; y++) {
-                      var spriteLine = this.app.hexToBin(itemData.substring((y+1)*2, (y+1)*2+2));
+                      var spriteLine = Tool.hexToBin(itemData.substring((y+1)*2, (y+1)*2+2));
                       for (var x = 0; x < 8; x++) {
                         if (spriteLine[x] == '1') {
                           this.app.layout.paintRect(this.graphicCache[itemData].ctx, x, y, 1, 1, penColor);
@@ -159,8 +161,8 @@ export class GameAreaEntity extends AbstractEntity {
             graphicData[objectType].forEach((objData) => {
               if (this.graphicCache[objData.data].needToRefresh(this, 8, 8)) {
                 var attr = objData.data.substring(0, 2);
-                var penColor = this.penColorByAttr(this.app.hexToInt(attr));
-                var bkColor = this.bkColorByAttr(this.app.hexToInt(attr));
+                var penColor = this.penColorByAttr(Tool.hexToInt(attr));
+                var bkColor = this.bkColorByAttr(Tool.hexToInt(attr));
                 if (bkColor == roomBkColor) {
                   bkColor = false;
                 }
@@ -168,7 +170,7 @@ export class GameAreaEntity extends AbstractEntity {
                   penColor = bkColor;
                 }
                 for (var y = 0; y < 8; y++) {
-                  var spriteLine = this.app.hexToBin(objData.data.substring((y+1)*2, (y+1)*2+2));
+                  var spriteLine = Tool.hexToBin(objData.data.substring((y+1)*2, (y+1)*2+2));
                   for (var x = 0; x < 8; x++) {
                     if (spriteLine[x] == '1') {
                       this.app.layout.paintRect(this.graphicCache[objData.data].ctx, x, y, 1, 1, penColor);
@@ -201,11 +203,11 @@ export class GameAreaEntity extends AbstractEntity {
           }
           if (this.graphicCache[rampData.data].needToRefresh(this, 8, 8)) {
             var attr = rampData.data.substring(0, 2);
-            var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(attr));
+            var penColor = this.app.platform.penColorByAttr(Tool.hexToInt(attr));
             if (this.monochromeColor !== false) {
               penColor = this.monochromeColor;
             }
-            var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(attr)&63);
+            var bkColor = this.app.platform.bkColorByAttr(Tool.hexToInt(attr)&63);
             if (bkColor == roomBkColor) {
               bkColor = false;
             }
@@ -213,7 +215,7 @@ export class GameAreaEntity extends AbstractEntity {
               this.app.layout.paintRect(this.graphicCache[rampData.data].ctx, 0, 0, 8, 8, bkColor);
             }
             for (var y = 0; y < 8; y++) {
-              var spriteLine = this.app.hexToBin(rampData.data.substring((y+1)*2, (y+1)*2+2));
+              var spriteLine = Tool.hexToBin(rampData.data.substring((y+1)*2, (y+1)*2+2));
               for (var x = 0; x < 8; x++) {
                 if (spriteLine[x] == '1') {
                   this.app.layout.paintRect(this.graphicCache[rampData.data].ctx, x, y, 1, 1, penColor);
@@ -236,7 +238,7 @@ export class GameAreaEntity extends AbstractEntity {
 
         this.layoutObjects.forEach((idItem) => {
           if (idItem !== false && idItem in graphicData) {            
-            var attr = this.app.hexToInt(graphicData[idItem].substring(0, 2));
+            var attr = Tool.hexToInt(graphicData[idItem].substring(0, 2));
             if ((attr&128) == 128) {
               this.graphicCache[graphicData[idItem]].cleanCache();
             }
@@ -293,7 +295,7 @@ export class GameAreaEntity extends AbstractEntity {
     if ('extends' in graphicData) {
       data.layout.forEach((row, r) => {
         for (var column = 0; column < 32; column++) {
-          var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
+          var item = Tool.binToInt(Tool.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
           var idItem = this.layoutObjects[item];
           if (idItem !== false) {
             if (this.staticKinds.includes(idItem)) {
@@ -321,13 +323,13 @@ export class GameAreaEntity extends AbstractEntity {
       });
     }
 
-    this.bkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(data.bkColor), 56, 8);
+    this.bkColor = this.app.platform.zxColorByAttr(Tool.hexToInt(data.bkColor), 56, 8);
     this.bkColorForRestore = this.bkColor;
 
     // Willy
     this.initData.willy = [];
     if (!this.demo) {
-      var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(data.willy.attribute));
+      var penColor = this.app.platform.penColorByAttr(Tool.hexToInt(data.willy.attribute));
       var entity = new SpriteEntity(this, this.app.willyRoomsCache.x+data.willy.paintCorrections.x, this.app.willyRoomsCache.y, penColor, false, this.app.willyRoomsCache.frame, this.app.willyRoomsCache.direction);
       this.addEntity(entity);
       entity.setGraphicsData(data.willy);
@@ -366,7 +368,7 @@ export class GameAreaEntity extends AbstractEntity {
     this.initData.nasties = [];
     data.layout.forEach((row, r) => {
       for (var column = 0; column < 32; column++) {
-        var item = this.app.binToInt(this.app.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
+        var item = Tool.binToInt(Tool.hexToBin(row.substring(Math.floor(column/4)*2, Math.floor(column/4)*2+2)).substring(column%4*2, column%4*2+2));
         var idItem = [false, 'floor', 'wall', 'nasty'][item];
         if (idItem !== false) {
           var layoutInitData = {x: column*8, y: r*8, width: 8, height: 8};
@@ -449,7 +451,7 @@ export class GameAreaEntity extends AbstractEntity {
     this.initData.conveyors = [];
     if ('conveyors' in graphicData) {
       graphicData.conveyors.forEach((conveyorData) => {
-        var attr = this.app.hexToInt(conveyorData.data.substring(0, 2));
+        var attr = Tool.hexToInt(conveyorData.data.substring(0, 2));
         var penColor = this.app.platform.penColorByAttr(attr);
         var bkColor = this.app.platform.bkColorByAttr(attr);
         if (bkColor == this.bkColor) {
@@ -482,7 +484,7 @@ export class GameAreaEntity extends AbstractEntity {
         if ((attr & 128) == 128) {
           var reverseSpriteData = '';
           for (var s = 0; s < 8; s++) {
-            var hexStr = this.app.intToHex((this.app.hexToInt(conveyorSpriteData.substring(s*2, s*2+2))^255));
+            var hexStr = Tool.intToHex((Tool.hexToInt(conveyorSpriteData.substring(s*2, s*2+2))^255));
             hexStr.padStart(2, '0');
             reverseSpriteData = reverseSpriteData+hexStr;
           }
@@ -506,7 +508,7 @@ export class GameAreaEntity extends AbstractEntity {
     if ('ropes' in data) {
       data.ropes.forEach((ropeData, rope) => {
         this.spriteEntities.ropes.push({nodes:[]});
-        var color = this.app.platform.penColorByAttr(this.app.hexToInt(ropeData.attribute));
+        var color = this.app.platform.penColorByAttr(Tool.hexToInt(ropeData.attribute));
         var x = ropeData.init.x;
         var y = ropeData.init.y;
         var ptr = Math.abs(ropeData.init.frame);
@@ -544,7 +546,7 @@ export class GameAreaEntity extends AbstractEntity {
           guardianTypeData.forEach((guardianDefs) => {
             guardianDefs.figures.forEach((guardian) => {
               if (!('forGameState' in guardianDefs) || guardianDefs.forGameState == this.app.gameState) {
-                var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(guardian.attribute));
+                var penColor = this.app.platform.penColorByAttr(Tool.hexToInt(guardian.attribute));
                 var paintCorrectionsX = 0;
                 var paintCorrectionsY = 0;
                 if ('paintCorrections' in guardianDefs) {
@@ -611,11 +613,11 @@ export class GameAreaEntity extends AbstractEntity {
       if (!(item.id in this.app.itemsCollected)) {
         var tmpColor = itemColor;
         var penColor0 = this.app.platform.color(tmpColor);
-        tmpColor = this.app.rotateInc(tmpColor, 3, 6);
+        tmpColor = Tool.cycleInc(tmpColor, 3, 6);
         var penColor1 = this.app.platform.color(tmpColor);
-        tmpColor = this.app.rotateInc(tmpColor, 3, 6);
+        tmpColor = Tool.cycleInc(tmpColor, 3, 6);
         var penColor2 = this.app.platform.color(tmpColor);
-        tmpColor = this.app.rotateInc(tmpColor, 3, 6);
+        tmpColor = Tool.cycleInc(tmpColor, 3, 6);
         var penColor3 = this.app.platform.color(tmpColor);
         var entity = new SpriteEntity(this, item.x*8, item.y*8, false, false, 0, 0);
         this.addEntity(entity);
@@ -628,7 +630,7 @@ export class GameAreaEntity extends AbstractEntity {
         this.spriteEntities.items.push(entity);
         this.initData.items.push({id: item.id, hide: false, x: item.x*8, y: item.y*8, width: 8, height: 8, frame: 0, direction: 0});
         if (!('matchColorsOfItems' in data) && (!data.matchColorsOfItems)) {
-          itemColor = this.app.rotateInc(itemColor, 3, 6);
+          itemColor = Tool.cycleInc(itemColor, 3, 6);
         }
       }
     });
@@ -638,8 +640,8 @@ export class GameAreaEntity extends AbstractEntity {
     this.initData.switches = [];
     if ('switches' in data) {
       data.switches.forEach((switche) => {
-        var penColor = this.app.platform.penColorByAttr(this.app.hexToInt(switche.attribute));
-        var bkColor = this.app.platform.bkColorByAttr(this.app.hexToInt(switche.attribute));
+        var penColor = this.app.platform.penColorByAttr(Tool.hexToInt(switche.attribute));
+        var bkColor = this.app.platform.bkColorByAttr(Tool.hexToInt(switche.attribute));
         if (bkColor == this.bkColor) {
           bkColor = false;
         }

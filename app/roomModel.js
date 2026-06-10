@@ -141,7 +141,7 @@ export class RoomModel extends AbstractModel {
 
     this.gameInfoEntity.roomNameEntity.setText(data.data.name);
     this.app.roomName = data.data.name;
-    this.borderEntity.bkColor = this.app.platform.zxColorByAttr(this.app.hexToInt(data.data.borderColor), 7, 1);
+    this.borderEntity.bkColor = this.app.platform.zxColorByAttr(Tool.hexToInt(data.data.borderColor), 7, 1);
     for (var l = 0; l < this.app.lives; l++) {
       this.gameInfoEntity.liveEntities[l].setGraphicsData(data.data.willy);
     }

@@ -256,7 +256,7 @@ export class MenuModel extends AbstractModel {
         var counter = Math.round((timestamp-this.timer)/80);
         if (this.prevCounter != counter) {
           this.prevCounter = counter;
-          this.gameFrame = this.app.rotateInc(this.gameFrame, 0, 14);
+          this.gameFrame = Tool.cycleInc(this.gameFrame, 0, 14);
       
           // head
           if (this.gameFrame%2 == 0) {
@@ -295,7 +295,7 @@ export class MenuModel extends AbstractModel {
           this.headEntity.x = this.headX;
           this.headEntity.y = this.headY+this.wave[this.waveCounter];
           if ((this.waveCounter > 0) || (this.headDirectionY == 0)) {
-            this.waveCounter = this.app.rotateInc(this.waveCounter, 0, this.wave.length-1);
+            this.waveCounter = Tool.cycleInc(this.waveCounter, 0, this.wave.length-1);
           }
 
           // Willy
