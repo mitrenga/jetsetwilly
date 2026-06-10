@@ -13,6 +13,7 @@ const { GameOverModel } = await import('./gameOverModel.js?ver='+window.srcVersi
 const { TapeLoadingModel } = await import('./tapeLoadingModel.js?ver='+window.srcVersion);
 const { ZXErrorEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxErrorEntity.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
+const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
 /*/
 import AbstractApp from './svision/js/abstractApp.js';
 import AudioManager from './audioManager.js';
@@ -28,6 +29,7 @@ import GameOverModel from './gameOverModel.js';
 import TapeLoadingModel from './tapeLoadingModel.js';
 import ZXErrorEntity from './svision/js/platform/canvas2D/zxSpectrum/zxErrorEntity.js';
 import Tool from './svision/js/tool.js';
+import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
 /**/
 // begin code
 
@@ -366,8 +368,8 @@ export class GameApp extends AbstractApp {
         this.fonts.zxFonts8x8,
         message,
         action,
-        this.platform.colorByName('white'),
-        this.platform.colorByName('red')
+        ZXColor.white,
+        ZXColor.red
       )
     );
   } // showErrorMessage

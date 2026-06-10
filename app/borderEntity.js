@@ -3,11 +3,13 @@ const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+wi
 const { ButtonEntity } = await import('./svision/js/platform/canvas2D/buttonEntity.js?ver='+window.srcVersion);
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
+const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
 /*/
 import AbstractEntity from './svision/js/abstractEntity.js';
 import ButtonEntity from './svision/js/platform/canvas2D/buttonEntity.js';
 import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
 import Tool from './svision/js/tool.js';
+import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
 /**/
 // begin code
 
@@ -75,15 +77,15 @@ export class BorderEntity  extends AbstractEntity {
     super.drawEntity();
 
     if (this.escapeEntity) {
-      var penColor = this.app.platform.colorByName('brightWhite');
+      var penColor = ZXColor.brightWhite;
       if (this.animation !== false) {
-        penColor = this.app.platform.colorByName('black');
+        penColor = ZXColor.black;
       }
       switch (this.bkColor) {
-        case this.app.platform.colorByName('white'):
-        case this.app.platform.colorByName('yellow'):
-        case this.app.platform.colorByName('cyan'):
-          penColor = this.app.platform.colorByName('black');
+        case ZXColor.white:
+        case ZXColor.yellow:
+        case ZXColor.cyan:
+          penColor = ZXColor.black;
           break;
       }
       if (this.escapeEntity.penColor !== penColor) {
@@ -121,7 +123,7 @@ export class BorderEntity  extends AbstractEntity {
         if (y+stripeHeight+extraStripe > this.height) {
           stripeHeight = this.height-y-extraStripe;
         }
-        this.stripes.push({y: y, height: stripeHeight+extraStripe, color: this.app.platform.colorByName(this.style[this.animation].colors[color])});
+        this.stripes.push({y: y, height: stripeHeight+extraStripe, color: ZXColor[this.style[this.animation].colors[color]]});
         y += stripeHeight+extraStripe;
         if (this.animation == 'screech') {
           color = Math.floor(Math.random()*this.style[this.animation].colors.length);

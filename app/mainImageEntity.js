@@ -1,9 +1,11 @@
 /**/
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
+const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
 /*/
 import AbstractEntity from './svision/js/abstractEntity.js';
 import Tool from './svision/js/tool.js';
+import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
 /**/
 // begin code
 
@@ -39,7 +41,7 @@ export class MainImageEntity extends AbstractEntity {
     if (this.attrStep > 0) {
       attr = (((attr&56)+(this.attrStep<<3))&56)+(((attr&7)+this.attrStep)&7);
     }
-    this.app.layout.paint(this, 0, 0, this.width, this.height, this.app.platform.bkColorByAttr(attr));
+    this.app.layout.paint(this, 0, 0, this.width, this.height, ZXColor.bkAttrColor(attr));
     for (var block = 0; block < 2; block++) {
       for (var row = 0; row < 8; row++) {
         for (var column = 0; column < 32; column++) {
@@ -55,8 +57,8 @@ export class MainImageEntity extends AbstractEntity {
             } else {
               attr = (((attr&56)+(this.attrStep<<3))&56)+(((attr&7)+this.attrStep)&7);
             }
-            var bkColor = this.app.platform.bkColorByAttr(attr);
-            var penColor = this.app.platform.penColorByAttr(attr);
+            var bkColor = ZXColor.bkAttrColor(attr);
+            var penColor = ZXColor.penAttrColor(attr);
             if (hexAttr == '2C') {
               var tmpColor = bkColor;
               bkColor = penColor;

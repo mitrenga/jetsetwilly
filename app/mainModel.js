@@ -7,6 +7,7 @@ const { SlidingTextEntity } = await import('./svision/js/platform/canvas2D/slidi
 const { MainFonts } = await import('./mainFonts.js?ver='+window.srcVersion);
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
 const { PauseGameEntity } = await import('./pauseGameEntity.js?ver='+window.srcVersion);
+const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import AbstractEntity from './svision/js/abstractEntity.js';
@@ -16,6 +17,7 @@ import SlidingTextEntity from './svision/js/platform/canvas2D/slidingTextEntity.
 import MainFonts from './mainFonts.js';
 import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
 import PauseGameEntity from './pauseGameEntity.js';
+import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
 /**/
 // begin code
 
@@ -44,15 +46,15 @@ export class MainModel extends AbstractModel {
   init() {
     super.init();
 
-    this.borderEntity.bkColor = this.app.platform.colorByName('black');
+    this.borderEntity.bkColor = ZXColor.black;
     this.mainImageEntity = new MainImageEntity(this.desktopEntity, 0, 0, 32*8, 24*8, this.flashState);
     this.desktopEntity.addEntity(this.mainImageEntity);
-    this.slidingTextEntity = new SlidingTextEntity(this.mainImageEntity, this.app.fonts.zxFonts8x8Mono, 0, 18*8, 32*8, 8, this.slidingText, this.app.platform.colorByName('yellow'), this.app.platform.colorByName('black'), {animation: 'custom', rightMargin: 256});
+    this.slidingTextEntity = new SlidingTextEntity(this.mainImageEntity, this.app.fonts.zxFonts8x8Mono, 0, 18*8, 32*8, 8, this.slidingText, ZXColor.yellow, ZXColor.black, {animation: 'custom', rightMargin: 256});
     this.mainImageEntity.addEntity(this.slidingTextEntity);
     this.blackBoxEntity = new AbstractEntity(this.mainImageEntity, 0, 19*8+4, 32*8, 4*8+1, false, '#00000000');
     this.blackBoxEntity.clickColor = '#444444';
     this.mainImageEntity.addEntity(this.blackBoxEntity);
-    this.spaceEntity = new TextEntity(this.blackBoxEntity, new MainFonts(this.app), 0, 2*8-3, 32*8, 7, 'PRESS SPACE TO SELECT ROOMS MAP', this.app.platform.colorByName('brightWhite'), false, {align: 'center'});
+    this.spaceEntity = new TextEntity(this.blackBoxEntity, new MainFonts(this.app), 0, 2*8-3, 32*8, 7, 'PRESS SPACE TO SELECT ROOMS MAP', ZXColor.brightWhite, false, {align: 'center'});
     this.blackBoxEntity.addEntity(this.spaceEntity);
     this.sendEvent(0, {id: 'openAudioChannel', channel: 'music', options: {muted: this.app.muted.music}});
     this.sendEvent(0, {id: 'openAudioChannel', channel: 'sounds', options: {muted: this.app.muted.sounds}});
@@ -88,8 +90,8 @@ export class MainModel extends AbstractModel {
         return true;
 
       case 'screechBegin':
-        this.slidingTextEntity.setPenColor(this.app.platform.colorByName('brightWhite'));
-        this.slidingTextEntity.setBkColor(this.app.platform.colorByName('brightBlue'));
+        this.slidingTextEntity.setPenColor(ZXColor.brightWhite);
+        this.slidingTextEntity.setBkColor(ZXColor.brightBlue);
         this.screechDuration = event.data.duration;
         this.timer = this.app.now;
         this.sendEvent(0, {id: 'setBorderAnimation', value: 'screech'});

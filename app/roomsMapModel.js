@@ -4,12 +4,14 @@ const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion
 const { RoomMapEntity } = await import('./roomMapEntity.js?ver='+window.srcVersion);
 const { RoomSelectionEntity } = await import('./roomSelectionEntity.js?ver='+window.srcVersion);
 const { PauseGameEntity } = await import('./pauseGameEntity.js?ver='+window.srcVersion);
+const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import BorderEntity from './borderEntity.js';
 import RoomMapEntity from './roomMapEntity.js';
 import RoomSelectionEntity from './roomSelectionEntity.js';
 import PauseGameEntity from './pauseGameEntity.js';
+import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
 /**/
 // begin code
 
@@ -42,8 +44,8 @@ export class RoomsMapModel extends AbstractModel {
   init() {
     super.init();
 
-    this.borderEntity.bkColor = this.app.platform.colorByName('cyan');
-    this.desktopEntity.bkColor = this.app.platform.colorByName('black');
+    this.borderEntity.bkColor = ZXColor.cyan;
+    this.desktopEntity.bkColor = ZXColor.black;
     for (var y = 0; y < this.app.globalData.roomsMap.positions.length; y++) {
       this.roomsMapEntities.push([]);
       for (var x = 0; x < this.app.globalData.roomsMap.positions[y].length; x++) {

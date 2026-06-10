@@ -1,7 +1,9 @@
 /**/
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
+const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
 /*/
 import AbstractEntity from './svision/js/abstractEntity.js';
+import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
 /**/
 // begin code
 
@@ -41,7 +43,7 @@ export class RoomSelectionEntity extends AbstractEntity {
       cropHeight = this.parentEntity.height-this.y;
     }
 
-    var color = this.app.platform.color(this.colorState*2+9);
+    var color = ZXColor.color(this.colorState*2+9);
 
     // top
     if (cropHeight < 4 && cropY == 0) {

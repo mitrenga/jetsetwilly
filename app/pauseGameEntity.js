@@ -3,11 +3,13 @@ const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+wi
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
 const { ButtonEntity } = await import('./svision/js/platform/canvas2D/buttonEntity.js?ver='+window.srcVersion);
 const { MenuEntity } = await import('./svision/js/platform/canvas2D/menuEntity.js?ver='+window.srcVersion);
+const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
 /*/
 import AbstractEntity from './svision/js/abstractEntity.js';
 import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
 import ButtonEntity from './svision/js/platform/canvas2D/buttonEntity.js';
 import MenuEntity from './svision/js/platform/canvas2D/menuEntity.js';
+import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
 /**/
 // begin code
 
@@ -36,8 +38,8 @@ export class PauseGameEntity extends AbstractEntity {
       t2Width: 114,
       t2RightMargin: 3,
       t2TopMargin: 2, 
-      textColor: this.app.platform.colorByName('black'),
-      selectionTextColor: this.app.platform.colorByName('black'),
+      textColor: ZXColor.black,
+      selectionTextColor: ZXColor.black,
       selectionBarColor: '#dbdbdbff',
       hoverColor: '#0000001e',
       selectionHoverColor: '#efefefff',
@@ -48,9 +50,9 @@ export class PauseGameEntity extends AbstractEntity {
 
   init() {
     super.init();
-    this.addEntity(new AbstractEntity(this, 0, 0, this.width, this.height, false, this.app.platform.colorByName('brightWhite')));
-    this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, this.width, 9, this.title, this.app.platform.colorByName('brightBlack'), false, {align: 'center', margin: 2}));
-    this.addEntity(new MenuEntity(this, 1, 8, this.width-2, this.height-9, this.app.platform.colorByName('yellow'), this.menuOptions, this, this.getMenuData));
+    this.addEntity(new AbstractEntity(this, 0, 0, this.width, this.height, false, ZXColor.brightWhite));
+    this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, this.width, 9, this.title, ZXColor.brightBlack, false, {align: 'center', margin: 2}));
+    this.addEntity(new MenuEntity(this, 1, 8, this.width-2, this.height-9, ZXColor.yellow, this.menuOptions, this, this.getMenuData));
   } // init
 
   getMenuData(self, key, row) {

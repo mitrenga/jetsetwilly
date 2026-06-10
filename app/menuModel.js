@@ -12,6 +12,7 @@ const { ZXControlsEntity } = await import('./svision/js/platform/canvas2D/zxSpec
 const { AboutEntity } = await import('./aboutEntity.js?ver='+window.srcVersion);
 const { ZXWaitForAudioEventEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxWaitForAudioEventEntity.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
+const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
@@ -26,6 +27,7 @@ import ZXControlsEntity from './svision/js/platform/canvas2D/zxSpectrum/zxContro
 import AboutEntity from './aboutEntity.js';
 import ZXWaitForAudioEventEntity from './svision/js/platform/canvas2D/zxSpectrum/zxWaitForAudioEventEntity.js';
 import Tool from './svision/js/tool.js';
+import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
 /**/
 // begin code
 
@@ -101,8 +103,8 @@ export class MenuModel extends AbstractModel {
   init() {
     super.init();
 
-    this.borderEntity.bkColor = this.app.platform.colorByName('white');
-    this.desktopEntity.bkColor = this.app.platform.colorByName('white');
+    this.borderEntity.bkColor = ZXColor.white;
+    this.desktopEntity.bkColor = ZXColor.white;
 
     this.bodyObjects.forEach((object, o) => {
       this.bodyEntities[o] = new SpriteEntity(this.desktopEntity, this.headX, this.headY, object.color, false, 0, this.track[o].direction);
@@ -120,7 +122,7 @@ export class MenuModel extends AbstractModel {
     this.sighboardEntity = new TextEntity(this.desktopEntity, signboardFonts, 144, 6, 93, 10, 'JET SET WILlY', '#5b5b5bff', false, {scale: 2, animationMode: 'flashPenColor', flashColor: '#9b9b9bff'});
     this.desktopEntity.addEntity(this.sighboardEntity);
 
-    this.copyrightEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, this.app.copyright, this.app.platform.colorByName('black'), false, {align: 'center'});
+    this.copyrightEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, this.app.copyright, ZXColor.black, false, {align: 'center'});
     this.desktopEntity.addEntity(this.copyrightEntity);
 
     this.app.stack.flashState = false;
@@ -196,7 +198,7 @@ export class MenuModel extends AbstractModel {
           return true;
         } else {
           if (this.app.inputEventsManager.needEventForAudio()) {
-            this.desktopEntity.addModalEntity(new ZXWaitForAudioEventEntity(this.desktopEntity, 64, 75, 128, 45, this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('magenta'), 'startGame2'));
+            this.desktopEntity.addModalEntity(new ZXWaitForAudioEventEntity(this.desktopEntity, 64, 75, 128, 45, ZXColor.brightWhite, ZXColor.magenta, 'startGame2'));
             return true;
           }
         }
@@ -226,7 +228,7 @@ export class MenuModel extends AbstractModel {
 
       case 'startTapeLoading':
         if (this.app.inputEventsManager.needEventForAudio()) {
-          this.desktopEntity.addModalEntity(new ZXWaitForAudioEventEntity(this.desktopEntity, 64, 75, 128, 45, this.app.platform.colorByName('brightWhite'), this.app.platform.colorByName('magenta'), 'startTapeLoading2'));
+          this.desktopEntity.addModalEntity(new ZXWaitForAudioEventEntity(this.desktopEntity, 64, 75, 128, 45, ZXColor.brightWhite, ZXColor.magenta, 'startTapeLoading2'));
           return true;
         }
       case 'startTapeLoading2': 
