@@ -48,3 +48,20 @@ document.addEventListener("gesturechange", (event) => event.preventDefault());
 // start game
 gameApp.eventResizeWindow(null);
 requestAnimationFrame(loopGame);
+
+// register service worker for production (devMode == false, e.g. bundle import); dev mode bypasses SW entirely
+if ('serviceWorker' in navigator) {
+  if (window.devMode) {
+    navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((reg) => reg.unregister()));
+  } else {
+    navigator.serviceWorker.register('serviceWorker', { type: 'module' });
+    if (navigator.serviceWorker.controller) {
+      let swRefreshing = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (swRefreshing) return;
+        swRefreshing = true;
+        window.location.reload();
+      });
+    }
+  }
+}
