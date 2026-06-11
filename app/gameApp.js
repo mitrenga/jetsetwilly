@@ -1,4 +1,5 @@
 /**/
+const { Version } = await import('./version.js?ver='+window.srcVersion);
 const { AbstractApp } = await import('./svision/js/abstractApp.js?ver='+window.srcVersion);
 const { AudioManager } = await import('./audioManager.js?ver='+window.srcVersion);
 const { ZXFonts8x8 } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxFonts8x8.js?ver='+window.srcVersion);
@@ -15,6 +16,7 @@ const { ZXErrorEntity } = await import('./svision/js/platform/canvas2D/zxSpectru
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
 /*/
+import Version from './version.js';
 import AbstractApp from './svision/js/abstractApp.js';
 import AudioManager from './audioManager.js';
 import ZXFonts8x8 from './svision/js/platform/canvas2D/zxSpectrum/zxFonts8x8.js';
@@ -45,7 +47,7 @@ export class GameApp extends AbstractApp {
       }
     };
 
-    this.version = '2026.05.10';
+    this.version = Version;
     this.copyright = '© 2026 GNU General Public Licence';
     this.devModeName = devModeName;
     this.appIconSprite = appIconSprite;
