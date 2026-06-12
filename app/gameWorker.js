@@ -33,6 +33,12 @@ var accelerator, counter, counter2, counter4, counter6, gameData,
     standing, jumpCounter, jumpDirection, fallingCounter, fallingDirection, mustMovingDirection, shouldMovingDirection, previousDirection,
     caughtRope, caughtNode, ropeProhibited, operation, pause, loopCounter, nextLoop, ended;
 
+/**
+ * Resets all module-level game state to its initial values, ready for a new
+ * room. The `controls` object is intentionally left untouched here so any held
+ * keys survive a room change.
+ * @returns {void}
+ */
 function resetData() {
   accelerator = 0;
   counter = 0;
@@ -58,6 +64,14 @@ function resetData() {
   ended = false;
 } // resetData
 
+/**
+ * Main game tick. Schedules the next frame (at normal or, in fast game state,
+ * half interval) unless paused or ended, advances the frame counters, runs the
+ * per-frame subsystems (conveyors, ropes, Willy, guardians, items, switches and
+ * the collision checks) and posts the updated gameData back to the main thread.
+ * Also drives room-transition flags via gameData.info[7].
+ * @returns {void}
+ */
 function gameLoop() {
   loopCounter++;
   if (ended) {
@@ -140,6 +154,10 @@ function gameLoop() {
   }
 } // gameLoop
 
+/**
+ * Advances every conveyor's animation frame (cycles 0→3).
+ * @returns {void}
+ */
 function conveyors() {
   gameData.conveyors.forEach((conveyor) => {
     if (conveyor.frame == 3) {
@@ -150,6 +168,12 @@ function conveyors() {
   });
 } // conveyors
 
+/**
+ * Advances every rope's swing for the current frame: updates its frame and
+ * swing direction, then recomputes each node's (x, y) from the rope's relative
+ * coordinate table.
+ * @returns {void}
+ */
 function ropes() {
   gameData.ropes.forEach((rope, r) => {
 
@@ -181,6 +205,11 @@ function ropes() {
   });
 } // ropes
 
+/**
+ * Dispatches Willy's per-frame update to the handler for his current
+ * operation: 'walking' (willyWalking) or 'onRope' (willyOnRope).
+ * @returns {void}
+ */
 function willy() {
   switch (operation) {
     case 'walking':
@@ -192,6 +221,13 @@ function willy() {
   }
 } // willy
 
+/**
+ * Updates Willy while walking/jumping/falling: gravity, the jump arc (jumpMap),
+ * conveyor-forced movement, left/right walking (following ramps), room-edge
+ * transitions (left/right/above/below via gameData.info[7]) and grabbing a rope
+ * when he overlaps one. Mutates gameData.willy[0] and the movement state.
+ * @returns {void}
+ */
 function willyWalking() {
   var willy = gameData.willy[0];
 
@@ -427,6 +463,13 @@ function willyWalking() {
   }
 } // willyWalking
 
+/**
+ * Updates Willy while hanging on a rope: jumping off, or climbing along the
+ * rope's nodes left/right, handling the top exit (room change above) and the
+ * bottom (drop back to walking). Mutates gameData.willy[0] and rope/movement
+ * state.
+ * @returns {void}
+ */
 function willyOnRope() {
   var willy = gameData.willy[0];
   if (controls.isJump()) {
@@ -500,6 +543,12 @@ function willyOnRope() {
   }
 } // willyOnRope
 
+/**
+ * Advances every guardian according to its `type`: horizontal and vertical
+ * patrols (reversing at their limits), 'arrow' (flies across and hides
+ * off-screen, with a sound cue) and 'maria' (faces Willy based on his height).
+ * @returns {void}
+ */
 function guardians() {
   gameData.guardians.forEach((guardian) => {
     switch (guardian.type) {
@@ -639,6 +688,10 @@ function guardians() {
   });
 } // guardians
 
+/**
+ * Advances every collectable item's animation frame (cycles 0→3).
+ * @returns {void}
+ */
 function items() {
   gameData.items.forEach((item) => {
     if (item.frame == 3) {
@@ -649,6 +702,10 @@ function items() {
   });
 } // items
 
+/**
+ * Advances every switch's animation frame (wrapping at its frame count).
+ * @returns {void}
+ */
 function switches() {
   gameData.switches.forEach((switche) => {
     switche.frame++;
@@ -658,35 +715,26 @@ function switches() {
   });    
 } // switches
 
+/**
+ * Axis-aligned bounding-box overlap test of the rectangle (x, y, width, height)
+ * against every non-hidden object in the given lists.
+ * @param {number} x - Left edge of the test rectangle.
+ * @param {number} y - Top edge of the test rectangle.
+ * @param {number} width - Rectangle width.
+ * @param {number} height - Rectangle height.
+ * @param {Array<Array<{x:number,y:number,width:number,height:number,hide?:boolean}>>} objectsArray - Lists of objects to test against.
+ * @returns {number} 1-based index of the first overlapping object within its list, or 0 if none overlap.
+ */
 function isTouching(x, y, width, height, objectsArray) {
   for (var a = 0; a < objectsArray.length; a++) {
     var objects = objectsArray[a];
     for (var o = 0; o < objects.length; o++) {
       var obj = objects[o];
       if (!('hide' in obj) || !obj.hide) {
-        var d = obj.direction;
-        if (d+1 > obj.directions) {
-          d = 0;
-        }
-        var f = obj.frame+d*obj.frames;
         var x1 = obj.x;
         var x2 = obj.x+obj.width;
         var y1 = obj.y;
         var y2 = obj.y+obj.height;
-        if ('touchCorrections' in obj) {
-          if ('x1' in obj.touchCorrections[f]) {
-            x1 += obj.touchCorrections[f].x1;
-          }
-          if ('y1' in obj.touchCorrections[f]) {
-            y1 += obj.touchCorrections[f].y1;
-          }
-          if ('x2' in obj.touchCorrections[f]) {
-            x2 = obj.x+obj.touchCorrections[f].x2;
-          }
-          if ('y2' in obj.touchCorrections[f]) {
-            y2 = obj.y+obj.touchCorrections[f].y2;
-          }
-        }
         if (!(x+width <= x1 || y+height <= y1 || x >= x2 || y >= y2)) {
           return o+1;
         }
@@ -697,6 +745,16 @@ function isTouching(x, y, width, height, objectsArray) {
 } // isTouching
 
 /*
+ * Like isTouching, but tests full containment: returns whether the rectangle
+ * (x, y, width, height) lies entirely inside a non-hidden object. Currently
+ * unused (the whole function is disabled).
+ * @param {number} x - Left edge of the test rectangle.
+ * @param {number} y - Top edge of the test rectangle.
+ * @param {number} width - Rectangle width.
+ * @param {number} height - Rectangle height.
+ * @param {Array<Array<{x:number,y:number,width:number,height:number,hide?:boolean}>>} objectsArray - Lists of objects to test against.
+ * @returns {number} 1-based index of the first containing object within its list, or 0 if none contain it.
+ *
 function isInside(x, y, width, height, objectsArray) {
   for (var a = 0; a < objectsArray.length; a++) {
     var objects = objectsArray[a];
@@ -713,6 +771,19 @@ function isInside(x, y, width, height, objectsArray) {
 } // isInside
 */
 
+/**
+ * Finds the objects the rectangle (x, y, width, height) is resting on — those
+ * it overlaps horizontally and whose top edge its bottom edge sits exactly on.
+ * Returns an empty list while Willy is ascending in a jump. Unless ramps are
+ * ignored, sloped ramp surfaces are also considered (via isStandingOnRamp).
+ * @param {number} x - Left edge.
+ * @param {number} y - Top edge.
+ * @param {number} width - Rectangle width.
+ * @param {number} height - Rectangle height.
+ * @param {Array<Array<object>>} objectsArray - Lists of objects to test against.
+ * @param {boolean} ignoreRamps - When true, ramps are not considered.
+ * @returns {object[]} The objects being stood on (possibly empty).
+ */
 function isStandingOn(x, y, width, height, objectsArray, ignoreRamps) {
   var result = [];
 
@@ -737,6 +808,17 @@ function isStandingOn(x, y, width, height, objectsArray, ignoreRamps) {
   return isStandingOnRamp(result, x, y, width, height);
 } // isStandingOn
 
+/**
+ * Appends any ramp whose sloped surface Willy's bottom edge currently rests on
+ * to the given result list, handling left and right gradients. Skipped while
+ * jumping with a horizontal direction.
+ * @param {object[]} result - Objects already found to be stood on; appended to.
+ * @param {number} x - Left edge.
+ * @param {number} y - Top edge.
+ * @param {number} width - Rectangle width.
+ * @param {number} height - Rectangle height.
+ * @returns {object[]} The (possibly extended) result list.
+ */
 function isStandingOnRamp(result, x, y, width, height) {
   if (!jumpCounter || !jumpDirection) {
     for (var o = 0; o < gameData.ramps.length; o++) {
@@ -762,10 +844,23 @@ function isStandingOnRamp(result, x, y, width, height) {
   return result;
 } // isStandingOnRamp
 
+/**
+ * Tests whether Willy could move by (moveX, moveY) without his 10×16 body
+ * entering a wall.
+ * @param {number} moveX - Horizontal offset to test.
+ * @param {number} moveY - Vertical offset to test.
+ * @returns {boolean} True if the target position is clear.
+ */
 function canMove(moveX, moveY) {
   return !isTouching(gameData.willy[0].x+moveX, gameData.willy[0].y+moveY, 10, 16, [gameData.walls]);
 } // canMove
 
+/**
+ * If Willy overlaps a collectable item, hides it and records its id as
+ * collected; once every item in the room is collected, advances the game state
+ * (gameData.info[9]).
+ * @returns {void}
+ */
 function isTouchingItem() {
   var touchId = isTouching(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.items]);
   if (touchId) {
@@ -778,11 +873,110 @@ function isTouchingItem() {
   }
 } // isTouchingItem
 
+/**
+ * Maps a sprite's logical (frame, direction) to the flat index used by
+ * per-frame data such as blankMargins, matching the frame+direction layout used
+ * when the sprite is drawn. Falls back to direction 0 when the object has fewer
+ * directions than its current `direction`.
+ * @param {{frame:number,direction:number,directions:number,frames:number}} obj - The sprite-bearing object.
+ * @returns {number} The flat frame index.
+ */
+function collisionFrameIndex(obj) {
+  var d = obj.direction;
+  if (d+1 > obj.directions) {
+    d = 0;
+  }
+  return obj.frame+d*obj.frames;
+} // collisionFrameIndex
+
+/**
+ * Tests whether the local pixel (x, y) is solid according to a blank-margin
+ * map. A pixel is solid when it lies inside both the row span (left/right) and
+ * the column span (top/bottom), so interior holes count as solid.
+ * @param {{left:number[],right:number[],top:number[],bottom:number[]}} map - Blank-margin map for one sprite frame.
+ * @param {number} x - Local x within the sprite.
+ * @param {number} y - Local y within the sprite.
+ * @returns {boolean} True if the pixel is solid.
+ */
+function isMarginSolid(map, x, y) {
+  var width = map.top.length;
+  var height = map.left.length;
+  if (x < 0 || x >= width || y < 0 || y >= height) {
+    return false;
+  }
+  return map.left[y] <= x && x < width-map.right[y] && map.top[x] <= y && y < height-map.bottom[x];
+} // isMarginSolid
+
+/**
+ * Pixel-perfect collision test between two sprites. Broad phase: intersect
+ * their paint-corrected pixel rectangles; narrow phase: scan the overlap for a
+ * pixel that is solid in both sprites' blank-margin maps. Returns false if
+ * either sprite has no blankMargins.
+ * @param {object} a - First sprite (needs blankMargins, x, y, frame/direction).
+ * @param {object} b - Second sprite (same requirements).
+ * @returns {boolean} True if the sprites overlap on a mutually solid pixel.
+ */
+function isPixelColliding(a, b) {
+  if (!a.blankMargins || !b.blankMargins) {
+    return false;
+  }
+  var ma = a.blankMargins[collisionFrameIndex(a)];
+  var mb = b.blankMargins[collisionFrameIndex(b)];
+  var ba = paintCorrectedBox(a);
+  var bb = paintCorrectedBox(b);
+  var ax = ba.x;
+  var ay = ba.y;
+  var bx = bb.x;
+  var by = bb.y;
+  var x0 = Math.max(ax, bx);
+  var y0 = Math.max(ay, by);
+  var x1 = Math.min(ax+ma.top.length, bx+mb.top.length);
+  var y1 = Math.min(ay+ma.left.length, by+mb.left.length);
+  for (var y = y0; y < y1; y++) {
+    for (var x = x0; x < x1; x++) {
+      if (isMarginSolid(ma, x-ax, y-ay) && isMarginSolid(mb, x-bx, y-by)) {
+        return true;
+      }
+    }
+  }
+  return false;
+} // isPixelColliding
+
+/**
+ * Computes a sprite's on-screen rectangle. paintCorrections shifts the origin
+ * and the renderer compensates the size, so the result matches the region the
+ * sprite actually occupies (and that isPixelColliding scans). Sprites without
+ * paintCorrections are treated as a zero offset.
+ * @param {{x:number,y:number,width:number,height:number,paintCorrections?:{x:number,y:number}}} obj
+ * @returns {{x:number,y:number,width:number,height:number}} The corrected rectangle.
+ */
+function paintCorrectedBox(obj) {
+  var px = obj.paintCorrections ? obj.paintCorrections.x : 0;
+  var py = obj.paintCorrections ? obj.paintCorrections.y : 0;
+  return {x: obj.x+px, y: obj.y+py, width: obj.width-px, height: obj.height-py};
+} // paintCorrectedBox
+
+/**
+ * Detects whether Willy is killed this frame: a broad-phase bounding-box test
+ * against each guardian, confirmed by a pixel-perfect check, plus bounding-box
+ * tests against nasties (touching or standing on). On a hit it sets the crash
+ * flag (gameData.info[5]) and posts a 'crash' message.
+ * @returns {void}
+ */
 function isColliding() {
   var willy = gameData.willy[0];
-  var f = willy.frame+willy.direction*willy.frames;
-  if (isTouching(willy.x+willy.touchCorrections[f].x1, willy.y, willy.touchCorrections[f].x2-willy.touchCorrections[f].x1, 16, [gameData.guardians])) {
-    gameData.info[5] = true;
+  var w = paintCorrectedBox(willy);
+  for (var g = 0; g < gameData.guardians.length; g++) {
+    var guardian = gameData.guardians[g];
+    if (('hide' in guardian) && guardian.hide) {
+      continue;
+    }
+    // Broad phase: paint-corrected bounding-box test; only then confirm pixel-perfect.
+    if (isTouching(w.x, w.y, w.width, w.height, [[paintCorrectedBox(guardian)]]) &&
+        isPixelColliding(willy, guardian)) {
+      gameData.info[5] = true;
+      break;
+    }
   }
   if (isTouching(willy.x, willy.y, 10, 16, [gameData.nasties])) {
     gameData.info[5] = true;
@@ -796,6 +990,17 @@ function isColliding() {
   }
 } // isColliding
 
+/**
+ * Computes the vertical adjustment needed to follow a ramp when Willy moves
+ * horizontally by `move`, so he walks up/down the slope instead of into it.
+ * Only applies while grounded (not jumping). Handles left and right gradients.
+ * @param {number} move - Intended horizontal move (signed).
+ * @param {number} x - Left edge.
+ * @param {number} y - Top edge.
+ * @param {number} width - Rectangle width.
+ * @param {number} height - Rectangle height.
+ * @returns {number} The vertical offset to apply (0 if no ramp applies).
+ */
 function rampMovement(move, x, y, width, height) {
   if (!jumpCounter && !controls.jump) {
     var absMove = Math.abs(move);
@@ -818,6 +1023,11 @@ function rampMovement(move, x, y, width, height) {
   return 0;
 } // rampMovement
 
+/**
+ * If Willy touches a switch, runs its configured actions (setValue,
+ * setGameState) whose `forGameState` matches the current game state.
+ * @returns {void}
+ */
 function isTouchingSwitch() {
   var touchId = isTouching(gameData.willy[0].x, gameData.willy[0].y, 10, 16, [gameData.switches]);
   if (touchId) {
@@ -837,6 +1047,14 @@ function isTouchingSwitch() {
   }
 } // isTouchingSwitch
 
+/**
+ * Worker message handler for commands from the main thread: 'init' (load the
+ * initial data, restore Willy's carried-over movement state and start the
+ * loop), 'controls' (update a control flag or predicate), 'pause', 'continue'
+ * and 'reset'.
+ * @param {MessageEvent} event - Message carrying a `data.id` command and payload.
+ * @returns {void}
+ */
 onmessage = (event) => {
   switch (event.data.id) {
     case 'init':

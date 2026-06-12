@@ -337,7 +337,7 @@ export class GameAreaEntity extends AbstractEntity {
       entity.setGraphicsData(data.willy);
       this.spriteEntities.willy.push(entity);
       this.app.willyRoomsCache.paintCorrections = {...data.willy.paintCorrections};
-      this.app.willyRoomsCache.touchCorrections = {...data.willy.touchCorrections};
+      this.app.willyRoomsCache.blankMargins = SpriteTool.buildBlankMargins(data.willy);
       this.initData.willy.push(this.app.willyRoomsCache);
     }
 
@@ -577,9 +577,7 @@ export class GameAreaEntity extends AbstractEntity {
                 if ('paintCorrections' in guardianDefs) {
                   guardianInitData.paintCorrections = guardianDefs.paintCorrections;
                 }
-                if ('touchCorrections' in guardianDefs) {
-                  guardianInitData.touchCorrections = guardianDefs.touchCorrections;
-                }
+                guardianInitData.blankMargins = SpriteTool.buildBlankMargins(guardianDefs);
                 switch (guardianType) {
                   case 'horizontal':
                     guardianInitData.limitLeft = guardian.limits.left;

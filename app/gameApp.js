@@ -298,7 +298,6 @@ export class GameApp extends AbstractApp {
           width: this.globalData.willy.width,
           height: this.globalData.willy.height,
           paintCorrections: this.globalData.willy.paintCorrections,
-          touchCorrections: this.globalData.willy.touchCorrections,
           frames: this.globalData.willy.frames,
           directions: this.globalData.willy.directions,
           roomNumber: roomNumber,
