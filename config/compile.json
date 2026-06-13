@@ -7,7 +7,7 @@
         "svision/js/abstractAudioManager.js",
         "svision/js/audioWorkletHandler.js",
         "svision/js/audioScriptProcessorHandler.js",
-        "svision/js/audioDisableHandler.js",
+        "svision/js/audioSilentHandler.js",
         "svision/js/tool.js",
         "audioManager.js",
         "svision/js/abstractFonts.js",

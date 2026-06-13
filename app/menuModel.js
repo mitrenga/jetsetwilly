@@ -215,11 +215,11 @@ export class MenuModel extends AbstractModel {
         return true;
 
       case 'setSounds':
-        this.desktopEntity.addModalEntity(new ZXVolumeEntity(this.desktopEntity, 27, 24, 202, 134, 'sounds', 'audioChannelSounds', 'exampleJumpSound'));
+        this.desktopEntity.addModalEntity(new ZXVolumeEntity(this.desktopEntity, 27, 24, 202, 134, 'sounds', 'audioBusSoundsLevel', 'exampleJumpSound'));
         return true;
 
       case 'setMusic':
-        this.desktopEntity.addModalEntity(new ZXVolumeEntity(this.desktopEntity, 27, 24, 202, 134, 'music', 'audioChannelMusic', 'exampleInGameMelody'));
+        this.desktopEntity.addModalEntity(new ZXVolumeEntity(this.desktopEntity, 27, 24, 202, 134, 'music', 'audioBusMusicLevel', 'exampleInGameMelody'));
         return true;
 
       case 'setControls':

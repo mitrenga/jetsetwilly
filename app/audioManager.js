@@ -2,13 +2,13 @@
 const { AbstractAudioManager } = await import('./svision/js/abstractAudioManager.js?ver='+window.srcVersion);
 const { AudioWorkletHandler } = await import('./svision/js/audioWorkletHandler.js?ver='+window.srcVersion);
 const { AudioScriptProcessorHandler } = await import('./svision/js/audioScriptProcessorHandler.js?ver='+window.srcVersion);
-const { AudioDisableHandler } = await import('./svision/js/audioDisableHandler.js?ver='+window.srcVersion);
+const { AudioSilentHandler } = await import('./svision/js/audioSilentHandler.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 /*/
 import AbstractAudioManager from './svision/js/abstractAudioManager.js';
 import AudioWorkletHandler from './svision/js/audioWorkletHandler.js';
 import AudioScriptProcessorHandler from './svision/js/audioScriptProcessorHandler.js';
-import AudioDisableHandler from './svision/js/audioDisableHandler.js';
+import AudioSilentHandler from './svision/js/audioSilentHandler.js';
 import Tool from './svision/js/tool.js';
 /**/
 // begin code
@@ -19,8 +19,8 @@ export class AudioManager extends AbstractAudioManager {
     super(app);
     this.id = 'AudioManager';
     this.volume = {};
-    this.volume.sounds = Math.min(10, Math.max(0, Math.round(Number(Tool.readCookie('audioChannelSounds', 5)))));
-    this.volume.music = Math.min(10, Math.max(0, Math.round(Number(Tool.readCookie('audioChannelMusic', 2)))));
+    this.volume.sounds = Math.min(10, Math.max(0, Math.round(Number(Tool.readCookie('audioBusSoundsLevel', 5)))));
+    this.volume.music = Math.min(10, Math.max(0, Math.round(Number(Tool.readCookie('audioBusMusicLevel', 2)))));
   } // constructor
 
   createAudioHandler(channel, options) {
@@ -37,8 +37,8 @@ export class AudioManager extends AbstractAudioManager {
         break;
     }
 
-    if ((!('audioDisableHandler' in options) || options.audioDisableHandler != 'disable') && volume == 0.0) {
-      return new AudioDisableHandler(this.app);
+    if ((!('audioSilentHandler' in options) || options.audioSilentHandler != 'silent') && volume == 0.0) {
+      return new AudioSilentHandler(this.app);
     }
 
     if (this.unsupportedAudioChannel == false) {
@@ -55,7 +55,7 @@ export class AudioManager extends AbstractAudioManager {
         break;
       case 'AudioScriptProcessorHandler':
         Tool.writeCookie('unsupportedAudioChannel', 'AudioScriptProcessorHandler');
-        audioHandler = new AudioDisableHandler(this.app);
+        audioHandler = new AudioSilentHandler(this.app);
         break;
     }
 
