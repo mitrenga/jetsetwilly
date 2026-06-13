@@ -58,7 +58,7 @@ export class MainModel extends AbstractModel {
     this.blackBoxEntity.addEntity(this.spaceEntity);
     this.sendEvent(0, {id: 'openAudioBus', bus: 'music', options: {muted: this.app.muted.music}});
     this.sendEvent(0, {id: 'openAudioBus', bus: 'sounds', options: {muted: this.app.muted.sounds}});
-    this.sendEvent(0, {id: 'openAudioBus', bus: 'extra', options: {muted: this.app.muted.sounds}});
+    this.sendEvent(0, {id: 'openAudioBus', bus: 'extra', options: {muted: this.app.muted.sounds, channelCount: 2}});
     this.sendEvent(0, {id: 'playSound', bus: 'music', sound: 'titleScreenMelody', options: false});
 
     this.app.stack.flashState = false;

@@ -651,7 +651,7 @@ function guardians() {
             break;
         }
         if (guardian.counter == guardian.soundWhenCounter) {
-          postMessage({id: 'playSound', bus: 'extra', sound: 'arrowSound', options: false});
+          postMessage({id: 'playSound', bus: 'extra', sound: 'arrowSound', options: {channelVolumes: guardian.direction == 0 ? [1, 0] : [0, 1]}});
         }
         var x = guardian.counter*guardian.speed;
         if (x > 255) {
