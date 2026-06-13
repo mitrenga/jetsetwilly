@@ -56,10 +56,10 @@ export class MainModel extends AbstractModel {
     this.mainImageEntity.addEntity(this.blackBoxEntity);
     this.spaceEntity = new TextEntity(this.blackBoxEntity, new MainFonts(this.app), 0, 2*8-3, 32*8, 7, 'PRESS SPACE TO SELECT ROOMS MAP', ZXColor.brightWhite, false, {align: 'center'});
     this.blackBoxEntity.addEntity(this.spaceEntity);
-    this.sendEvent(0, {id: 'openAudioChannel', channel: 'music', options: {muted: this.app.muted.music}});
-    this.sendEvent(0, {id: 'openAudioChannel', channel: 'sounds', options: {muted: this.app.muted.sounds}});
-    this.sendEvent(0, {id: 'openAudioChannel', channel: 'extra', options: {muted: this.app.muted.sounds}});
-    this.sendEvent(0, {id: 'playSound', channel: 'music', sound: 'titleScreenMelody', options: false});
+    this.sendEvent(0, {id: 'openAudioBus', bus: 'music', options: {muted: this.app.muted.music}});
+    this.sendEvent(0, {id: 'openAudioBus', bus: 'sounds', options: {muted: this.app.muted.sounds}});
+    this.sendEvent(0, {id: 'openAudioBus', bus: 'extra', options: {muted: this.app.muted.sounds}});
+    this.sendEvent(0, {id: 'playSound', bus: 'music', sound: 'titleScreenMelody', options: false});
 
     this.app.stack.flashState = false;
     this.sendEvent(330, {id: 'changeFlashState'});
@@ -67,7 +67,7 @@ export class MainModel extends AbstractModel {
 
   shutdown() {
     super.shutdown();
-    this.sendEvent(0, {id: 'stopAllAudioChannels'});
+    this.sendEvent(0, {id: 'stopAllAudioBuses'});
   } // shutdown
 
   newBorderEntity() {
@@ -86,7 +86,7 @@ export class MainModel extends AbstractModel {
         return true;
 
       case 'melodyEnd':
-        this.sendEvent(0, {id: 'playSound', channel: 'music', sound: 'screechSound', options: false});
+        this.sendEvent(0, {id: 'playSound', bus: 'music', sound: 'screechSound', options: false});
         return true;
 
       case 'screechBegin':
@@ -152,12 +152,12 @@ export class MainModel extends AbstractModel {
               return true;
             case this.app.controls.keyboard.music:
               this.app.muted.music = !this.app.muted.music;
-              this.sendEvent(0, {id: 'muteAudioChannel', channel: 'music', muted: this.app.muted.music});
+              this.sendEvent(0, {id: 'muteAudioBus', bus: 'music', muted: this.app.muted.music});
               return true;
             case this.app.controls.keyboard.sounds:
               this.app.muted.sounds = !this.app.muted.sounds;
-              this.sendEvent(0, {id: 'muteAudioChannel', channel: 'sounds', muted: this.app.muted.sounds});
-              this.sendEvent(0, {id: 'muteAudioChannel', channel: 'extra', muted: this.app.muted.sounds});
+              this.sendEvent(0, {id: 'muteAudioBus', bus: 'sounds', muted: this.app.muted.sounds});
+              this.sendEvent(0, {id: 'muteAudioBus', bus: 'extra', muted: this.app.muted.sounds});
               return true;
           }
         }
@@ -196,7 +196,7 @@ export class MainModel extends AbstractModel {
         this.app.startRoom(true, true, false, true, false, this.app.globalData.initRoom);
         return true;
 
-      case 'errorAudioChannel':
+      case 'errorAudioBus':
         this.app.showErrorMessage(event.error, 'reopen');
         return true;
     }

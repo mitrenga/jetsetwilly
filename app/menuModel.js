@@ -130,7 +130,7 @@ export class MenuModel extends AbstractModel {
 
     this.fetchData('menu.data', {key: 'menu', when: 'required'}, {});
     
-    this.sendEvent(0, {id: 'closeAllAudioChannels'});
+    this.sendEvent(0, {id: 'closeAllAudioBuses'});
   } // init
 
   getMenuData(self, key, row) {

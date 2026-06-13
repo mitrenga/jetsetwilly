@@ -23,11 +23,11 @@ export class AudioManager extends AbstractAudioManager {
     this.volume.music = Math.min(10, Math.max(0, Math.round(Number(Tool.readCookie('audioBusMusicLevel', 2)))));
   } // constructor
 
-  createAudioHandler(channel, options) {
+  createAudioHandler(bus, options) {
     var audioHandler = false;
 
     var volume = 0.0;
-    switch (channel) {
+    switch (bus) {
       case 'music':
         volume = this.volumeLevel(this.volume.music);
         break;
@@ -37,37 +37,37 @@ export class AudioManager extends AbstractAudioManager {
         break;
     }
 
-    if ((!('audioSilentHandler' in options) || options.audioSilentHandler != 'silent') && volume == 0.0) {
+    if (options.audioSilentHandler != 'disable' && volume == 0.0) {
       return new AudioSilentHandler(this.app);
     }
 
-    if (this.unsupportedAudioChannel == false) {
-      this.unsupportedAudioChannel = Tool.readCookie('unsupportedAudioChannel', false);
+    if (this.unsupportedAudioBus == false) {
+      this.unsupportedAudioBus = Tool.readCookie('unsupportedAudioBus', false);
     }
 
-    switch (this.unsupportedAudioChannel) {
+    switch (this.unsupportedAudioBus) {
       case false:
         audioHandler = new AudioWorkletHandler(this.app);
         break;
       case 'AudioWorkletHandler':
-        Tool.writeCookie('unsupportedAudioChannel', 'AudioWorkletHandler');
+        Tool.writeCookie('unsupportedAudioBus', 'AudioWorkletHandler');
         audioHandler = new AudioScriptProcessorHandler(this.app);
         break;
       case 'AudioScriptProcessorHandler':
-        Tool.writeCookie('unsupportedAudioChannel', 'AudioScriptProcessorHandler');
+        Tool.writeCookie('unsupportedAudioBus', 'AudioScriptProcessorHandler');
         audioHandler = new AudioSilentHandler(this.app);
         break;
     }
 
-    if (channel in this.restartSounds) {
-      this.app.model.sendEvent(1, {id: 'playSound', channel: channel, sound: this.restartSounds[channel].sound, options: this.restartSounds[channel].options});
+    if (bus in this.restartSounds) {
+      this.app.model.sendEvent(1, {id: 'playSound', bus: bus, sound: this.restartSounds[bus].sound, options: this.restartSounds[bus].options});
     }
 
     return audioHandler;
   } // createAudioHandler
 
-  audioData(channel, sound, options) {
-    var data = super.audioData(channel, sound, options);
+  audioData(bus, sound, options) {
+    var data = super.audioData(bus, sound, options);
     if (data !== false) {
       return data;
     }

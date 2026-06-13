@@ -75,7 +75,7 @@ export class RoomModel extends AbstractModel {
 
     if (this.app.restartInGameMelody) {
       this.app.restartInGameMelody = false;
-      this.sendEvent(0, {id: 'playSound', channel: 'music', sound: 'inGameMelody', options: {repeat: true, lives: this.app.lives}});
+      this.sendEvent(0, {id: 'playSound', bus: 'music', sound: 'inGameMelody', options: {repeat: true, lives: this.app.lives}});
     }
 
     var roomId = 'room'+this.roomNumber.toString().padStart(2, '0');
@@ -85,7 +85,7 @@ export class RoomModel extends AbstractModel {
   shutdown() {
     super.shutdown();
     this.sendWorkerMessage({id: 'reset'});
-    this.sendEvent(0, {id: 'stopAudioChannel', channel: 'extra'});
+    this.sendEvent(0, {id: 'stopAudioBus', bus: 'extra'});
   } // shutdown
 
   newBorderEntity() {
@@ -161,13 +161,13 @@ export class RoomModel extends AbstractModel {
     switch (event.id) {
       case 'blurWindow':
         this.sendWorkerMessage({id: 'pause'});
-        this.sendEvent(0, {id: 'pauseAllAudioChannels'});
+        this.sendEvent(0, {id: 'pauseAllAudioBuses'});
         this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 52, 40, 153, 85, 'PAUSE GAME', 'GameExitModel'));
         return true;
 
       case 'continueGame':        
         this.sendWorkerMessage({id: 'continue'});
-        this.sendEvent(0, {id: 'continueAllAudioChannels'});
+        this.sendEvent(0, {id: 'continueAllAudioBuses'});
         return true;
 
       case 'keyPress':
@@ -196,7 +196,7 @@ export class RoomModel extends AbstractModel {
           case 'Escape':
           case 'GamepadExit':
             this.sendWorkerMessage({id: 'pause'});
-            this.sendEvent(0, {id: 'pauseAllAudioChannels'});
+            this.sendEvent(0, {id: 'pauseAllAudioBuses'});
             this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 52, 40, 153, 85, 'PAUSE GAME', 'GameExitModel'));
             return true;
 
@@ -253,13 +253,13 @@ export class RoomModel extends AbstractModel {
 
           case this.app.controls.keyboard.music:
             this.app.muted.music = !this.app.muted.music;
-            this.sendEvent(0, {id: 'muteAudioChannel', channel: 'music', muted: this.app.muted.music});
+            this.sendEvent(0, {id: 'muteAudioBus', bus: 'music', muted: this.app.muted.music});
             return true;
 
           case this.app.controls.keyboard.sounds:
             this.app.muted.sounds = !this.app.muted.sounds;
-            this.sendEvent(0, {id: 'muteAudioChannel', channel: 'sounds', muted: this.app.muted.sounds});
-            this.sendEvent(0, {id: 'muteAudioChannel', channel: 'extra', muted: this.app.muted.sounds});
+            this.sendEvent(0, {id: 'muteAudioBus', bus: 'sounds', muted: this.app.muted.sounds});
+            this.sendEvent(0, {id: 'muteAudioBus', bus: 'extra', muted: this.app.muted.sounds});
             return true;
         }
         break;
@@ -376,10 +376,10 @@ export class RoomModel extends AbstractModel {
         if (!this.demo) {
           this.gameAreaEntity.spriteEntities.willy[0].hide = true;
         }
-        this.sendEvent(0, {id: 'stopAllAudioChannels'});
+        this.sendEvent(0, {id: 'stopAllAudioBuses'});
         this.borderEntity.bkColor = ZXColor.color(0);
         this.gameAreaEntity.setMonochromeColors(ZXColor.color(15), ZXColor.color(0));
-        this.sendEvent(0, {id: 'playSound', channel: 'sounds', sound: 'crashSound', options: false});
+        this.sendEvent(0, {id: 'playSound', bus: 'sounds', sound: 'crashSound', options: false});
         this.animationTime = this.timer;
         this.animationType = 'crash';
         this.app.restartInGameMelody = true;
@@ -618,11 +618,11 @@ export class RoomModel extends AbstractModel {
         break;
 
       case 'playSound':
-        this.sendEvent(0, {id: 'playSound', channel: event.data.channel, sound: event.data.sound, options: event.data.options});
+        this.sendEvent(0, {id: 'playSound', bus: event.data.bus, sound: event.data.sound, options: event.data.options});
         break;
 
-      case 'stopAudioChannel':
-        this.sendEvent(0, {id: 'stopAudioChannel', channel: event.data.channel});
+      case 'stopAudioBus':
+        this.sendEvent(0, {id: 'stopAudioBus', bus: event.data.bus});
         break;
 
       case 'crash':
