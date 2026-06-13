@@ -67,7 +67,7 @@ export class MainModel extends AbstractModel {
 
   shutdown() {
     super.shutdown();
-    this.app.audioManager.stopAllChannels();
+    this.sendEvent(0, {id: 'stopAllAudioChannels'});
   } // shutdown
 
   newBorderEntity() {
@@ -152,12 +152,12 @@ export class MainModel extends AbstractModel {
               return true;
             case this.app.controls.keyboard.music:
               this.app.muted.music = !this.app.muted.music;
-              this.app.audioManager.muteChannel('music', this.app.muted.music);
+              this.sendEvent(0, {id: 'muteAudioChannel', channel: 'music', muted: this.app.muted.music});
               return true;
             case this.app.controls.keyboard.sounds:
               this.app.muted.sounds = !this.app.muted.sounds;
-              this.app.audioManager.muteChannel('sounds', this.app.muted.sounds);
-              this.app.audioManager.muteChannel('extra', this.app.muted.sounds);
+              this.sendEvent(0, {id: 'muteAudioChannel', channel: 'sounds', muted: this.app.muted.sounds});
+              this.sendEvent(0, {id: 'muteAudioChannel', channel: 'extra', muted: this.app.muted.sounds});
               return true;
           }
         }

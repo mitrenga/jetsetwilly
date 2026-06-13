@@ -86,7 +86,7 @@ export class TapeLoadingModel extends AbstractModel {
   } // newBorderEntity
 
   shutdown() {
-    this.app.audioManager.closeAllChannels();
+    this.sendEvent(0, {id: 'closeAllAudioChannels'});
   } // shutdown
 
   handleEvent(event) {

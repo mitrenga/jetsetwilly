@@ -91,7 +91,7 @@ export class GameOverModel extends AbstractModel {
     this.timerEntity = new TextEntity(this.buttonNoEntity, this.app.fonts.fonts5x5, 8, 4, 10, 5, '10', ZXColor.white, false, {align: 'center'});
     this.buttonNoEntity.addEntity(this.timerEntity);
 
-    this.app.audioManager.stopAllChannels();
+    this.sendEvent(0, {id: 'stopAllAudioChannels'});
 
     if (this.shoeAnimation) {
       this.sendEvent(0, {id: 'playSound', channel: 'sounds', sound: 'gameOverSound', options: false});

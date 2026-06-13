@@ -72,7 +72,7 @@ export class AudioManager extends AbstractAudioManager {
       return data;
     }
 
-    var sampleRate = this.channels[channel].getSampleRate();
+    var sampleRate = this.getSampleRate();
     switch (sound) {
       case 'titleScreenMelody': return this.titleScreenMelody(sampleRate);
       case 'screechSound': return this.screechSound(sampleRate);

@@ -85,7 +85,7 @@ export class RoomModel extends AbstractModel {
   shutdown() {
     super.shutdown();
     this.sendWorkerMessage({id: 'reset'});
-    this.app.audioManager.stopChannel('extra');
+    this.sendEvent(0, {id: 'stopAudioChannel', channel: 'extra'});
   } // shutdown
 
   newBorderEntity() {
@@ -161,13 +161,13 @@ export class RoomModel extends AbstractModel {
     switch (event.id) {
       case 'blurWindow':
         this.sendWorkerMessage({id: 'pause'});
-        this.app.audioManager.pauseAllChannels();
+        this.sendEvent(0, {id: 'pauseAllAudioChannels'});
         this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 52, 40, 153, 85, 'PAUSE GAME', 'GameExitModel'));
         return true;
 
       case 'continueGame':        
         this.sendWorkerMessage({id: 'continue'});
-        this.app.audioManager.continueAllChannels();
+        this.sendEvent(0, {id: 'continueAllAudioChannels'});
         return true;
 
       case 'keyPress':
@@ -196,7 +196,7 @@ export class RoomModel extends AbstractModel {
           case 'Escape':
           case 'GamepadExit':
             this.sendWorkerMessage({id: 'pause'});
-            this.app.audioManager.pauseAllChannels();
+            this.sendEvent(0, {id: 'pauseAllAudioChannels'});
             this.desktopEntity.addModalEntity(new PauseGameEntity(this.desktopEntity, 52, 40, 153, 85, 'PAUSE GAME', 'GameExitModel'));
             return true;
 
@@ -253,13 +253,13 @@ export class RoomModel extends AbstractModel {
 
           case this.app.controls.keyboard.music:
             this.app.muted.music = !this.app.muted.music;
-            this.app.audioManager.muteChannel('music', this.app.muted.music);
+            this.sendEvent(0, {id: 'muteAudioChannel', channel: 'music', muted: this.app.muted.music});
             return true;
 
           case this.app.controls.keyboard.sounds:
             this.app.muted.sounds = !this.app.muted.sounds;
-            this.app.audioManager.muteChannel('sounds', this.app.muted.sounds);
-            this.app.audioManager.muteChannel('extra', this.app.muted.sounds);
+            this.sendEvent(0, {id: 'muteAudioChannel', channel: 'sounds', muted: this.app.muted.sounds});
+            this.sendEvent(0, {id: 'muteAudioChannel', channel: 'extra', muted: this.app.muted.sounds});
             return true;
         }
         break;

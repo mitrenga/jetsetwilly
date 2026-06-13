@@ -109,15 +109,15 @@ export class PauseGameEntity extends AbstractEntity {
         
       case 'changeSoundsState':
         this.app.muted.sounds = !this.app.muted.sounds;
-        this.app.audioManager.muteChannel('sounds', this.app.muted.sounds);
-        this.app.audioManager.muteChannel('extra', this.app.muted.sounds);
+        this.sendEvent(0, 0, {id: 'muteAudioChannel', channel: 'sounds', muted: this.app.muted.sounds});
+        this.sendEvent(0, 0, {id: 'muteAudioChannel', channel: 'extra', muted: this.app.muted.sounds});
         this.sendEvent(1, 0, {id: 'refreshMenu'});
 
         return true;
 
       case 'changeMusicState':
         this.app.muted.music = !this.app.muted.music;
-        this.app.audioManager.muteChannel('music', this.app.muted.music);
+        this.sendEvent(0, 0, {id: 'muteAudioChannel', channel: 'music', muted: this.app.muted.music});
         this.sendEvent(1, 0, {id: 'refreshMenu'});
         return true;
 
