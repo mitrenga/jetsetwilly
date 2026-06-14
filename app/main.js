@@ -49,11 +49,13 @@ document.addEventListener("gesturechange", (event) => event.preventDefault());
 gameApp.eventResizeWindow(null);
 requestAnimationFrame(loopGame);
 
-// register service worker for production (devMode == false, e.g. bundle import); dev mode bypasses SW entirely
+// register service worker when enabled: in production (devMode === false) or in
+// dev mode carrying the serviceWorker flag (devMode = {serviceWorker: true});
+// plain dev mode (devMode === true) unregisters and bypasses the SW
 if ('serviceWorker' in navigator) {
-  if (window.devMode) {
-    navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((reg) => reg.unregister()));
-  } else {
+  const dm = window.devMode;
+  const swEnabled = !dm || (typeof dm === 'object' && dm.serviceWorker);
+  if (swEnabled) {
     navigator.serviceWorker.register('serviceWorker', { type: 'module' });
     if (navigator.serviceWorker.controller) {
       let swRefreshing = false;
@@ -63,5 +65,7 @@ if ('serviceWorker' in navigator) {
         window.location.reload();
       });
     }
+  } else {
+    navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((reg) => reg.unregister()));
   }
 }
