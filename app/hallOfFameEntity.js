@@ -32,14 +32,14 @@ export class HallOfFameEntity extends AbstractEntity {
     this.addEntity(this.noteEntity);
     this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', {id: 'closeHallOfFame'}, ['Enter', 'Escape', ' ', 'GamepadOK', 'GamepadExit'], ZXColor.brightWhite, ZXColor.brightBlue, {align: 'center', margin: 4}));
 
-    this.fetchData('hallOfFame.db', {key: 'hallOfFame', when: 'offline'}, {});
+    if (navigator.onLine) {
+      this.fetchData('hallOfFame.db', false, {});
+    } else {
+      this.showOfflineNotice();
+    }
   } // init
 
   setData(data) {
-    if (data.source == 'server') {
-      this.app.saveDataToStorage('hallOfFame', data.data);
-    }
-
     for (var i = 0; i < Object.keys(data.data).length; i++) {
       var y = 12+i*10;
       this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 2, y, 18, 8, (i+1)+'.', ZXColor.black, false, {align: 'right'}));
@@ -58,9 +58,12 @@ export class HallOfFameEntity extends AbstractEntity {
   } // setData
 
   errorData(error) {
-    this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 0, this.height/2-20, this.width, 32, 'ERROR: '+error.message, ZXColor.brightRed, false, {align: 'center', textWrap: true}));
-    super.errorData(error);
+    this.showOfflineNotice();
   } // errorData
+
+  showOfflineNotice() {
+    this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 0, this.height/2-20, this.width, 32, 'SYSTEM OFFLINE - SCORES UNAVAILABLE', ZXColor.brightRed, false, {align: 'center', textWrap: true}));
+  } // showOfflineNotice
 
   handleEvent(event) {
     if (super.handleEvent(event)) {
