@@ -5,6 +5,6 @@
 /**/
 // begin code
 
-export const Version = '2026.06.15a';
+export const Version = '2026.06.16';
 
 export default Version;
