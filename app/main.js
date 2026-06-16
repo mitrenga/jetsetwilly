@@ -56,7 +56,7 @@ if ('serviceWorker' in navigator) {
   const dm = window.devMode;
   const swEnabled = !dm || (typeof dm === 'object' && dm.serviceWorker);
   if (swEnabled) {
-    navigator.serviceWorker.register('serviceWorker', { type: 'module' });
+    navigator.serviceWorker.register('serviceWorker', { type: 'module' }).catch((error) => console.error('service worker registration failed:', error));
     if (navigator.serviceWorker.controller) {
       let swRefreshing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
