@@ -58,10 +58,11 @@ if ('serviceWorker' in navigator) {
   if (swEnabled) {
     navigator.serviceWorker.register('serviceWorker', { type: 'module' }).catch((error) => console.error('service worker registration failed:', error));
     if (navigator.serviceWorker.controller) {
-      let swRefreshing = false;
       navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (swRefreshing) return;
-        swRefreshing = true;
+        // guard with sessionStorage (survives the reload) so a controllerchange
+        // that keeps firing cannot turn into an infinite reload loop
+        if (sessionStorage.getItem('swReloaded')) return;
+        sessionStorage.setItem('swReloaded', '1');
         window.location.reload();
       });
     }
