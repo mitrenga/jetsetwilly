@@ -1,9 +1,11 @@
 /**/
 const { GameApp } = await import('./gameApp.js?ver='+window.srcVersion);
 const { appPlatform } = await import('./appPlatform.js?ver='+window.srcVersion);
+const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 /*/
 import GameApp from './gameApp.js';
 import appPlatform from './appPlatform.js';
+import Tool from './svision/js/tool.js';
 /**/
 // begin code
 
@@ -54,18 +56,14 @@ requestAnimationFrame(loopGame);
 // plain dev mode (devMode === true) unregisters and bypasses the SW
 if ('serviceWorker' in navigator) {
   const dm = window.devMode;
-  const swEnabled = !dm || (typeof dm === 'object' && dm.serviceWorker);
+  // an explicit disableServiceWorker cookie (toggled from the /config page) forces the SW off
+  const swDisabled = Tool.readCookie('disableServiceWorker', false) === 'true';
+  const swEnabled = !swDisabled && (!dm || (typeof dm === 'object' && dm.serviceWorker));
   if (swEnabled) {
+    // intentionally no auto-reload on controllerchange: on flaky old engines it
+    // re-fires on every load, which caused an infinite reload loop. The updated
+    // SW (skipWaiting + clients.claim) simply takes effect on the next launch.
     navigator.serviceWorker.register('serviceWorker', { type: 'module' }).catch((error) => console.error('service worker registration failed:', error));
-    if (navigator.serviceWorker.controller) {
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        // guard with sessionStorage (survives the reload) so a controllerchange
-        // that keeps firing cannot turn into an infinite reload loop
-        if (sessionStorage.getItem('swReloaded')) return;
-        sessionStorage.setItem('swReloaded', '1');
-        window.location.reload();
-      });
-    }
   } else {
     navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((reg) => reg.unregister()));
   }
