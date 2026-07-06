@@ -3,12 +3,12 @@
         "version.js",
         "svision/js/inputEventsManager.js",
         "svision/js/abstractApp.js",
-        "svision/js/abstractAudioHandler.js",
-        "svision/js/abstractAudioManager.js",
-        "svision/js/audioWorkletHandler.js",
-        "svision/js/audioScriptProcessorHandler.js",
-        "svision/js/audioSilentHandler.js",
         "svision/js/tool.js",
+        "svision/js/audio/abstractAudioHandler.js",
+        "svision/js/audio/abstractAudioManager.js",
+        "svision/js/audio/audioWorkletHandler.js",
+        "svision/js/audio/audioScriptProcessorHandler.js",
+        "svision/js/audio/audioSilentHandler.js",
         "audioManager.js",
         "svision/js/abstractFonts.js",
         "svision/js/platform/canvas2D/zxSpectrum/zxFonts8x8.js",
@@ -67,6 +67,6 @@
     ],
     "standalone": [
         "gameWorker.js",
-        "svision/js/audioProcessor.js"
+        "svision/js/audio/worker/audioProcessor.js"
     ]
 }
