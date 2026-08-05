@@ -51,7 +51,7 @@ export class GameAreaEntity extends AbstractEntity {
       this.app.layout.paint(this, 0, 0, this.width, this.height, this.bkColor);
 
       for (var f = 0; f < 2; f++) {
-        if (this.drawingCache[f].needToRefresh(this, this.width, this.height)) {
+        if (this.drawingCache[f].preparePaint(this.width, this.height)) {
           // layout - bkColor
           this.roomData.layout.forEach((row, r) => {
             for (var column = 0; column < 32; column++) {
@@ -69,7 +69,7 @@ export class GameAreaEntity extends AbstractEntity {
                     bkColor = penColor;
                   }
                   if (bkColor != false) {
-                    this.app.layout.paintRect(this.drawingCache[f].ctx, column*8, r*8, 8, 8, bkColor);
+                    this.drawingCache[f].paint(column*8, r*8, 8, 8, bkColor);
                   }
                 }
               }
@@ -99,7 +99,7 @@ export class GameAreaEntity extends AbstractEntity {
                   for (var w = 0; w < objData.width; w++) {
                     for (var h = 0; h < objData.height; h++) {
                       if (bkColor != false) {
-                        this.app.layout.paintRect(this.drawingCache[f].ctx, (location.x+w)*8, (location.y+h)*8, 8, 8, bkColor);
+                        this.drawingCache[f].paint((location.x+w)*8, (location.y+h)*8, 8, 8, bkColor);
                       }
                     }
                   }
@@ -122,7 +122,7 @@ export class GameAreaEntity extends AbstractEntity {
       super.drawSubEntities();
 
       for (var f = 2; f < 4; f++) {
-        if (this.drawingCache[f].needToRefresh(this, this.width, this.height)) {
+        if (this.drawingCache[f].preparePaint(this.width, this.height)) {
           // layout - penColor
           this.roomData.layout.forEach((row, r) => {
             for (var column = 0; column < 32; column++) {
@@ -132,7 +132,7 @@ export class GameAreaEntity extends AbstractEntity {
                 var itemData = graphicData[idItem];
                 var attr = itemData.substring(0, 2);
                 if (this.staticKinds.includes(idItem)) {
-                  if (this.graphicCache[itemData].needToRefresh(this, 8, 8)) {
+                  if (this.graphicCache[itemData].preparePaint(8, 8)) {
                     var penColor = this.penColorByAttr(Tool.hexToInt(attr));
                     var bkColor = this.bkColorByAttr(Tool.hexToInt(attr));
                     if (bkColor == roomBkColor) {
@@ -145,13 +145,13 @@ export class GameAreaEntity extends AbstractEntity {
                       var spriteLine = Tool.hexToBin(itemData.substring((y+1)*2, (y+1)*2+2));
                       for (var x = 0; x < 8; x++) {
                         if (spriteLine[x] == '1') {
-                          this.app.layout.paintRect(this.graphicCache[itemData].ctx, x, y, 1, 1, penColor);
+                          this.graphicCache[itemData].paint(x, y, 1, 1, penColor);
                         }
                       }
                     }
                   }
                 }
-                this.drawingCache[f].ctx.drawImage(this.graphicCache[itemData].canvas, column*8*this.app.layout.ratio, r*8*this.app.layout.ratio);
+                this.drawingCache[f].ctx.drawImage(this.graphicCache[itemData].canvas, column*8, r*8);
               }
             }
           });
@@ -161,7 +161,7 @@ export class GameAreaEntity extends AbstractEntity {
         ['walls', 'floors', 'nasties'].forEach((objectType) => {
           if (objectType in graphicData) {
             graphicData[objectType].forEach((objData) => {
-              if (this.graphicCache[objData.data].needToRefresh(this, 8, 8)) {
+              if (this.graphicCache[objData.data].preparePaint(8, 8)) {
                 var attr = objData.data.substring(0, 2);
                 var penColor = this.penColorByAttr(Tool.hexToInt(attr));
                 var bkColor = this.bkColorByAttr(Tool.hexToInt(attr));
@@ -175,7 +175,7 @@ export class GameAreaEntity extends AbstractEntity {
                   var spriteLine = Tool.hexToBin(objData.data.substring((y+1)*2, (y+1)*2+2));
                   for (var x = 0; x < 8; x++) {
                     if (spriteLine[x] == '1') {
-                      this.app.layout.paintRect(this.graphicCache[objData.data].ctx, x, y, 1, 1, penColor);
+                      this.graphicCache[objData.data].paint(x, y, 1, 1, penColor);
                     }
                   }
                 }
@@ -189,7 +189,7 @@ export class GameAreaEntity extends AbstractEntity {
               locations.forEach((location) => {
                 for (var w = 0; w < objData.width; w++) {
                   for (var h = 0; h < objData.height; h++) {
-                    this.drawingCache[f].ctx.drawImage(this.graphicCache[objData.data].canvas, (location.x+w)*8*this.app.layout.ratio, (location.y+h)*8*this.app.layout.ratio);
+                    this.drawingCache[f].ctx.drawImage(this.graphicCache[objData.data].canvas, (location.x+w)*8, (location.y+h)*8);
                   }
                 }
               });
@@ -203,7 +203,7 @@ export class GameAreaEntity extends AbstractEntity {
           if (rampData.gradient == 'left') {
               gradient = -1;
           }
-          if (this.graphicCache[rampData.data].needToRefresh(this, 8, 8)) {
+          if (this.graphicCache[rampData.data].preparePaint(8, 8)) {
             var attr = rampData.data.substring(0, 2);
             var penColor = ZXColor.penAttrColor(Tool.hexToInt(attr));
             if (this.monochromeColor !== false) {
@@ -214,13 +214,13 @@ export class GameAreaEntity extends AbstractEntity {
               bkColor = false;
             }
             if (bkColor != false) {
-              this.app.layout.paintRect(this.graphicCache[rampData.data].ctx, 0, 0, 8, 8, bkColor);
+              this.graphicCache[rampData.data].paint(0, 0, 8, 8, bkColor);
             }
             for (var y = 0; y < 8; y++) {
               var spriteLine = Tool.hexToBin(rampData.data.substring((y+1)*2, (y+1)*2+2));
               for (var x = 0; x < 8; x++) {
                 if (spriteLine[x] == '1') {
-                  this.app.layout.paintRect(this.graphicCache[rampData.data].ctx, x, y, 1, 1, penColor);
+                  this.graphicCache[rampData.data].paint(x, y, 1, 1, penColor);
                 }
               }
             }
@@ -233,7 +233,7 @@ export class GameAreaEntity extends AbstractEntity {
           }
           locations.forEach((location) => {
             for (var pos = 0; pos < rampData.length; pos++) {
-              this.drawingCache[f].ctx.drawImage(this.graphicCache[rampData.data].canvas, (location.x+pos*gradient)*8*this.app.layout.ratio, (location.y-pos)*8*this.app.layout.ratio);
+              this.drawingCache[f].ctx.drawImage(this.graphicCache[rampData.data].canvas, (location.x+pos*gradient)*8, (location.y-pos)*8);
             }
           });
         });
