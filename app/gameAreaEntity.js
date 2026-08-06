@@ -759,16 +759,6 @@ export class GameAreaEntity extends AbstractEntity {
   } // updateData
 
 
-  cleanCache() {
-    this.drawingCache[0].cleanCache();
-    this.drawingCache[1].cleanCache();
-    this.drawingCache[2].cleanCache();
-    this.drawingCache[3].cleanCache();
-    Object.keys(this.graphicCache).forEach((attr) => {
-      this.graphicCache[attr].cleanCache();
-    });
-  } // cleanCache
-
   penColorByAttr(attr) {
     if (this.monochromeColor) {
       return this.monochromeColor;
