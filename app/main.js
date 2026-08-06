@@ -62,7 +62,9 @@ if ('serviceWorker' in navigator) {
   if (swEnabled) {
     // intentionally no auto-reload on controllerchange: on flaky old engines it
     // re-fires on every load, which caused an infinite reload loop. The updated
-    // SW (skipWaiting + clients.claim) simply takes effect on the next launch.
+    // SW installs in the background and waits; the new version takes effect via
+    // the in-app upgrade (menu UPGRADE button) or on the next launch after all
+    // tabs are closed.
     navigator.serviceWorker.register('serviceWorker', { type: 'module' }).catch((error) => console.error('service worker registration failed:', error));
   } else {
     navigator.serviceWorker.getRegistrations().then((regs) => regs.forEach((reg) => reg.unregister()));
