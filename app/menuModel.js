@@ -8,7 +8,7 @@ const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEnti
 const { ZXPlayerNameEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxPlayerNameEntity.js?ver='+window.srcVersion);
 const { HallOfFameEntity } = await import('./hallOfFameEntity.js?ver='+window.srcVersion);
 const { ZXVolumeEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxVolumeEntity.js?ver='+window.srcVersion);
-const { ZXControlsEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxControlsEntity.js?ver='+window.srcVersion);
+const { ZXSettingsEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxSettingsEntity.js?ver='+window.srcVersion);
 const { AboutEntity } = await import('./aboutEntity.js?ver='+window.srcVersion);
 const { ZXWaitForAudioEventEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxWaitForAudioEventEntity.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
@@ -23,7 +23,7 @@ import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
 import ZXPlayerNameEntity from './svision/js/platform/canvas2D/zxSpectrum/zxPlayerNameEntity.js';
 import HallOfFameEntity from './hallOfFameEntity.js';
 import ZXVolumeEntity from './svision/js/platform/canvas2D/zxSpectrum/zxVolumeEntity.js';
-import ZXControlsEntity from './svision/js/platform/canvas2D/zxSpectrum/zxControlsEntity.js';
+import ZXSettingsEntity from './svision/js/platform/canvas2D/zxSpectrum/zxSettingsEntity.js';
 import AboutEntity from './aboutEntity.js';
 import ZXWaitForAudioEventEntity from './svision/js/platform/canvas2D/zxSpectrum/zxWaitForAudioEventEntity.js';
 import Tool from './svision/js/tool.js';
@@ -43,7 +43,7 @@ export class MenuModel extends AbstractModel {
       {t1: 'HALL OF FAME', event: {id: 'showHallOfFame'}},
       {t1: 'SOUNDS', event: {id: 'setSounds'}},
       {t1: 'MUSIC', event: {id: 'setMusic'}},
-      {t1: 'CONTROLS', event: {id: 'setControls'}},
+      {t1: 'SETTINGS', event: {id: 'setSettings'}},
       {t1: 'SHOW TAPE LOADING', event: {id: 'startTapeLoading'}},
       {t1: 'ABOUT GAME', event: {id: 'showAbout'}}
     ];
@@ -222,8 +222,8 @@ export class MenuModel extends AbstractModel {
         this.desktopEntity.addModalEntity(new ZXVolumeEntity(this.desktopEntity, 27, 24, 202, 134, 'music', 'audioBusMusicLevel', 'exampleInGameMelody'));
         return true;
 
-      case 'setControls':
-        this.desktopEntity.addModalEntity(new ZXControlsEntity(this.desktopEntity, 27, 24, 202, 134, this.app.controlsOptions));
+      case 'setSettings':
+        this.desktopEntity.addModalEntity(new ZXSettingsEntity(this.desktopEntity, 27, 24, 202, 134, this.app.controlsOptions));
         return true;
 
       case 'startTapeLoading':
