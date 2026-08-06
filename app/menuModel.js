@@ -1,6 +1,7 @@
 /**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
+const { ButtonEntity } = await import('./svision/js/platform/canvas2D/buttonEntity.js?ver='+window.srcVersion);
 const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion);
 const { MenuEntity } = await import('./svision/js/platform/canvas2D/menuEntity.js?ver='+window.srcVersion);
 const { SignboardFonts } = await import('./signboardFonts.js?ver='+window.srcVersion);
@@ -16,6 +17,7 @@ const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxCo
 /*/
 import AbstractModel from './svision/js/abstractModel.js';
 import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
+import ButtonEntity from './svision/js/platform/canvas2D/buttonEntity.js';
 import BorderEntity from './borderEntity.js';
 import MenuEntity from './svision/js/platform/canvas2D/menuEntity.js';
 import SignboardFonts from './signboardFonts.js';
@@ -92,6 +94,8 @@ export class MenuModel extends AbstractModel {
     this.wave = [0, 2, 4, 5, 6, 7, 7, 7, 6, 5, 4, 2, 0, -2, -4, -5, -6, -7, -7, -7, -6, -5, -4, -2];
     this.waveCounter = 0;
     this.willyEntity = null;
+    this.versionEntity = null;
+    this.newVersionAvailable = false;
     this.gameFrame = 0;
     this.dataLoaded = false;
   } // constructor
@@ -122,7 +126,13 @@ export class MenuModel extends AbstractModel {
     this.sighboardEntity = new TextEntity(this.desktopEntity, signboardFonts, 144, 6, 93, 10, 'JET SET WILlY', '#5b5b5bff', false, {scale: 2, animationMode: 'flashPenColor', flashColor: '#9b9b9bff'});
     this.desktopEntity.addEntity(this.sighboardEntity);
 
-    this.desktopEntity.addEntity(new TextEntity(this.desktopEntity, this.app.fonts.fonts5x5, 185, 158, 55, 5, 'Ⓥ'+this.app.version, '#a0a0a0', false, {align: 'right'}));
+    this.versionEntity = new ButtonEntity(this.desktopEntity, this.app.fonts.fonts5x5, 185, 158, 55, 5, 'Ⓥ'+this.app.version, {id: 'upgradeApp'}, [], '#a0a0a0', false, {align: 'right'});
+    this.desktopEntity.addEntity(this.versionEntity);
+    // suppress the hover/click colors resolved in init(), so the button always
+    // looks like plain text
+    this.versionEntity.hoverColor = false;
+    this.versionEntity.clickColor = false;
+    this.checkServerVersion();
 
     this.copyrightEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, this.app.copyright, ZXColor.black, false, {align: 'center'});
     this.desktopEntity.addEntity(this.copyrightEntity);
@@ -134,6 +144,24 @@ export class MenuModel extends AbstractModel {
     
     this.sendEvent(0, {id: 'closeAllAudioBuses'});
   } // init
+
+  checkServerVersion() {
+    // A dedicated receiver, so the request does not clash with the model's own
+    // menu.data fetch (one fetchDataId slot and setData per receiver).
+    var receiver = {
+      id: this.id+'Version',
+      fetchDataId: '',
+      setData: (data) => {
+        if (data.data.version && data.data.version !== 'unknown' && data.data.version !== this.app.version) {
+          this.newVersionAvailable = true;
+          this.versionEntity.setText('UPGRADE !');
+          this.versionEntity.setPenColor(ZXColor.brightRed);
+        }
+      },
+      errorData: () => {}
+    };
+    receiver.fetchDataId = this.app.fetchData('version.db', false, {}, receiver);
+  } // checkServerVersion
 
   getMenuData(self, key, row) {
     switch (key) {
@@ -239,6 +267,12 @@ export class MenuModel extends AbstractModel {
     
       case 'showAbout':
         this.desktopEntity.addModalEntity(new AboutEntity(this.desktopEntity, 27, 25, 202, 138));
+        return true;
+
+      case 'upgradeApp':
+        if (this.newVersionAvailable) {
+          this.app.upgradeApp();
+        }
         return true;
 
       case 'changeFlashState':
