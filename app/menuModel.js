@@ -122,6 +122,8 @@ export class MenuModel extends AbstractModel {
     this.sighboardEntity = new TextEntity(this.desktopEntity, signboardFonts, 144, 6, 93, 10, 'JET SET WILlY', '#5b5b5bff', false, {scale: 2, animationMode: 'flashPenColor', flashColor: '#9b9b9bff'});
     this.desktopEntity.addEntity(this.sighboardEntity);
 
+    this.desktopEntity.addEntity(new TextEntity(this.desktopEntity, this.app.fonts.fonts5x5, 185, 158, 55, 5, 'Ⓥ'+this.app.version, '#a0a0a0', false, {align: 'right'}));
+
     this.copyrightEntity = new TextEntity(this.desktopEntity, this.app.fonts.zxFonts8x8, 0, 23*8, 32*8, 8, this.app.copyright, ZXColor.black, false, {align: 'center'});
     this.desktopEntity.addEntity(this.copyrightEntity);
 
