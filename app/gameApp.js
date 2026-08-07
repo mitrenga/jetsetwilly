@@ -69,7 +69,7 @@ export class GameApp extends AbstractApp {
       '←': {width: 6, data: [[0,2,6,1], [1,1,1,3], [2,0,1,5]]},
       '↓': {width: 5, data: [[2,0,1,5], [1,3,3,1], [0,2,5,1]]},
       '↑': {width: 5, data: [[2,0,1,5], [1,1,3,1], [0,2,5,1]]},
-      '➔': {width: 6, data: [[0,2,6,1], [4,1,1,3], [3,0,1,5]]},
+      '→': {width: 6, data: [[0,2,6,1], [4,1,1,3], [3,0,1,5]]},
       // blinking cursor for the key-remap screen
       '█': {width: 4, data: [[0,0,4,5]]},
       // devModeName banner decoration
