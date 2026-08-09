@@ -11,7 +11,8 @@
     'mansion\'s strange inhabitants.</p>'.
     '<p>This is a faithful remake of the original game that runs directly in your web browser. '.
     'There is nothing to install and nothing to download — just open the page and play. '.
-    'Please enable JavaScript to start the game.</p>';
+    'Please enable JavaScript to start the game.</p>'.
+    '<p><a href="about">More about Jet Set Willy and this remake</a></p>';
   $appOpenGraph = [
     'image' => 'images/poster.png',
   ];
