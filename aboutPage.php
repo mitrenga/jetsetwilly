@@ -39,7 +39,7 @@ class AboutPage extends AbstractAboutPage {
       ],
       'footer' =>
         '<p>An unofficial fan remake. The original game and its artwork belong to their authors. '.
-        'Remake source code is available on <a href="https://github.com/mitrenga" target="_blank" rel="noopener">GitHub</a>.</p>',
+        'Remake source code is available on <a href="https://github.com/mitrenga/jetsetwilly" target="_blank" rel="noopener">GitHub</a>.</p>',
     ];
   } // aboutData
 
