@@ -39,6 +39,27 @@ https://jetsetwilly.free
 - build the production bundle: ~/app/svision/tools/svtool build bundle
 
 
+## Developer mode
+Developer mode is switched in `~/config/config.php` (both settings are optional; without them the app runs in production mode):
+
+```php
+$devMode = true;
+$devModeName = '.{\"penColor\":\"#000000\",\"bkColor\":\"#fefe00\",\"width\":185}◢◤ ◢◤ ◢◤ ◢◤  DEVELOPER MODE ◢◤ ◢◤ ◢◤ ◢◤';
+```
+
+`$devMode` values:
+- `true` — development: JS sources are served directly instead of the bundle and the service worker is unregistered/bypassed
+- `['serviceWorker' => true]` — development, but the service worker stays enabled (for testing SW behavior against a built `js/` deploy)
+- `false` or not set — production: minified bundle + service worker
+
+`$devModeName` is a label rendered in the top border of the game screen, so a development instance is recognizable at a glance. Set it to `false` (or leave it empty) to hide the label. The value is either plain text, or text prefixed with `.{...}` — a JSON object whose properties are applied to the label's TextEntity, typically:
+- `penColor` — text color
+- `bkColor` — background color
+- `width` — label width in game pixels (the text is centered inside it)
+
+The config is written into a double-quoted JavaScript string, so quotes inside the JSON prefix must be escaped as `\"` (see the example above).
+
+
 ## Build & tooling
 The `svtool` CLI (`~/app/svision/tools/svtool`) builds and checks the deploy. Run it from the project root:
 - `svtool build bundle` — minified production bundle `js/bundle.<version>.min.js` (requires terser)
