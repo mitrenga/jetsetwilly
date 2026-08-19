@@ -266,7 +266,7 @@ export class MenuModel extends AbstractModel {
         return true;
     
       case 'showAbout':
-        this.desktopEntity.addModalEntity(new AboutEntity(this.desktopEntity, 27, 25, 202, 138));
+        this.desktopEntity.addModalEntity(new AboutEntity(this.desktopEntity, 27, 25, 202, 147));
         return true;
 
       case 'upgradeApp':
