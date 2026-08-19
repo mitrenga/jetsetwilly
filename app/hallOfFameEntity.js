@@ -25,9 +25,9 @@ export class HallOfFameEntity extends AbstractEntity {
   init() {
     super.init();
     
-    this.addEntity(new AbstractEntity(this, 0, 6, this.width, this.height-6, false, ZXColor.black));
-    this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, 64, 7, 'HALL OF FAME', ZXColor.brightWhite, ZXColor.black, {topMargin: 1, leftMargin: 2}));
-    this.addEntity(new AbstractEntity(this, 1, 7, this.width-2, this.height-8, false, ZXColor.brightWhite));
+    this.addEntity(new AbstractEntity(this, 0, 0, this.width, this.height, false, ZXColor.black));
+    this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, this.width, 9, 'HALL OF FAME', ZXColor.brightWhite, false, {align: 'center', topMargin: 2}));
+    this.addEntity(new AbstractEntity(this, 1, 9, this.width-2, this.height-10, false, ZXColor.yellow));
     this.noteEntity = new SlidingTextEntity(this, this.app.fonts.fonts5x5, 8, this.height-12, this.width-55, 5, "                                                    Only results from standard games started in the Bathroom are recorded. Continued games are not included.                                                    ", ZXColor.brightRed, false, {animation: 'loopLeft'});
     this.addEntity(this.noteEntity);
     this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', {id: 'closeHallOfFame'}, ['Enter', 'Escape', ' ', 'GamepadOK', 'GamepadExit'], ZXColor.brightWhite, ZXColor.brightBlue, {align: 'center', margin: 4}));
@@ -47,7 +47,7 @@ export class HallOfFameEntity extends AbstractEntity {
       var scoreColor = false;
       var scoreText = '';
       if (Number(data.data[i].completed) != 0) {
-        scoreColor = ZXColor.green;
+        scoreColor = ZXColor.magenta;
         scoreText = 'COMPLETED';
       } else {
         scoreColor = ZXColor.black;
