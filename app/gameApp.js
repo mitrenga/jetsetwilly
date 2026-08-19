@@ -264,8 +264,12 @@ export class GameApp extends AbstractApp {
 
   setModel(model) {
     if (model == 'MenuModel' && this.globalData === false) {
-      this.showErrorMessage('Game data could not be loaded.', 'restart');
-      return;
+      // the fetch may still be pending or has failed: as a last resort try the
+      // data cached in localStorage before bothering the user
+      if (!this.loadGlobalDataFromStorage()) {
+        this.showErrorMessage('Game data could not be loaded.', 'retry');
+        return;
+      }
     }
     var needResizeApp = false;
     var selectionItem = 0;
@@ -384,15 +388,22 @@ export class GameApp extends AbstractApp {
     this.applyGlobalData(data.data.global);
 
     Object.keys(data.data).forEach((key) => {
-      this.saveDataToStorage(key, data.data[key]);
+      if (key != 'global') {
+        this.saveDataToStorage(key, data.data[key]);
+      }
     });
+    // save global last: its presence in storage marks the whole appData save
+    // as complete, which the offline fallback relies on
+    this.saveDataToStorage('global', data.data.global);
   } // setGlobalData
 
   // Load the application data: from the server when online (which also refreshes
   // localStorage), or rehydrate the global data from localStorage when offline.
+  // The timeout covers an unreachable server with the device still online:
+  // without it the request may hang far longer than the boot sequence.
   loadAppData() {
     if (navigator.onLine) {
-      this.fetchDataId = this.fetchData('appData.db', false, {}, this);
+      this.fetchDataId = this.fetchData('appData.db', false, {}, this, 2000);
     } else {
       this.loadGlobalDataFromStorage();
     }
@@ -416,11 +427,21 @@ export class GameApp extends AbstractApp {
   } // setData
 
   errorData(error) {
-    // The network request failed (offline, or navigator.onLine reported a false
-    // positive). Fall back to the data cached in localStorage; if none exists,
+    // The network request failed (offline, unreachable server, or the fetch
+    // timeout). Fall back to the data cached in localStorage; if none exists,
     // log it and let the MenuModel guard surface the error to the user.
     if (!this.loadGlobalDataFromStorage()) {
       console.error(error.message ? error.message : error);
+      return;
+    }
+    // Resume a boot that already gave up waiting for this response (the user
+    // pressed IGNORE on the error panel and the app is stuck on the reset
+    // screen). Skip when the menu handover is still scheduled or the error
+    // panel is open — those paths reach the menu on their own.
+    if (this.model && this.model.id == 'ZXResetModel'
+        && !this.model.events.some((queued) => queued.id == 'setMenuModel')
+        && !this.model.desktopEntity.modalEntity) {
+      this.setModel('MenuModel');
     }
   } // errorData
 
