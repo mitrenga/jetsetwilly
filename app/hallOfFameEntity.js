@@ -15,10 +15,11 @@ import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
 
 export class HallOfFameEntity extends AbstractEntity {
 
-  constructor(parentEntity, x, y, width, height) {
+  constructor(parentEntity, x, y, width, height, bkColor) {
     super(parentEntity, x, y, width, height, false, false);
     this.id = 'HallOfFameEntity';
 
+    this.panelBkColor = bkColor;
     this.noteEntity = null;
   } // constructor
 
@@ -27,7 +28,7 @@ export class HallOfFameEntity extends AbstractEntity {
     
     this.addEntity(new AbstractEntity(this, 0, 0, this.width, this.height, false, ZXColor.black));
     this.addEntity(new TextEntity(this, this.app.fonts.fonts5x5, 0, 0, this.width, 9, 'HALL OF FAME', ZXColor.brightWhite, false, {align: 'center', topMargin: 2}));
-    this.addEntity(new AbstractEntity(this, 1, 9, this.width-2, this.height-10, false, ZXColor.yellow));
+    this.addEntity(new AbstractEntity(this, 1, 9, this.width-2, this.height-10, false, this.panelBkColor));
     this.noteEntity = new SlidingTextEntity(this, this.app.fonts.fonts5x5, 8, this.height-12, this.width-55, 5, "                                                    Only results from standard games started in the Bathroom are recorded. Continued games are not included.                                                    ", ZXColor.brightRed, false, {animation: 'loopLeft'});
     this.addEntity(this.noteEntity);
     this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, this.width-39, this.height-16, 36, 13, 'CLOSE', {id: 'closeHallOfFame'}, ['Enter', 'Escape', ' ', 'GamepadOK', 'GamepadExit'], ZXColor.brightWhite, ZXColor.brightBlue, {align: 'center', margin: 4}));

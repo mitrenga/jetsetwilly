@@ -13,10 +13,11 @@ import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
 
 export class AboutEntity extends AbstractEntity {
 
-  constructor(parentEntity, x, y, width, height) {
+  constructor(parentEntity, x, y, width, height, bkColor) {
     super(parentEntity, x, y, width, height, false, false);
-    this.id = 'AboutEntity';    
+    this.id = 'AboutEntity';
 
+    this.panelBkColor = bkColor;
     this.clickCounter = 0;
   } // constructor
 
@@ -25,7 +26,7 @@ export class AboutEntity extends AbstractEntity {
     
     this.addEntity(new AbstractEntity(this, 0, 0, this.width, this.height, false, ZXColor.black));
     this.addEntity(new ButtonEntity(this, this.app.fonts.fonts5x5, 0, 0, this.width, 9, 'ABOUT GAME', {id: 'clickLabel'}, [], ZXColor.brightWhite, false, {align: 'center', topMargin: 2, member: 'titleBar', hoverColor: ZXColor.black, clickColor: ZXColor.black}));
-    this.addEntity(new AbstractEntity(this, 1, 9, this.width-2, this.height-10, false, ZXColor.yellow));
+    this.addEntity(new AbstractEntity(this, 1, 9, this.width-2, this.height-10, false, this.panelBkColor));
 
     this.aboutText = 'JET SET WILLY IS A REMAKE OF THE ORIGINAL 1984 GAME BY MATTHEW SMITH.\n' +
                     'FUNNY THING IS, DURING DEVELOPMENT, I␣STUDIED THE ORIGINAL CODE AND CAME ' +
