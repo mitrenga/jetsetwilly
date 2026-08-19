@@ -72,7 +72,9 @@ export class MenuModel extends AbstractModel {
     // background colors of the dialog panels opened from the menu and of the
     // on-screen keyboard buttons in the player-name dialog
     this.dialogBkColor = ZXColor.brightWhite;
-    this.keyboardButtonsBkColor = ZXColor.brightYellow;
+    this.keyboardButtonsBkColor = '#9e9e9e';
+    this.keyboardButtonsHoverColor = '#cacaca';
+    this.keyboardButtonsClickColor = '#616161';
 
     this.sighboardEntity = null;
     this.copyrightEntity = null;
@@ -228,7 +230,7 @@ export class MenuModel extends AbstractModel {
     switch (event.id) {
       case 'startGame': 
         if (!this.app.playerName.length) {
-          this.desktopEntity.addModalEntity(new ZXPlayerNameEntity(this.desktopEntity, 27, 24, 202, 134, true, this.dialogBkColor, this.keyboardButtonsBkColor));
+          this.desktopEntity.addModalEntity(new ZXPlayerNameEntity(this.desktopEntity, 27, 24, 202, 134, true, this.dialogBkColor, this.keyboardButtonsBkColor, this.keyboardButtonsHoverColor, this.keyboardButtonsClickColor));
           return true;
         } else {
           if (this.app.inputEventsManager.needEventForAudio()) {
@@ -241,7 +243,7 @@ export class MenuModel extends AbstractModel {
         return true;
 
       case 'setPlayerName':
-        this.desktopEntity.addModalEntity(new ZXPlayerNameEntity(this.desktopEntity, 27, 24, 202, 134, false, this.dialogBkColor, this.keyboardButtonsBkColor));
+        this.desktopEntity.addModalEntity(new ZXPlayerNameEntity(this.desktopEntity, 27, 24, 202, 134, false, this.dialogBkColor, this.keyboardButtonsBkColor, this.keyboardButtonsHoverColor, this.keyboardButtonsClickColor));
       return true;
       
       case 'showHallOfFame':
