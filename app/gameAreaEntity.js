@@ -759,6 +759,18 @@ export class GameAreaEntity extends AbstractEntity {
   } // updateData
 
 
+  // override of AbstractEntity.cleanCache - called from setBkColor and setMonochromeColors,
+  // invalidates the layout caches so the monochrome colors get repainted
+  cleanCache() {
+    this.drawingCache[0].cleanCache();
+    this.drawingCache[1].cleanCache();
+    this.drawingCache[2].cleanCache();
+    this.drawingCache[3].cleanCache();
+    Object.keys(this.graphicCache).forEach((attr) => {
+      this.graphicCache[attr].cleanCache();
+    });
+  } // cleanCache
+
   penColorByAttr(attr) {
     if (this.monochromeColor) {
       return this.monochromeColor;
@@ -780,7 +792,11 @@ export class GameAreaEntity extends AbstractEntity {
   } // restoreBkColor
 
   setMonochromeColors(monochromeColor, bkColor) {
-    this.monochromeColor = monochromeColor;
+    if (monochromeColor != this.monochromeColor) {
+      this.monochromeColor = monochromeColor;
+      // setBkColor invalidates the caches only when bkColor changes; the pen color change must do it too
+      this.cleanCache();
+    }
     this.setBkColor(bkColor);
 
     Object.keys(this.spriteEntities).forEach((objectsType) => {
