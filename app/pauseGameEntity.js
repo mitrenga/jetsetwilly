@@ -1,16 +1,8 @@
-/**/
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
 const { ButtonEntity } = await import('./svision/js/platform/canvas2D/buttonEntity.js?ver='+window.srcVersion);
 const { MenuEntity } = await import('./svision/js/platform/canvas2D/menuEntity.js?ver='+window.srcVersion);
 const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
-/*/
-import AbstractEntity from './svision/js/abstractEntity.js';
-import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
-import ButtonEntity from './svision/js/platform/canvas2D/buttonEntity.js';
-import MenuEntity from './svision/js/platform/canvas2D/menuEntity.js';
-import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
-/**/
 // begin code
 
 export class PauseGameEntity extends AbstractEntity {
@@ -130,5 +122,3 @@ export class PauseGameEntity extends AbstractEntity {
   } // handleEvent
 
 } // PauseGameEntity
-
-export default PauseGameEntity;

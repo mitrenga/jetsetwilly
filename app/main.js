@@ -1,12 +1,6 @@
-/**/
 const { GameApp } = await import('./gameApp.js?ver='+window.srcVersion);
 const { appPlatform } = await import('./appPlatform.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
-/*/
-import GameApp from './gameApp.js';
-import appPlatform from './appPlatform.js';
-import Tool from './svision/js/tool.js';
-/**/
 // begin code
 
 var gameApp = new GameApp(appPlatform(), window.importPath, window.wsURL, window.devModeName, window.appIconSprite);

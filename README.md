@@ -63,7 +63,7 @@ The config is written into a double-quoted JavaScript string, so quotes inside t
 ## Build & tooling
 The `svtool` CLI (`~/app/svision/tools/svtool`) builds and checks the deploy. Run it from the project root:
 - `svtool build bundle` — minified production bundle `js/bundle.<version>.min.js` (requires terser)
-- `svtool build import-from` — source mirrors in `js/` for browsers without dynamic `import()` (e.g. older devices)
+- `svtool build debug-bundle` — the same concatenation left unminified, `js/bundle.<version>.js`, for debugging on a device whose console cannot be opened
 - `svtool verify` — check the `js/` deploy is complete, matches the current sources, and stays within ES2018 (authoritative via es-check if installed, otherwise a heuristic scan)
 - `svtool info` — show the app version, deploy state and the most recent database records
 - `svtool clean` — remove everything generated from `js/`
@@ -74,7 +74,7 @@ Optional — run `svtool` from anywhere and enable bash completion (adjust the p
 
 Open a new shell afterwards, then run `svtool <command>` from any project root.
 
-Production serves the bundle; in development the sources are served directly (await-import) or as mirrors (import-from).
+Production serves the bundle; in development, with no bundle built, the sources under `app/` are served and loaded one by one through dynamic `import()`.
 
 
 ## License

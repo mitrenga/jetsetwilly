@@ -1,8 +1,4 @@
-/**/
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
-/*/
-import AbstractEntity from './svision/js/abstractEntity.js';
-/**/
 // begin code
 
 export class PillarEntity extends AbstractEntity {
@@ -39,5 +35,3 @@ export class PillarEntity extends AbstractEntity {
   } // drawEntity
 
 } // PillarEntity
-
-export default PillarEntity;

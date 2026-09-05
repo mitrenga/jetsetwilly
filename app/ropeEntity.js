@@ -1,8 +1,4 @@
-/**/
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
-/*/
-import AbstractEntity from './svision/js/abstractEntity.js';
-/**/
 // begin code
 
 export class RopeEntity extends AbstractEntity {
@@ -17,5 +13,3 @@ export class RopeEntity extends AbstractEntity {
   } // drawEntity
 
 } // RopeEntity
-
-export default RopeEntity;

@@ -1,8 +1,4 @@
-/**/
 const { AbstractFonts } = await import('./svision/js/abstractFonts.js?ver='+window.srcVersion);
-/*/
-import AbstractFonts from './svision/js/abstractFonts.js';
-/**/
 // begin code
 
 export class SignboardFonts extends AbstractFonts {
@@ -38,5 +34,3 @@ export class SignboardFonts extends AbstractFonts {
   } // getCharData
 
 } // SignboardFonts
-
-export default SignboardFonts;

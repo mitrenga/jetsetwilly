@@ -1,4 +1,3 @@
-/**/
 const { Version } = await import('./version.js?ver='+window.srcVersion);
 const { AbstractApp } = await import('./svision/js/abstractApp.js?ver='+window.srcVersion);
 const { AudioManager } = await import('./audioManager.js?ver='+window.srcVersion);
@@ -15,24 +14,6 @@ const { TapeLoadingModel } = await import('./tapeLoadingModel.js?ver='+window.sr
 const { ZXErrorEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxErrorEntity.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
-/*/
-import Version from './version.js';
-import AbstractApp from './svision/js/abstractApp.js';
-import AudioManager from './audioManager.js';
-import ZXFonts8x8 from './svision/js/platform/canvas2D/zxSpectrum/zxFonts8x8.js';
-import Fonts5x5 from './svision/js/platform/canvas2D/fonts5x5.js';
-import Fonts3x3 from './svision/js/platform/canvas2D/fonts3x3.js';
-import ZXResetModel from './svision/js/platform/canvas2D/zxSpectrum/zxResetModel.js';
-import MenuModel from './menuModel.js';
-import MainModel from './mainModel.js';
-import RoomsMapModel from './roomsMapModel.js';
-import RoomModel from './roomModel.js';
-import GameOverModel from './gameOverModel.js';
-import TapeLoadingModel from './tapeLoadingModel.js';
-import ZXErrorEntity from './svision/js/platform/canvas2D/zxSpectrum/zxErrorEntity.js';
-import Tool from './svision/js/tool.js';
-import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
-/**/
 // begin code
 
 export class GameApp extends AbstractApp {
@@ -462,5 +443,3 @@ export class GameApp extends AbstractApp {
   } // showErrorMessage
   
 } // GameApp
-
-export default GameApp;

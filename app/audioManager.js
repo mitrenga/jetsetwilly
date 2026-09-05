@@ -1,16 +1,8 @@
-/**/
 const { AbstractAudioManager } = await import('./svision/js/audio/abstractAudioManager.js?ver='+window.srcVersion);
 const { AudioWorkletHandler } = await import('./svision/js/audio/audioWorkletHandler.js?ver='+window.srcVersion);
 const { AudioScriptProcessorHandler } = await import('./svision/js/audio/audioScriptProcessorHandler.js?ver='+window.srcVersion);
 const { AudioSilentHandler } = await import('./svision/js/audio/audioSilentHandler.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
-/*/
-import AbstractAudioManager from './svision/js/audio/abstractAudioManager.js';
-import AudioWorkletHandler from './svision/js/audio/audioWorkletHandler.js';
-import AudioScriptProcessorHandler from './svision/js/audio/audioScriptProcessorHandler.js';
-import AudioSilentHandler from './svision/js/audio/audioSilentHandler.js';
-import Tool from './svision/js/tool.js';
-/**/
 // begin code
 
 export class AudioManager extends AbstractAudioManager {
@@ -532,5 +524,3 @@ export class AudioManager extends AbstractAudioManager {
   } // keyboardSound
 
 } // AudioManager
-
-export default AudioManager;

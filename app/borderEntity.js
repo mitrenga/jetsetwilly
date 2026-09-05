@@ -1,16 +1,8 @@
-/**/
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { ButtonEntity } = await import('./svision/js/platform/canvas2D/buttonEntity.js?ver='+window.srcVersion);
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
-/*/
-import AbstractEntity from './svision/js/abstractEntity.js';
-import ButtonEntity from './svision/js/platform/canvas2D/buttonEntity.js';
-import TextEntity from './svision/js/platform/canvas2D/textEntity.js';
-import Tool from './svision/js/tool.js';
-import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
-/**/
 // begin code
 
 export class BorderEntity  extends AbstractEntity {
@@ -197,5 +189,3 @@ export class BorderEntity  extends AbstractEntity {
   } // handleEvent
 
 } // BorderEntity
-
-export default BorderEntity;

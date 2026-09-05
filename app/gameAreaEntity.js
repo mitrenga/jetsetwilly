@@ -1,4 +1,3 @@
-/**/
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { DrawingCache } = await import('./svision/js/platform/canvas2D/drawingCache.js?ver='+window.srcVersion);
 const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
@@ -6,15 +5,6 @@ const { SpriteTool } = await import('./svision/js/spriteTool.js?ver='+window.src
 const { RopeEntity } = await import('./ropeEntity.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
-/*/
-import AbstractEntity from './svision/js/abstractEntity.js';
-import DrawingCache from './svision/js/platform/canvas2D/drawingCache.js';
-import SpriteEntity from './svision/js/platform/canvas2D/spriteEntity.js';
-import SpriteTool from './svision/js/spriteTool.js';
-import RopeEntity from './ropeEntity.js';
-import Tool from './svision/js/tool.js';
-import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
-/**/
 // begin code
 
 export class GameAreaEntity extends AbstractEntity {
@@ -820,5 +810,3 @@ export class GameAreaEntity extends AbstractEntity {
   } // setMonochromeColors
 
 } // GameAreaEntity
-
-export default GameAreaEntity;

@@ -1,18 +1,9 @@
-/**/
 const { AbstractModel } = await import('./svision/js/abstractModel.js?ver='+window.srcVersion);
 const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion);
 const { RoomMapEntity } = await import('./roomMapEntity.js?ver='+window.srcVersion);
 const { RoomSelectionEntity } = await import('./roomSelectionEntity.js?ver='+window.srcVersion);
 const { PauseGameEntity } = await import('./pauseGameEntity.js?ver='+window.srcVersion);
 const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
-/*/
-import AbstractModel from './svision/js/abstractModel.js';
-import BorderEntity from './borderEntity.js';
-import RoomMapEntity from './roomMapEntity.js';
-import RoomSelectionEntity from './roomSelectionEntity.js';
-import PauseGameEntity from './pauseGameEntity.js';
-import ZXColor from './svision/js/platform/canvas2D/zxSpectrum/zxColor.js';
-/**/
 // begin code
 
 export class RoomsMapModel extends AbstractModel {
@@ -422,5 +413,3 @@ export class RoomsMapModel extends AbstractModel {
   } // loopModel
 
 } // RoomsMapModel
-
-export default RoomsMapModel;
