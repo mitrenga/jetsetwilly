@@ -3,6 +3,7 @@ const { AudioWorkletHandler } = await import('./svision/js/audio/audioWorkletHan
 const { AudioScriptProcessorHandler } = await import('./svision/js/audio/audioScriptProcessorHandler.js?ver='+window.srcVersion);
 const { AudioSilentHandler } = await import('./svision/js/audio/audioSilentHandler.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
+const { ZXMachineSounds } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxMachineSounds.js?ver='+window.srcVersion);
 // begin code
 
 export class AudioManager extends AbstractAudioManager {
@@ -78,10 +79,10 @@ export class AudioManager extends AbstractAudioManager {
       case 'itemSound': return this.itemSound(sampleRate);
       case 'arrowSound': return this.arrowSound(sampleRate);
       case 'gameOverSound': return this.gameOverSound(sampleRate);
-      case 'tapePilotToneSound': return this.tapePilotToneSound(sampleRate);
-      case 'tapeRndDataSound': return this.tapeRndDataSound(sampleRate);
-      case 'basicBeepsSound': return this.basicBeepsSound(sampleRate);
-      case 'keyboardSound': return this.keyboardSound(sampleRate);
+      case 'tapePilotToneSound': return ZXMachineSounds.tapePilotTone(sampleRate, this.volumeLevel(this.volume.sounds));
+      case 'tapeRndDataSound': return ZXMachineSounds.tapeRndData(sampleRate, this.volumeLevel(this.volume.sounds));
+      case 'basicBeepsSound': return ZXMachineSounds.basicBeeps(sampleRate, this.volumeLevel(this.volume.sounds));
+      case 'keyboardSound': return ZXMachineSounds.keyClick(sampleRate, this.volumeLevel(this.volume.sounds));
      }
     return false;
   } // audioData
@@ -472,55 +473,5 @@ export class AudioManager extends AbstractAudioManager {
     pulses = this.resizeArray(pulses, pulsesCounter);
     return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
   } // gameOverSound
-
-  tapePilotToneSound(sampleRate) {
-    // T-state is 1/3500000 = 0.0000002867 sec. 
-    // leader pulse is 2168 T-states long and is repeated 8063 times for header blocks and 3223 times for data blocks
-    var pulse = Math.ceil(sampleRate*2168/3500000);
-    var fragments = [pulse];
-    var pulses = [0];
-    return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
-  } // tapePilotToneSound
-
-  tapeRndDataSound(sampleRate) {
-    // two sync pulses of 667 and 735 T-states
-    var f667 = Math.ceil(sampleRate*667/3500000);
-    var f735 = Math.ceil(sampleRate*735/3500000);
-    // data is encoded as two 855 T-state pulses for binary zero, and two 1710 T-state pulses for binary one
-    var f885 = Math.ceil(sampleRate*855/3500000);
-    var f1710 = Math.ceil(sampleRate*1710/3500000);
-
-    var fragments = [f667, f735, f885, f1710];
-    var pulses = [0, 0, 1, 1];
-    return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds), infinityRndPulses: {fragments: [2, 3], quantity: 2}};
-  } // tapeRndDataSound
-
-  basicBeepsSound(sampleRate) {
-    var beeps = [261.626, 293.665, 329.628, 369.994, 415.305, 466.164, 523.251];
-    
-    var fragments = [];
-    for (var x = 0; x < beeps.length; x++) {
-      fragments.push(Math.ceil(sampleRate/beeps[x]/2));
-    }
-    fragments.push(Math.ceil(sampleRate/44));
-
-    var pulses = [];
-    for (var x = 0; x < beeps.length; x++) {
-      var duration = 0;
-      do {
-        pulses.push(x);
-        duration = duration+fragments[x];
-      } while (duration < sampleRate/10);
-      pulses.push(beeps.length);
-    }
-    return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
-  } // basicBeepsSound
-
-  keyboardSound(sampleRate) {
-    var pulse = Math.ceil(15*sampleRate/44100);
-    var fragments = [pulse];
-    var pulses = [0];
-    return {fragments: fragments, pulses: pulses, volume: this.volumeLevel(this.volume.sounds)};
-  } // keyboardSound
 
 } // AudioManager
