@@ -3,7 +3,7 @@
 class DataCommand {
    
    var $files = [
-      'global', 'menu',
+      'global', 'menu', 'intro',
       'room00', 'room01', 'room02', 'room03', 'room04', 'room05', 'room06', 'room07', 'room08', 'room09', 'room10', 'room11',
       'room12', 'room13', 'room14', 'room15', 'room16', 'room17', 'room18', 'room19', 'room20', 'room21', 'room22', 'room23',
       'room24', 'room25', 'room26', 'room27', 'room28', 'room29', 'room30', 'room31', 'room32', 'room33', 'room34', 'room35',

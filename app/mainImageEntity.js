@@ -1,104 +1,167 @@
-const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
+const { RasterEntity } = await import('./svision/js/platform/canvas2D/rasterEntity.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
 // begin code
 
-export class MainImageEntity extends AbstractEntity {
+/**
+ * The title picture, built the way the original builds it: 16 rows of
+ * attribute bytes (data/intro.json) and, for every cell, a shape chosen by the
+ * attribute's code — the sloping edges of the letters are two kinds of
+ * staircase, mirrored on odd columns. The colours cycle by attribute
+ * arithmetic while the menu runs (`attrStep`, set by MainModel every frame),
+ * and at rest the attribute 211 flashes with the machine's FLASH phase.
+ *
+ * It is a {@link RasterEntity}: the picture is painted into the frame with
+ * {@link RasterEntity#paintRect} and repainted only when `attrStep` or the
+ * FLASH phase changes — the setter of `attrStep` invalidates the frame, so the
+ * model keeps assigning it as before. Until 2026-09-07 the same 500-odd
+ * rectangles went straight onto the main canvas on every display frame.
+ *
+ * The attributes come with appData (db/appData.php) and are read from
+ * localStorage in init(), synchronously, the same way every room reads its own
+ * file. The children (the sliding text, the menu box) are drawn over it.
+ */
+export class MainImageEntity extends RasterEntity {
 
   constructor(parentEntity, x, y, width, height) {
     super(parentEntity, x, y, width, height);
     this.id = 'MainImageEntity';
-    this.attrStep = 0;
 
-    this.introImageAttributes = [
-      "0000000000000000000000000000000000000000000000000000000000000000",
-      "0000000000000000000000000000000000000000000000000000000000000000",
-      "0000000000000000000000000000000000002828050500000000000000000000",
-      "00000000D3D3D300D3D3D300D3D3D30028D3D3D325D3D3D300D3D3D300000000",
-      "0000000000D30000D300000000D328282DD3252524D300000000D30000000000",
-      "0000000000D30000D3D3D30028D32D2D25D3D3D324D3D3D30000D30000000000",
-      "0000000000D30000D30028282DD3252524240CD324D300000000D30000000000",
-      "00000000D3D30000D3D3D32D25D3242404D3D3D324D3D3D30000D30000000000",
-      "000000000000000029292D2D2C2C040400000909242400000000000000000000",
-      "0000000000000000090929292D2D050500000909242400000000000000000000",
-      "000000000000D3000808D309D329D32D0505D30924D3000000D3000000000000",
-      "000000000000D3000000D308D309D3292D2DD30924D3000000D3000000000000",
-      "000000000000D300D300D300D308D3092929D30924D3D3D3D3D3000000000000",
-      "000000000000D300D300D300D300D3080909D309242400D30000000000000000",
-      "000000000000D3D3D3D3D300D300D3D3D308D3D3D32400D30000000000000000",
-      "0000000000000000000000000000000000000808040400000000000000000000"
-    ]; // introImageAttributes
+    /** 16 rows of 32 attribute bytes as hex, from data/intro.json */
+    this.attributes = null;
+    this.attrStepValue = 0;
+    // attribute 211 flashes at rest
+    this.watchFlash = true;
   } // constructor
-  
-  drawEntity() {
-    var attr = 0;
-    if (this.attrStep > 0) {
-      attr = (((attr&56)+(this.attrStep<<3))&56)+(((attr&7)+this.attrStep)&7);
+
+  init() {
+    super.init();
+    this.fetchData('intro.data', {key: 'intro', when: 'required'}, {});
+  } // init
+
+  /**
+   * Takes the attributes when they arrive and passes whatever comes on to the
+   * children, as every entity does.
+   * @param {Object} data - {url, source, data}; the picture has `data.attributes`.
+   */
+  setData(data) {
+    if (data && data.data && data.data.attributes) {
+      this.attributes = data.data.attributes;
+      this.invalidate();
     }
-    this.app.layout.paint(this, 0, 0, this.width, this.height, ZXColor.bkAttrColor(attr));
+    super.setData(data);
+  } // setData
+
+  /**
+   * The step of the colour cycle, 0 at rest. Assigning a different value
+   * repaints the picture on the next draw; assigning the same one costs nothing.
+   * @type {number}
+   */
+  get attrStep() {
+    return this.attrStepValue;
+  }
+
+  set attrStep(value) {
+    if (value !== this.attrStepValue) {
+      this.attrStepValue = value;
+      this.invalidate();
+    }
+  }
+
+  /**
+   * An attribute after `attrStep` steps of the colour cycle: ink and paper each
+   * advanced by the step, modulo 8, bright and flash untouched.
+   * @param {number} attr - The attribute byte.
+   * @returns {number} The cycled attribute.
+   */
+  cycled(attr) {
+    if (this.attrStepValue == 0) {
+      return attr;
+    }
+    return (((attr&56)+(this.attrStepValue<<3))&56)+(((attr&7)+this.attrStepValue)&7);
+  } // cycled
+
+  /**
+   * Nothing is drawn before the attributes have arrived.
+   */
+  drawEntity() {
+    if (this.attributes === null) {
+      return;
+    }
+    super.drawEntity();
+  } // drawEntity
+
+  /**
+   * Paints the picture: the ground in the cycled colour of attribute 0, then
+   * every non-empty cell's paper and its shape in its ink.
+   * @param {Uint8ClampedArray} data - The RGBA bytes of the frame.
+   */
+  paintRaster(data) {
+    this.pixels.fill(RasterEntity.colorValue(ZXColor.bkAttrColor(this.cycled(0))));
     for (var block = 0; block < 2; block++) {
       for (var row = 0; row < 8; row++) {
         for (var column = 0; column < 32; column++) {
-          var hexAttr = this.introImageAttributes[block*8+row].substring(column*2, column*2+2);
-          if (hexAttr != '00') {
-            attr = Tool.hexToInt(hexAttr);
-            if (this.attrStep == 0) {
-              if (this.app.stack.flashState) {
-                if (attr == 211) {
-                  attr = 218;
-                }
+          var hexAttr = this.attributes[block*8+row].substring(column*2, column*2+2);
+          if (hexAttr == '00') {
+            continue;
+          }
+          var attr = Tool.hexToInt(hexAttr);
+          if (this.attrStepValue == 0) {
+            if (this.flashState && attr == 211) {
+              attr = 218;
+            }
+          } else {
+            attr = this.cycled(attr);
+          }
+          var bkColor = ZXColor.bkAttrColor(attr);
+          var penColor = ZXColor.penAttrColor(attr);
+          if (hexAttr == '2C') {
+            var tmpColor = bkColor;
+            bkColor = penColor;
+            penColor = tmpColor;
+          }
+          var x = column*8, y = (block*8+row)*8;
+          this.paintRect(x, y, 8, 8, bkColor);
+          switch (hexAttr) {
+            case '05':
+            case '08':
+            case '29':
+            case '2C':
+              // a staircase growing downwards; mirrored on odd columns
+              if (column%2 == 0) {
+                this.paintRect(x, y, 2, 1, penColor);
+                this.paintRect(x, y+1, 4, 1, penColor);
+                this.paintRect(x, y+2, 6, 1, penColor);
+                this.paintRect(x, y+3, 8, 5, penColor);
+              } else {
+                this.paintRect(x, y+4, 2, 1, penColor);
+                this.paintRect(x, y+5, 4, 1, penColor);
+                this.paintRect(x, y+6, 6, 1, penColor);
+                this.paintRect(x, y+7, 8, 1, penColor);
               }
-            } else {
-              attr = (((attr&56)+(this.attrStep<<3))&56)+(((attr&7)+this.attrStep)&7);
-            }
-            var bkColor = ZXColor.bkAttrColor(attr);
-            var penColor = ZXColor.penAttrColor(attr);
-            if (hexAttr == '2C') {
-              var tmpColor = bkColor;
-              bkColor = penColor;
-              penColor = tmpColor;
-            }
-            this.app.layout.paint(this, column*8, (block*8+row)*8, 8, 8, bkColor);
-            switch (hexAttr) {
-              case '05':
-              case '08':
-              case '29':
-              case '2C':
-                if (column%2 == 0) {
-                  this.app.layout.paint(this, column*8, (block*8+row)*8, 2, 1, penColor);
-                  this.app.layout.paint(this, column*8, (block*8+row)*8+1, 4, 1, penColor);
-                  this.app.layout.paint(this, column*8, (block*8+row)*8+2, 6, 1, penColor);
-                  this.app.layout.paint(this, column*8, (block*8+row)*8+3, 8, 5, penColor);
-                } else {
-                  this.app.layout.paint(this, column*8, (block*8+row)*8+4, 2, 1, penColor);
-                  this.app.layout.paint(this, column*8, (block*8+row)*8+5, 4, 1, penColor);
-                  this.app.layout.paint(this, column*8, (block*8+row)*8+6, 6, 1, penColor);
-                  this.app.layout.paint(this, column*8, (block*8+row)*8+7, 8, 1, penColor);
-                }
-                break;
+              break;
 
-              case '04':
-              case '0C':
-              case '25':
-              case '28':
-                if (column%2 == 0) {
-                  this.app.layout.paint(this, column*8, (block*8+row)*8, 8, 5, penColor);
-                  this.app.layout.paint(this, column*8, (block*8+row)*8+5, 6, 1, penColor);
-                  this.app.layout.paint(this, column*8, (block*8+row)*8+6, 4, 1, penColor);
-                  this.app.layout.paint(this, column*8, (block*8+row)*8+7, 2, 1, penColor);
-                } else {
-                  this.app.layout.paint(this, column*8, (block*8+row)*8, 8, 1, penColor);
-                  this.app.layout.paint(this, column*8, (block*8+row)*8+1, 6, 1, penColor);
-                  this.app.layout.paint(this, column*8, (block*8+row)*8+2, 4, 1, penColor);
-                  this.app.layout.paint(this, column*8, (block*8+row)*8+3, 2, 1, penColor);
-                }
-                break;
-            }
+            case '04':
+            case '0C':
+            case '25':
+            case '28':
+              // a staircase shrinking downwards; mirrored on odd columns
+              if (column%2 == 0) {
+                this.paintRect(x, y, 8, 5, penColor);
+                this.paintRect(x, y+5, 6, 1, penColor);
+                this.paintRect(x, y+6, 4, 1, penColor);
+                this.paintRect(x, y+7, 2, 1, penColor);
+              } else {
+                this.paintRect(x, y, 8, 1, penColor);
+                this.paintRect(x, y+1, 6, 1, penColor);
+                this.paintRect(x, y+2, 4, 1, penColor);
+                this.paintRect(x, y+3, 2, 1, penColor);
+              }
+              break;
           }
         }
       }
     }
-    super.drawSubEntities();
-  } // drawEntity
+  } // paintRaster
 
 } // MainImageEntity
