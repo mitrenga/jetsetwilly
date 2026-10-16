@@ -148,12 +148,12 @@ export class GameOverModel extends AbstractModel {
           this.gameEntity.options.penColorsMap[ch] = ZXColor.penAttrColor(this.colorCounter);
           this.colorCounter = Tool.cycleInc(this.colorCounter, 65, 71);
         }
-        this.gameEntity.drawingCache[0].cleanCache();
+        this.gameEntity.cleanCache();
         for (var ch = 0; ch < 4; ch++) {
           this.overEntity.options.penColorsMap[ch] = ZXColor.penAttrColor(this.colorCounter);
           this.colorCounter = Tool.cycleInc(this.colorCounter, 65, 71);
         }
-        this.overEntity.drawingCache[0].cleanCache();
+        this.overEntity.cleanCache();
       }
       var countdown = countdownLength-Math.floor((timestamp-this.timer-2000)/1000);
       if (countdown < 0) {

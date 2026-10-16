@@ -1,11 +1,18 @@
-const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
+const { RasterEntity } = await import('./svision/js/platform/canvas2D/rasterEntity.js?ver='+window.srcVersion);
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
-const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
 // begin code
 
-export class RoomMapEntity extends AbstractEntity {
+/**
+ * The 64x38 thumbnail of one room on the rooms map: the layout at a quarter of
+ * its size with a mark per kind of tile, ramps, conveyors, ropes, guardians,
+ * items and switches — rectangles, painted once into the frame of a
+ * {@link RasterEntity}. The map scrolls, so the thumbnail may stick out of its
+ * parent: the visible part is blitted through the crop cache, and the room's
+ * paper is painted under it on the main canvas for just that part.
+ */
+export class RoomMapEntity extends RasterEntity {
   
   constructor(parentEntity, x, y, roomNumber, roomsMapX, roomsMapY) {
     super(parentEntity, x, y, 64, 38, false, false);
@@ -115,7 +122,10 @@ export class RoomMapEntity extends AbstractEntity {
 
       this.app.layout.paint(this, moveX, moveY, cropWidth, cropHeight, roomBkColor);
 
-      if (this.drawingCache[0].preparePaint(this.width, this.height)) {
+      var cache = this.drawingCache[0];
+      if (cache.preparePaint(this.width, this.height)) {
+        var frame = this.frameBytes(cache);
+        this.pixels.fill(0);
 
         var graphicData = this.roomData.graphicData;
 
@@ -139,22 +149,22 @@ export class RoomMapEntity extends AbstractEntity {
                 for (var w = 0; w < objData.width; w++) {
                   for (var h = 0; h < objData.height; h++) {
                     if (bkColor != false) {
-                      this.drawingCache[0].paint((location.x+w)*2, (location.y+h)*2, 2, 2, bkColor);
+                      this.paintRect((location.x+w)*2, (location.y+h)*2, 2, 2, bkColor);
                     }
                     switch (objectType) {
                       case 'floors':
                         if (bkColor === false || penColor != roomBkColor) {
-                          this.drawingCache[0].paint((location.x+w)*2, (location.y+h)*2, 2, 1, penColor);
+                          this.paintRect((location.x+w)*2, (location.y+h)*2, 2, 1, penColor);
                         }
-                        this.drawingCache[0].paint((location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
+                        this.paintRect((location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
                         break;
                       case 'walls':
-                        this.drawingCache[0].paint((location.x+w)*2, (location.y+h)*2, 1, 1, penColor);
-                        this.drawingCache[0].paint((location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
+                        this.paintRect((location.x+w)*2, (location.y+h)*2, 1, 1, penColor);
+                        this.paintRect((location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
                         break;
                       case 'nasties':
-                        this.drawingCache[0].paint((location.x+w)*2, (location.y+h)*2, 2, 1, penColor);
-                        this.drawingCache[0].paint((location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
+                        this.paintRect((location.x+w)*2, (location.y+h)*2, 2, 1, penColor);
+                        this.paintRect((location.x+w)*2+1, (location.y+h)*2+1, 1, 1, penColor);
                         break;
                     }
                   }
@@ -175,7 +185,7 @@ export class RoomMapEntity extends AbstractEntity {
                 var penColor = ZXColor.penAttrColor(attr);
                 var bkColor = ZXColor.bkAttrColor(attr);
                 if (bkColor != false) {
-                  this.drawingCache[0].paint(column*2, r*2, 2, 2, bkColor);
+                  this.paintRect(column*2, r*2, 2, 2, bkColor);
                 }
                 switch (idItem) {
                   case 'floor':
@@ -183,20 +193,20 @@ export class RoomMapEntity extends AbstractEntity {
                       bkColor = false;
                     }
                     if (bkColor === false || penColor != roomBkColor) {
-                      this.drawingCache[0].paint(column*2, r*2, 2, 1, penColor);
+                      this.paintRect(column*2, r*2, 2, 1, penColor);
                     }
-                    this.drawingCache[0].paint(column*2+1, r*2+1, 1, 1, penColor);
+                    this.paintRect(column*2+1, r*2+1, 1, 1, penColor);
                     break;
                   case 'wall':
-                    this.drawingCache[0].paint(column*2, r*2, 1, 1, penColor);
-                    this.drawingCache[0].paint(column*2+1, r*2+1, 1, 1, penColor);
+                    this.paintRect(column*2, r*2, 1, 1, penColor);
+                    this.paintRect(column*2+1, r*2+1, 1, 1, penColor);
                     break;
                   case 'nasty':
-                    this.drawingCache[0].paint(column*2, r*2, 2, 1, penColor);
-                    this.drawingCache[0].paint(column*2, r*2+1, 1, 1, penColor);
+                    this.paintRect(column*2, r*2, 2, 1, penColor);
+                    this.paintRect(column*2, r*2+1, 1, 1, penColor);
                     break;
                   default:
-                    this.drawingCache[0].paint(column*2, r*2, 2, 2, penColor);
+                    this.paintRect(column*2, r*2, 2, 2, penColor);
                     break;
                 }
               }
@@ -223,9 +233,9 @@ export class RoomMapEntity extends AbstractEntity {
           }
           locations.forEach((location) => {
             for (var pos = 0; pos < rampData.length; pos++) {
-              this.drawingCache[0].paint((location.x+pos*gradient)*2, (location.y-pos)*2, 2, 2, bkColor);
-              this.drawingCache[0].paint((location.x+pos*gradient)*2+corrX, (location.y-pos)*2, 1, 1, penColor);
-              this.drawingCache[0].paint((location.x+pos*gradient)*2-gradient+corrX, (location.y-pos)*2+1, 1, 1, penColor);
+              this.paintRect((location.x+pos*gradient)*2, (location.y-pos)*2, 2, 2, bkColor);
+              this.paintRect((location.x+pos*gradient)*2+corrX, (location.y-pos)*2, 1, 1, penColor);
+              this.paintRect((location.x+pos*gradient)*2-gradient+corrX, (location.y-pos)*2+1, 1, 1, penColor);
             }
           });
         });
@@ -236,8 +246,8 @@ export class RoomMapEntity extends AbstractEntity {
             var attr = Tool.hexToInt(conveyorData.data.substring(0, 2));
             var penColor = ZXColor.penAttrColor(attr);
             var bkColor = ZXColor.bkAttrColor(attr);
-            this.drawingCache[0].paint(conveyorData.location.x*2, conveyorData.location.y*2, conveyorData.length*2, 2, bkColor);
-            this.drawingCache[0].paint(conveyorData.location.x*2, conveyorData.location.y*2, conveyorData.length*2, 1, penColor);
+            this.paintRect(conveyorData.location.x*2, conveyorData.location.y*2, conveyorData.length*2, 2, bkColor);
+            this.paintRect(conveyorData.location.x*2, conveyorData.location.y*2, conveyorData.length*2, 1, penColor);
           });
         }
 
@@ -250,7 +260,7 @@ export class RoomMapEntity extends AbstractEntity {
             var ptr = Math.abs(ropeData.init.frame);
             for (var r = 0; r <= ropeData.length; r++) {
               if (r%4 == 0) {
-                this.drawingCache[0].paint(Math.floor(x/4), Math.floor(y/4), 1, 1, color);
+                this.paintRect(Math.floor(x/4), Math.floor(y/4), 1, 1, color);
               }
               x += ropeData.relativeCoordinates[0][ptr]*Math.sign(ropeData.init.frame);
               y += ropeData.relativeCoordinates[1][ptr];
@@ -272,15 +282,15 @@ export class RoomMapEntity extends AbstractEntity {
                       for (var c = 0; c < guardianDefs.mapSprite[r].length; c++) {
                         if (guardianDefs.mapSprite[r][c] == '#') {
                           if (guardian.init.direction == 1) {
-                            this.drawingCache[0].paint(Math.floor(guardian.init.x/4)+guardianDefs.mapSprite[r].length-c-1, Math.floor(guardian.init.y/4)+r, 1, 1, penColor);
+                            this.paintRect(Math.floor(guardian.init.x/4)+guardianDefs.mapSprite[r].length-c-1, Math.floor(guardian.init.y/4)+r, 1, 1, penColor);
                           } else {
-                            this.drawingCache[0].paint(Math.floor(guardian.init.x/4)+c, Math.floor(guardian.init.y/4)+r, 1, 1, penColor);
+                            this.paintRect(Math.floor(guardian.init.x/4)+c, Math.floor(guardian.init.y/4)+r, 1, 1, penColor);
                           }
                         }
                       }
                     }
                   } else {
-                    this.drawingCache[0].paint(
+                    this.paintRect(
                       Math.floor(guardian.init.x/4),
                       Math.floor(guardian.init.y/4),
                       Math.floor(guardianDefs.width/4),
@@ -297,8 +307,8 @@ export class RoomMapEntity extends AbstractEntity {
         // items
         var itemColor = 3;
         this.app.items[this.roomNumber].forEach((item) => {
-          this.drawingCache[0].paint(item.x*2, item.y*2, 1, 1, ZXColor.color(itemColor));
-          this.drawingCache[0].paint(item.x*2+1, item.y*2+1, 1, 1, ZXColor.color(itemColor));
+          this.paintRect(item.x*2, item.y*2, 1, 1, ZXColor.color(itemColor));
+          this.paintRect(item.x*2+1, item.y*2+1, 1, 1, ZXColor.color(itemColor));
           if (!('matchColorsOfItems' in this.roomData) && (!this.roomData.matchColorsOfItems)) {
             itemColor = Tool.cycleInc(itemColor, 3, 6);
           }
@@ -310,16 +320,16 @@ export class RoomMapEntity extends AbstractEntity {
             var penColor = ZXColor.penAttrColor(Tool.hexToInt(switche.attribute));
             var bkColor = ZXColor.bkAttrColor(Tool.hexToInt(switche.attribute));
             if ('mapSprite' in switche) {
-              this.drawingCache[0].paint(Math.floor(switche.x*2), Math.floor(switche.y*2), switche.width/4, switche.height/4, bkColor);
+              this.paintRect(Math.floor(switche.x*2), Math.floor(switche.y*2), switche.width/4, switche.height/4, bkColor);
               for (var r = 0; r < switche.mapSprite.length; r++) {
                 for (var c = 0; c < switche.mapSprite[r].length; c++) {
                   if (switche.mapSprite[r][c] == '#') {
-                    this.drawingCache[0].paint(Math.floor(switche.x*2)+c, Math.floor(switche.y*2)+r, 1, 1, penColor);
+                    this.paintRect(Math.floor(switche.x*2)+c, Math.floor(switche.y*2)+r, 1, 1, penColor);
                   }
                 }
               }
             } else {
-              this.drawingCache[0].paint(
+              this.paintRect(
                 Math.floor(switche.x*2),
                 Math.floor(switche.y*2),
                 Math.floor(switche.width/4),
@@ -330,8 +340,9 @@ export class RoomMapEntity extends AbstractEntity {
           });
         }
 
+        cache.ctx.putImageData(frame, 0, 0);
       }
-    
+
       if (cropX != 0 || cropY != 0) {
         this.app.layout.paintCropCache(this, 0, cropX, cropY, cropX, cropY);
       } else {

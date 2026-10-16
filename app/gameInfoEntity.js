@@ -32,7 +32,10 @@ export class GameInfoEntity extends AbstractEntity {
       itemsLabel = 'Items remaining';
       itemsCounter = this.app.totalItems-itemsCounter;
     }
-    this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 1*8, 2*8, 13*8, 8, itemsLabel, false, false, {penColorsMap: penColorsMap}));
+    // the first seven letters run through the palette (penColorsMap), the rest
+    // is white — the pen colour; before 2026-09-07 it was false, and the rest
+    // came out white only because DrawingCache.paint(false) kept the last colour
+    this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 1*8, 2*8, 13*8, 8, itemsLabel, ZXColor.white, false, {penColorsMap: penColorsMap}));
     this.itemsCollectedEntity = new TextEntity(this, this.app.fonts.zxFonts8x8Mono, 15*8, 2*8, 3*8, 8, itemsCounter.toString().padStart(3, '0'), ZXColor.white, false, {});
     this.addEntity(this.itemsCollectedEntity);
     this.addEntity(new TextEntity(this, this.app.fonts.zxFonts8x8, 20*8, 2*8, 4*8, 8, 'Time', ZXColor.white, false, {}));
@@ -40,7 +43,8 @@ export class GameInfoEntity extends AbstractEntity {
     for (var c = 0; c < 7; c++) {
       penColorsMap[c] = ZXColor.color(7-c);
     }
-    this.timeEntity = new TextEntity(this, this.app.fonts.zxFonts8x8, 25*8, 2*8, 6*8, 8, this.app.timeStr, false, false, {align: 'right', penColorsMap: penColorsMap});
+    // seven colours for seven characters; an eighth ("12:00 am") is white
+    this.timeEntity = new TextEntity(this, this.app.fonts.zxFonts8x8, 25*8, 2*8, 6*8, 8, this.app.timeStr, ZXColor.white, false, {align: 'right', penColorsMap: penColorsMap});
     this.addEntity(this.timeEntity);
     for (var l = 0; l < this.app.lives; l++) {
       this.liveEntities[l] = new SpriteEntity(this, l*16, 5*8, ZXColor[this.liveColors[l]], false, 0, 0);
