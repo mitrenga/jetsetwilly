@@ -16,7 +16,7 @@ Supported:
 
 
 ## Play now
-https://jetsetwilly.free
+https://jetsetwilly.remake.free
 
 
 ## Requirements

@@ -31,10 +31,12 @@ class AboutPage extends AbstractAboutPage {
             'charge. The game supports keyboard, touch controls and gamepads.</p>',
         ],
         [
-          'heading' => 'Other game',
+          'heading' => 'Other games',
           'html' =>
-            '<p>Also try <a href="https://manicminer.free/" target="_blank" rel="noopener">Manic Miner</a> — '.
-            'the original adventure of Miner Willy, remade for your browser as well.</p>',
+            '<p>Also try <a href="https://manicminer.remake.free/" target="_blank" rel="noopener">Manic Miner</a>, '.
+            'the original adventure of Miner Willy, and '.
+            '<a href="https://sabrewulf.remake.free/" target="_blank" rel="noopener">Sabre Wulf</a>, '.
+            'Ultimate\'s jungle adventure — both remade for your browser as well.</p>',
         ],
       ],
       'links' => [
@@ -45,7 +47,8 @@ class AboutPage extends AbstractAboutPage {
       ],
       'footer' =>
         '<p>An unofficial fan remake. The original game and its artwork belong to their authors. '.
-        'Remake source code is available on <a href="https://github.com/mitrenga/jetsetwilly" target="_blank" rel="noopener">GitHub</a>.</p>',
+        'Remake source code is available on <a href="https://github.com/mitrenga/jetsetwilly" target="_blank" rel="noopener">GitHub</a> '.
+        'under <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank" rel="noopener">CC BY-NC-SA 4.0</a>.</p>',
     ];
   } // aboutData
 
