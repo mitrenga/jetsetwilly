@@ -29,7 +29,7 @@ export class GameApp extends AbstractApp {
     };
 
     this.version = Version;
-    this.copyright = '©␣2026␣Libor␣Mitrenga, CC␣BY⋅NC⋅SA';
+    this.copyright = 'Remake by L. Mitrenga, CC␣BY⋅NC⋅SA';
     this.devModeName = devModeName;
     this.appIconSprite = appIconSprite;
     
@@ -60,7 +60,7 @@ export class GameApp extends AbstractApp {
     this.fonts.fonts5x5.addSpace('␣', {width: 2, breaking: false, stretch: true});
 
     this.fonts.zxFonts8x8.addGlyphs('‗⋅', '000000000000F8F80000000030000000');
-    this.fonts.zxFonts8x8.addSpace('␣', {width: 3, breaking: false, stretch: false});
+    this.fonts.zxFonts8x8.addSpace('␣', {width: 4, breaking: false, stretch: false});
 
 
     this.controlsOptions = {
@@ -94,46 +94,49 @@ export class GameApp extends AbstractApp {
           {action: 'exit', label: 'EXIT', eventKey: 'GamepadExit'}
         ]
       },
+      // Jedna polovina obrazovky je páka (chůze vlevo a vpravo), druhá skok;
+      // která je která, je volba pro leváky a praváky v SETTINGS. Tvar je
+      // tentýž jako u sourozenců (booty, sabrewulf, jetpac …): `types` říká,
+      // která polovina je na které straně (`sprite` je ikona v SETTINGS),
+      // `halves` co polovina dělá a `zones` její dotykové plochy – `rect` je
+      // zlomek poloviny ([x, y, šířka, výška]), takže rozložení nezávisí na
+      // velikosti displeje.
       touchscreen: {
         device: 'touchscreen',
         types: {
+          // první klíč je i náhrada za poškozenou cookie
           keys: [
             'leftJump',
             'rightJump'
           ],
           leftJump: {
-            left: {
-              type: 'button',
-              control: false,
-              action: 'jump',
-              actions: false,
-              sprite: 'jump'
-            },
-            right: {
-              type: 'joystick',
-              control: 'horizontal',
-              action: false,
-              actions: ['left', 'right'],
-              sprite: 'left-right'
-            }
+            left: {half: 'jump', sprite: 'jump'},
+            right: {half: 'walk', sprite: 'left-right'}
           },
           rightJump: {
-            left: {
-              type: 'joystick',
-              control: 'horizontal',
-              action: false,
-              actions: ['left', 'right'],
-              sprite: 'left-right'
-            },
-            right: {
-              type: 'button',
-              control: false,
-              action: 'jump',
-              actions: false,
-              sprite: 'jump'
-            }
+            left: {half: 'walk', sprite: 'left-right'},
+            right: {half: 'jump', sprite: 'jump'}
           }
         },
+        halves: {
+          // páka jen ve vodorovné ose: Willy chodí, nahoru a dolů nic není
+          walk: {
+            icon: 'left-right',
+            zones: [
+              {rect: [0, 0, 1, 1], type: 'joystick', control: 'horizontal',
+               actions: {left: 'left', right: 'right'}}
+            ]
+          },
+          jump: {
+            icon: 'jump',
+            zones: [
+              {rect: [0, 0, 1, 1], type: 'button', action: 'jump'}
+            ]
+          }
+        },
+        // o kolik pixelů od posledního středu musí prst ujet, než páka změní
+        // směr (páka je relativní, viz touchMove)
+        joystickStep: 10,
         icons: {
           jump: {
             compressedSpriteData: 'lP101300N0A970111030Z0510122382012345617171859'
@@ -263,7 +266,7 @@ export class GameApp extends AbstractApp {
     }
     switch (model) {
       case 'LoadingModel':
-        this.model = new ZXResetModel(this, this.copyright);
+        this.model = new ZXResetModel(this);
         break;
       case 'MenuModel':
         this.model = new MenuModel(this, selectionItem);

@@ -1,5 +1,7 @@
 const { AbstractEntity } = await import('./svision/js/abstractEntity.js?ver='+window.srcVersion);
 const { ButtonEntity } = await import('./svision/js/platform/canvas2D/buttonEntity.js?ver='+window.srcVersion);
+const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
+const { SpriteTool } = await import('./svision/js/spriteTool.js?ver='+window.srcVersion);
 const { TextEntity } = await import('./svision/js/platform/canvas2D/textEntity.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
 const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
@@ -28,6 +30,11 @@ export class BorderEntity  extends AbstractEntity {
 
     this.leftControlEntity = null;
     this.rightControlEntity = null;
+    // Ikona toho, co která polovina obrazovky dělá: šipky vlevo/vpravo na
+    // jedné a skok na druhé. Kreslí se **jen do okraje**, ne přes hrací plochu.
+    this.leftIconEntity = null;
+    this.rightIconEntity = null;
+    this.gameControlIcons = false;
     this.devModeNameEntity = null;
   } // constructor
 
@@ -47,23 +54,95 @@ export class BorderEntity  extends AbstractEntity {
       this.addEntity(this.leftControlEntity);
       this.rightControlEntity = new AbstractEntity(this, 0, 0, 0, 0, false, false);
       this.addEntity(this.rightControlEntity);
+
+      this.leftIconEntity = new SpriteEntity(this, 0, 0, ZXColor.white, false, 0, 0);
+      this.leftIconEntity.hide = true;
+      this.addEntity(this.leftIconEntity);
+      this.rightIconEntity = new SpriteEntity(this, 0, 0, ZXColor.white, false, 0, 0);
+      this.rightIconEntity.hide = true;
+      this.addEntity(this.rightIconEntity);
     }
 
     if (this.app.devModeName !== false) {
       this.devModeNameEntity = new TextEntity(this, this.app.fonts.fonts5x5, 0, -7, 100, 7, '', false, false, {margin: 1});
       var cfgLen = this.app.devModeName.indexOf('}');
       this.devModeNameEntity.setText(this.app.devModeName.substring(cfgLen+1));
+      var cfg = null;
       try {
-        var cfg = JSON.parse(this.app.devModeName.substring(1, cfgLen+1));
+        cfg = JSON.parse(this.app.devModeName.substring(1, cfgLen+1));
         Object.keys(cfg).forEach((item) => {
           this.devModeNameEntity[item] = cfg[item];
         });
       } catch (error) {
         console.error(error.message);
       }
+      // no width in the configuration: the banner is as wide as its text (R-025)
+      if (!cfg || !('width' in cfg)) {
+        this.devModeNameEntity.width = this.devModeNameEntity.lineWidth(this.devModeNameEntity.text)+2;
+      }
       this.addEntity(this.devModeNameEntity);
     }
   } // init
+
+  /**
+   * Nastaví ikony dotykového ovládání pro obě poloviny obrazovky.
+   * @param {Object|false} left - Ikona levé poloviny (`controlsOptions.touchscreen.icons`).
+   * @param {Object|false} right - Ikona pravé poloviny.
+   */
+  setGameControlIcons(left, right) {
+    if (!this.enableGameControls) {
+      return;
+    }
+    this.gameControlIcons = !!(left && right);
+    [{entity: this.leftIconEntity, icon: left},
+     {entity: this.rightIconEntity, icon: right}].forEach((item) => {
+      if (item.icon) {
+        item.entity.setGraphicsData('compressedSpriteData' in item.icon
+                                    ? SpriteTool.decode(item.icon.compressedSpriteData)
+                                    : item.icon);
+      }
+    });
+    this.layoutGameControlIcons();
+  } // setGameControlIcons
+
+  /**
+   * Uloží ikony do okraje: když je okraj po stranách dost široký (telefon na
+   * šířku), jde každá ke své polovině; když je dost vysoký ten dolní (telefon
+   * na výšku), jdou obě pod hrací plochu. Jinak se nekreslí – přes hru ne.
+   */
+  layoutGameControlIcons() {
+    if (!this.enableGameControls || !this.leftIconEntity || this.model == null) {
+      return;
+    }
+    var icons = [this.leftIconEntity, this.rightIconEntity];
+    if (!this.gameControlIcons || icons.some((icon) => icon.width == 0)) {
+      icons.forEach((icon) => { icon.hide = true; });
+      return;
+    }
+    var margin = 2;
+    var beside = Math.max(...icons.map((icon) => icon.width))+2*margin;
+    var below = Math.max(...icons.map((icon) => icon.height))+2*margin;
+    if (this.model.borderWidth >= beside) {
+      // telefon na šířku: ke každé polovině její ikona, do postranního okraje
+      icons.forEach((icon, i) => {
+        icon.x = (i == 0 ? 0 : this.width-this.model.borderWidth)
+                 +Math.floor((this.model.borderWidth-icon.width)/2);
+        icon.y = Math.floor((this.height-icon.height)/2);
+        icon.hide = false;
+      });
+    } else if (this.model.borderHeight >= below) {
+      // telefon na výšku: obě do dolního okraje, každá nad svou polovinu
+      var top = this.height-this.model.borderHeight;
+      icons.forEach((icon, i) => {
+        icon.x = Math.floor(this.width*(1+2*i)/4-icon.width/2);
+        icon.y = top+Math.floor((this.model.borderHeight-icon.height)/2);
+        icon.hide = false;
+      });
+    } else {
+      // na okraj se nevejdou a přes hrací plochu se nekreslí
+      icons.forEach((icon) => { icon.hide = true; });
+    }
+  } // layoutGameControlIcons
 
   drawEntity() {
     super.drawEntity();
@@ -176,6 +255,8 @@ export class BorderEntity  extends AbstractEntity {
           this.rightControlEntity.y = 0;
           this.rightControlEntity.width = w;
           this.rightControlEntity.height = this.height;
+
+          this.layoutGameControlIcons();
         }
 
         if (this.devModeNameEntity) {

@@ -4,7 +4,6 @@ const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion
 const { GameAreaEntity } = await import('./gameAreaEntity.js?ver='+window.srcVersion);
 const { GameInfoEntity } = await import('./gameInfoEntity.js?ver='+window.srcVersion);
 const { PauseGameEntity } = await import('./pauseGameEntity.js?ver='+window.srcVersion);
-const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
 const { SpriteTool } = await import('./svision/js/spriteTool.js?ver='+window.srcVersion);
 const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
 // begin code
@@ -57,6 +56,8 @@ export class RoomModel extends AbstractModel {
     this.desktopEntity.addEntity(this.gameAreaEntity);
     this.gameInfoEntity = new GameInfoEntity(this.desktopEntity, 0, 16*8, 32*8, 8*8);
     this.desktopEntity.addEntity(this.gameInfoEntity);
+
+    this.showTouchIcons();
 
     this.app.stack.flashState = false;
     this.sendEvent(330, {id: 'changeFlashState'});
@@ -287,7 +288,7 @@ export class RoomModel extends AbstractModel {
             return true;
 
           case 'Touch':
-            this.touchEnd(event, 'left');
+            this.touchEnd(event);
             return true;
 
           case this.app.controls.keyboard.right:
@@ -391,16 +392,66 @@ export class RoomModel extends AbstractModel {
     return false;
   } // handleEvent
 
-  touchStart(event, side) {
-    var ts = this.app.controlsOptions.touchscreen.types[this.app.controls.touchscreen.type][side];
-    if (ts.type == 'button') {
-      this.sendWorkerMessage({id: 'controls', action: ts.action, value: true});
+  /**
+   * Ikony do okraje: co která polovina obrazovky dělá (šipky vlevo/vpravo,
+   * skok). Která je která, říká volba v SETTINGS (`controls.touchscreen.type`);
+   * obrázky jsou `controlsOptions.touchscreen.icons` podle `icon` poloviny.
+   */
+  showTouchIcons() {
+    if (!this.app.controls.touchscreen.supported || !this.borderEntity) {
+      return;
     }
-    this.app.inputEventsManager.touchesGameControls[event.identifier] = {center: {x: event.x, y: event.y}, type: ts.type, control: ts.control, action: ts.action, actions: ts.actions};
+    var icons = this.app.controlsOptions.touchscreen.icons;
+    this.borderEntity.setGameControlIcons(icons[this.touchHalf('left').icon], icons[this.touchHalf('right').icon]);
+  } // showTouchIcons
+
+  /**
+   * Co dělá tahle polovina obrazovky (`controlsOptions.touchscreen.halves`):
+   * páka, nebo skok, podle volby pro leváky a praváky v SETTINGS.
+   * @param {string} side - 'left' nebo 'right'.
+   * @returns {Object} {icon, zones}
+   */
+  touchHalf(side) {
+    var ts = this.app.controlsOptions.touchscreen;
+    return ts.halves[ts.types[this.app.controls.touchscreen.type][side].half];
+  } // touchHalf
+
+  /**
+   * Plocha poloviny pod prstem. `rect` je zlomek poloviny, takže se počítá
+   * z toho, kde na polovině prst je, ne z pixelů.
+   * @param {Object} event - Dotyk (x, y).
+   * @param {string} side - 'left' nebo 'right'.
+   * @returns {Object|false} Plocha, nebo false.
+   */
+  touchZone(event, side) {
+    var entity = side == 'left' ? this.borderEntity.leftControlEntity : this.borderEntity.rightControlEntity;
+    var half = this.touchHalf(side);
+    var rx = (event.x-(entity.parentX+entity.x))/Math.max(entity.width, 1);
+    var ry = (event.y-(entity.parentY+entity.y))/Math.max(entity.height, 1);
+    for (var z = 0; z < half.zones.length; z++) {
+      var r = half.zones[z].rect;
+      if (rx >= r[0] && rx <= r[0]+r[2] && ry >= r[1] && ry <= r[1]+r[3]) {
+        return half.zones[z];
+      }
+    }
+    return false;
+  } // touchZone
+
+  touchStart(event, side) {
+    var zone = this.touchZone(event, side);
+    if (zone === false) {
+      return;
+    }
+    // tlačítko drží akci od chvíle, kdy prst dosedne; páka nedělá nic,
+    // dokud se prst nepohne
+    var action = zone.type == 'button' ? zone.action : false;
+    if (action !== false) {
+      this.sendWorkerMessage({id: 'controls', action: action, value: true});
+    }
+    this.app.inputEventsManager.touchesGameControls[event.identifier] = {center: {x: event.x, y: event.y}, type: zone.type, control: zone.control, action: action, actions: zone.actions || false};
   } // touchStart
 
-  touchEnd(event, side) {
-    var ts = this.app.controlsOptions.touchscreen.types[this.app.controls.touchscreen.type][side];
+  touchEnd(event) {
     if (event.identifier in this.app.inputEventsManager.touchesGameControls) {
       if (this.app.inputEventsManager.touchesGameControls[event.identifier].action !== false) {
         this.sendWorkerMessage({id: 'controls', action: this.app.inputEventsManager.touchesGameControls[event.identifier].action, value: false});
@@ -409,35 +460,45 @@ export class RoomModel extends AbstractModel {
     }
   } // touchEnd
 
+  /**
+   * Prst se pohnul. Páka je **relativní**: ujede-li prst od středu víc než
+   * `joystickStep`, směr se přepne a střed jde za prstem – směr tedy drží,
+   * dokud prst nejede opačně, i když se vrátí, kde dosedl.
+   * @param {Object} event - Dotyk.
+   */
   touchMove(event) {
     if (event.identifier in this.app.inputEventsManager.touchesGameControls) {
       var touchGameControl = this.app.inputEventsManager.touchesGameControls[event.identifier];
       var action = touchGameControl.action;
       if (touchGameControl.type == 'joystick') {
+        var step = this.app.controlsOptions.touchscreen.joystickStep;
+        var actions = touchGameControl.actions;
         switch (touchGameControl.control) {
           case 'horizontal':
-            if (event.x-touchGameControl.center.x < -10) {
-              action = touchGameControl.actions[0];
+            if (event.x-touchGameControl.center.x < -step) {
+              action = actions.left;
               touchGameControl.center.x = event.x;
             }
-            if (event.x-touchGameControl.center.x > 10) {
-              action = touchGameControl.actions[1];
+            if (event.x-touchGameControl.center.x > step) {
+              action = actions.right;
               touchGameControl.center.x = event.x;
             }
             break;
           case 'vertical':
-            if (event.y-touchGameControl.center.y < -10) {
-              action = touchGameControl.actions[0];
+            if (event.y-touchGameControl.center.y < -step) {
+              action = actions.up;
               touchGameControl.center.y = event.y;
             }
-            if (event.y-touchGameControl.center.y > 10) {
-              action = touchGameControl.actions[1];
+            if (event.y-touchGameControl.center.y > step) {
+              action = actions.down;
               touchGameControl.center.y = event.y;
             }
             break;
         }
         if (touchGameControl.action !== action) {
-          this.sendWorkerMessage({id: 'controls', action: touchGameControl.action, value: false});
+          if (touchGameControl.action !== false) {
+            this.sendWorkerMessage({id: 'controls', action: touchGameControl.action, value: false});
+          }
           touchGameControl.action = action;
           this.sendWorkerMessage({id: 'controls', action: touchGameControl.action, value: true});
         }
