@@ -12,7 +12,7 @@ DEALLOCATE PREPARE stmt;
 
 CREATE TABLE IF NOT EXISTS rg_jsw_hallOfFame (
   `ndx` BIGINT(20) NOT NULL AUTO_INCREMENT,
-  `name` CHAR(64) NOT NULL,
+  `name` CHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
   `score` BIGINT(20) NOT NULL,
   `completed` INT(11) NOT NULL,
   `created` TIMESTAMP NOT NULL,
