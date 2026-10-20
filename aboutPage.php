@@ -28,7 +28,7 @@ class AboutPage extends AbstractAboutPage {
           'html' =>
             '<p>This is a faithful remake of the original game. It runs directly in your web browser — '.
             'there is nothing to install and nothing to download, just open the page and play, free of '.
-            'charge. The game supports keyboard, touch controls and gamepads.</p>',
+            'charge. The game supports keyboard, touch controls and gamepads.</p>'.$this->installNote(),
         ],
         [
           'heading' => 'Other games',
