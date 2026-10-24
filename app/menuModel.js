@@ -5,16 +5,16 @@ const { BorderEntity } = await import('./borderEntity.js?ver='+window.srcVersion
 const { MenuEntity } = await import('./svision/js/platform/canvas2D/menuEntity.js?ver='+window.srcVersion);
 const { SignboardFonts } = await import('./signboardFonts.js?ver='+window.srcVersion);
 const { SpriteEntity } = await import('./svision/js/platform/canvas2D/spriteEntity.js?ver='+window.srcVersion);
-const { ZXPlayerNameEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxPlayerNameEntity.js?ver='+window.srcVersion);
+const { ZXPlayerNameEntity } = await import('./svision/js/platform/canvas2D/zx/zxPlayerNameEntity.js?ver='+window.srcVersion);
 const { HallOfFameEntity } = await import('./hallOfFameEntity.js?ver='+window.srcVersion);
-const { ZXVolumeEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxVolumeEntity.js?ver='+window.srcVersion);
-const { ZXSettingsEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxSettingsEntity.js?ver='+window.srcVersion);
+const { ZXVolumeEntity } = await import('./svision/js/platform/canvas2D/zx/zxVolumeEntity.js?ver='+window.srcVersion);
+const { ZXSettingsEntity } = await import('./svision/js/platform/canvas2D/zx/zxSettingsEntity.js?ver='+window.srcVersion);
 const { AboutEntity } = await import('./aboutEntity.js?ver='+window.srcVersion);
-const { ZXWaitForAudioEventEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxWaitForAudioEventEntity.js?ver='+window.srcVersion);
+const { ZXWaitForAudioEventEntity } = await import('./svision/js/platform/canvas2D/zx/zxWaitForAudioEventEntity.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
-const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
-const { ZXDialogEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxDialogEntity.js?ver='+window.srcVersion);
-const { ZXDialogProperties } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxDialogProperties.js?ver='+window.srcVersion);
+const { ZXColor } = await import('./svision/js/platform/canvas2D/zx/zxColor.js?ver='+window.srcVersion);
+const { ZXDialogEntity } = await import('./svision/js/platform/canvas2D/zx/zxDialogEntity.js?ver='+window.srcVersion);
+const { ZXDialogProperties } = await import('./svision/js/platform/canvas2D/zx/zxDialogProperties.js?ver='+window.srcVersion);
 // begin code
 
 export class MenuModel extends AbstractModel {

@@ -1,19 +1,19 @@
 const { Version } = await import('./version.js?ver='+window.srcVersion);
 const { AbstractApp } = await import('./svision/js/abstractApp.js?ver='+window.srcVersion);
 const { AudioManager } = await import('./audioManager.js?ver='+window.srcVersion);
-const { ZXFonts8x8 } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxFonts8x8.js?ver='+window.srcVersion);
+const { ZXFonts8x8 } = await import('./svision/js/platform/canvas2D/zx/zxFonts8x8.js?ver='+window.srcVersion);
 const { Fonts5x5 } = await import('./svision/js/platform/canvas2D/fonts5x5.js?ver='+window.srcVersion);
 const { Fonts3x3 } = await import('./svision/js/platform/canvas2D/fonts3x3.js?ver='+window.srcVersion);
-const { ZXResetModel } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxResetModel.js?ver='+window.srcVersion);
+const { ZXResetModel } = await import('./svision/js/platform/canvas2D/zx/zxResetModel.js?ver='+window.srcVersion);
 const { MenuModel } = await import('./menuModel.js?ver='+window.srcVersion);
 const { MainModel } = await import('./mainModel.js?ver='+window.srcVersion);
 const { RoomsMapModel } = await import('./roomsMapModel.js?ver='+window.srcVersion);
 const { RoomModel } = await import('./roomModel.js?ver='+window.srcVersion);
 const { GameOverModel } = await import('./gameOverModel.js?ver='+window.srcVersion);
 const { TapeLoadingModel } = await import('./tapeLoadingModel.js?ver='+window.srcVersion);
-const { ZXErrorEntity } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxErrorEntity.js?ver='+window.srcVersion);
+const { ZXErrorEntity } = await import('./svision/js/platform/canvas2D/zx/zxErrorEntity.js?ver='+window.srcVersion);
 const { Tool } = await import('./svision/js/tool.js?ver='+window.srcVersion);
-const { ZXColor } = await import('./svision/js/platform/canvas2D/zxSpectrum/zxColor.js?ver='+window.srcVersion);
+const { ZXColor } = await import('./svision/js/platform/canvas2D/zx/zxColor.js?ver='+window.srcVersion);
 // begin code
 
 export class GameApp extends AbstractApp {
