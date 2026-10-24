@@ -3,3 +3,4 @@ config/config.php
 js
 test*
 tmp*
+CHAT.md
