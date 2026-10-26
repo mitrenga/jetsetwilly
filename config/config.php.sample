@@ -4,3 +4,7 @@
   $dbName = 'manicminer';
   $dbUser = 'your-user-name';
   $dbPassword = 'your-password';
+
+  // used by the statistics page (~/sw/stats), ignored by the game itself
+  $gameName = 'Jet Set Willy';
+  $hallOfFameTable = 'rg_jsw_hallOfFame';
