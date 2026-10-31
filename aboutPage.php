@@ -43,7 +43,6 @@ class AboutPage extends AbstractAboutPage {
         ['label' => 'Jet Set Willy on Wikipedia', 'url' => 'https://en.wikipedia.org/wiki/Jet_Set_Willy'],
         ['label' => 'Matthew Smith on Wikipedia', 'url' => 'https://en.wikipedia.org/wiki/Matthew_Smith_(games_programmer)'],
         ['label' => 'Game archive on World of Spectrum', 'url' => 'https://worldofspectrum.net/item/0002589/'],
-        ['label' => 'Retro Games — more classic remakes playable in your browser', 'url' => 'https://retrogames.free/'],
       ],
       'footer' =>
         '<p>An unofficial fan remake. The original game and its artwork belong to their authors. '.

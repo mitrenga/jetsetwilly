@@ -371,14 +371,15 @@ export class GameApp extends AbstractApp {
   setGlobalData(data) {
     this.applyGlobalData(data.data.global);
 
+    var files = {};
     Object.keys(data.data).forEach((key) => {
       if (key != 'global') {
-        this.saveDataToStorage(key, data.data[key]);
+        files[key] = data.data[key];
       }
     });
-    // save global last: its presence in storage marks the whole appData save
-    // as complete, which the offline fallback relies on
-    this.saveDataToStorage('global', data.data.global);
+    // global goes last; a full localStorage is cleared and tried once more
+    // (R-062)
+    this.saveAppDataToStorage(files, data.data.global);
   } // setGlobalData
 
   // Load the application data: from the server when online (which also refreshes
