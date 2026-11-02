@@ -8,3 +8,4 @@
   // used by the statistics page (~/sw/stats), ignored by the game itself
   $gameName = 'Jet Set Willy';
   $hallOfFameTable = 'rg_jsw_hallOfFame';
+  $hallOfFameRank = ['score' => 'DESC', 'completed' => 'DESC'];
