@@ -170,21 +170,9 @@ export class MenuModel extends AbstractModel {
           case 1:
             return self.app.playerName;
           case 3:
-            switch (self.app.audioManager.volume.sounds) {
-              case 0:
-                return 'OFF';
-              case 10:
-                return 'MAX';
-            }
-            return (self.app.audioManager.volume.sounds*10)+'%';
+            return ZXVolumeEntity.levelText(self.app.audioManager.volume.sounds);
           case 4:
-            switch (self.app.audioManager.volume.music) {
-              case 0:
-                return 'OFF';
-              case 10:
-                return 'MAX';
-            }
-            return (self.app.audioManager.volume.music*10)+'%';
+            return ZXVolumeEntity.levelText(self.app.audioManager.volume.music);
         }
         break;
 
